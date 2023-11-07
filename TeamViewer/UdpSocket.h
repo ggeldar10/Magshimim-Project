@@ -11,8 +11,10 @@ protected:
 public:
 	UdpSocket();
 	~UdpSocket();
-	/*virtual void sendMsgTo(std::string msg, sockaddr* to);
-	virtual int recv(std::string buffer, int len);*/
+	virtual void sendTo(std::string msg, sockaddr* to);
+	virtual void sendTo(char* msg, sockaddr* to);
+	virtual int recv(std::string buffer, int len);
+	virtual void bind(int port, sockaddr* addrs);
 
 };
 
