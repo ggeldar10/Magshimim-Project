@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 #include "UdpSocket.h"
 #include <algorithm>
@@ -57,18 +57,19 @@ void UdpSocket::sendMsg(std::string msg, sockaddr_in* to) // maybe change later 
 		std::cerr << "Invalid socket" << std::endl;
 		throw "Error socket is null"; //todo add an excpetion
 	}
+	bindUdpSocket(0, to);
 	short length = msg.size() + DATAGRAM_SIZE;
+	short srcPort = this->_port;
 	char* packet = new char[length + 1];
 	memset(packet, 0, length);
-	convertShortToChar(static_cast<short>(to->sin_port), packet + 2); // puts the port in the 2 and 3 positions
+	convertShortToChar(htons(srcPort), packet);
+	convertShortToChar(htons(static_cast<short>(to->sin_port)), packet + 2); // puts the port in the 2 and 3 positions
 	convertShortToChar(length, packet + 4); // puts the length in the 4 and 5 postions
 	strcpy_s(packet + DATAGRAM_SIZE, (length + 1) - DATAGRAM_SIZE, msg.c_str());
-	errno = 0;
 	int bytes = sendto(this->_socket, packet, length + 1, 0, (struct sockaddr*)to, sizeof(sockaddr_in));
 	if (bytes < 0)
 	{
-		int errorCode = WSAGetLastError();
-		std::cerr << "Error sending data: " << errorCode << std::endl;
+		std::cerr << "Error sending data: " << std::endl;
 		perror("send error");
 		delete[] packet;
 		throw "Error while sending";
@@ -126,7 +127,7 @@ int UdpSocket::recvieve(char* buffer, int len)
 				last_message = fullMsg;
 			}
 
-			delete fullMsg;
+			delete[] fullMsg;
 		}
 	}
 	if (len <= last_message.size())
@@ -147,12 +148,45 @@ using a certain port
 input: the port to listen to, the local address
 output: the socket is listening to incoming messages
 */
-void UdpSocket::bindUdpSocket(int port, sockaddr* addrs)
+void UdpSocket::bindUdpSocket(int port, std::string addrs)
 {
-	if (this->_socket == NULL)
+	if (this->_socket == INVALID_SOCKET)
 	{
 		throw "Error: socket is null";
 	}
-	bind(this->_socket, addrs, sizeof(*addrs));
-	this->_port = port;
+	sockaddr_in addrsInfo;
+	memset(&addrsInfo, 0, sizeof(addrsInfo));
+	addrsInfo.sin_family = AF_INET;
+	addrsInfo.sin_port = htons(port);
+	addrsInfo.sin_addr.s_addr = inet_addr(addrs.c_str());
+	bind(this->_socket, reinterpret_cast<sockaddr*>(&addrsInfo), sizeof(addrsInfo));
+	if (port == 0)
+	{
+		int sockLen = sizeof(sockaddr);
+		sockaddr help;
+		getsockname(this->_socket, &help, &sockLen);
+		sockaddr_in* name = reinterpret_cast<sockaddr_in*>(&help);
+		this->_port = name->sin_port;
+	}
+	else 
+	{
+		this->_port = port;
+	}
+}
+
+void UdpSocket::bindUdpSocket(int port, sockaddr_in* addr)
+{
+	bind(this->_socket, reinterpret_cast<sockaddr*>(addr), sizeof(addr));
+	if (port == 0)
+	{
+		int sockLen = sizeof(sockaddr);
+		sockaddr help;
+		getsockname(this->_socket, &help, &sockLen);
+		sockaddr_in* name = reinterpret_cast<sockaddr_in*>(&help);
+		this->_port = name->sin_port;
+	}
+	else
+	{
+		this->_port = port;
+	}
 }
