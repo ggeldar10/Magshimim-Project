@@ -2,19 +2,24 @@
 #include "winapi.h"
 #include <string>
 
-#define FOUR_BYTES 4
+#define DATAGRAM_SIZE 8
+#define EIGHT_BITS 8
+#define DST_PORT_POSITION 2
+#define LENGTH_POSITION 4
 
 class UdpSocket
 {
 protected:
 	SOCKET _socket;
-	int _port;
+	int _port = 0;
+
+	void convertShortToChar(short num, char* str);
 	
 public:
 	UdpSocket();
 	~UdpSocket();
-	virtual int sendTo(std::string msg, sockaddr* to);
-	virtual int sendTo(char* msg, sockaddr* to);
+	virtual void sendMsg(std::string msg, sockaddr_in* to);
+	virtual int sendMsg(char* msg, sockaddr* to);
 	virtual int recvieve(char* buffer, int len);
 	virtual void bindUdpSocket(int port, sockaddr* addrs);
 
