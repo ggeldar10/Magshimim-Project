@@ -80,20 +80,6 @@ void UdpSocket::sendMsg(std::string msg, sockaddr_in* to) // maybe change later 
 	}
 }
 
-/*
-this function will send the msg to the given address
-input: the message to send, the address to send to
-output: the error code of sendto
-*/
-int UdpSocket::sendMsg(char* msg, sockaddr* to)
-{
-	if (this->_socket == NULL)
-	{
-		throw "Error socket is null"; //todo add an excpetion
-	}
-	return sendto(this->_socket, msg, sizeof(msg), 0, to, sizeof(*to));
-}
-
 int UdpSocket::recvieve(char* buffer, int len)
 {
 	if (this->_port == 0)

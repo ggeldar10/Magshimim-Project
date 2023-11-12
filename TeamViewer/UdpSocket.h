@@ -19,7 +19,6 @@ public:
 	UdpSocket();
 	~UdpSocket();
 	virtual void sendMsg(std::string msg, sockaddr_in* to);
-	virtual int sendMsg(char* msg, sockaddr* to);
 	virtual int recvieve(char* buffer, int len);
 	virtual void bindUdpSocket(int port, std::string addr);
 	virtual void bindUdpSocket(int port, sockaddr_in* addr);
