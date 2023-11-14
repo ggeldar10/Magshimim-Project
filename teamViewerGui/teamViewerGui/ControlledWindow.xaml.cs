@@ -10,25 +10,18 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace teamViewerGui
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for ControlledWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class ControlledWindow : Window
     {
-        public MainWindow()
+        public ControlledWindow()
         {
             InitializeComponent();
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            ControllerWindow window = new ControllerWindow();
-            window.Show();
         }
     }
 }
