@@ -71,6 +71,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CommunicatorPipes.cs" />
     <Compile Include="ControlledWindow.xaml.cs">
       <DependentUpon>ControlledWindow.xaml</DependentUpon>
     </Compile>
