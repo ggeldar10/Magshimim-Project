@@ -14,7 +14,6 @@ protected:
 	int _port = 0;
 
 	void convertShortToChar(short num, char* str);
-	
 public:
 	UdpSocket();
 	~UdpSocket();

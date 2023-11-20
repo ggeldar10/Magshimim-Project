@@ -32,6 +32,12 @@ UdpSocket::UdpSocket() : _socket(NULL), _port(0)
 		std::cerr << "Error creating socket" << std::endl;
 		throw std::invalid_argument("Error creating socket"); // change later
 	}
+	sockaddr_in addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(0);
+	addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	bindUdpSocket(0, &addr);
 }
 
 UdpSocket::~UdpSocket()
@@ -57,7 +63,6 @@ void UdpSocket::sendMsg(std::string msg, sockaddr_in* to) // maybe change later 
 		std::cerr << "Invalid socket" << std::endl;
 		throw "Error socket is null"; //todo add an excpetion
 	}
-	bindUdpSocket(0, to);
 	short length = msg.size() + DATAGRAM_SIZE;
 	short srcPort = this->_port;
 	char* packet = new char[length + 1];
