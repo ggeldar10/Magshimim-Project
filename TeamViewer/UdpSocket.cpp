@@ -69,15 +69,10 @@ void UdpSocket::sendMsg(std::string msg, sockaddr_in* to) // maybe change later 
 		throw "Error socket is null"; //todo add an excpetion
 	}
 	UdpPacket udpPacket = createPacket(msg, to);
-	short length = msg.size() + DATAGRAM_SIZE;
-	short srcPort = this->_port;
-	char* packet = new char[length + 1];
-	memset(packet, 0, length);
-	convertShortToChar(htons(srcPort), packet);
-	convertShortToChar(htons(static_cast<short>(to->sin_port)), packet + 2); // puts the port in the 2 and 3 positions
-	convertShortToChar(length, packet + 4); // puts the length in the 4 and 5 postions
-	strcpy_s(packet + DATAGRAM_SIZE, (length + 1) - DATAGRAM_SIZE, msg.c_str());
-	int bytes = sendto(this->_socket, packet, length + 1, 0, (struct sockaddr*)to, sizeof(sockaddr_in));
+	unsigned char* packet = new unsigned char[udpPacket.getLength() + 1];
+	memset(packet, 0, udpPacket.getLength() + 1);
+	udpPacket.convertPacketToChar(packet, udpPacket.getLength() + 1);
+	int bytes = sendto(this->_socket, reinterpret_cast<char*>(packet), udpPacket.getLength() + 1, 0, (struct sockaddr*)to, sizeof(sockaddr_in));
 	if (bytes < 0)
 	{
 		std::cerr << "Error sending data: " << std::endl;

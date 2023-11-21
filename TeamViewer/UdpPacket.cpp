@@ -19,7 +19,7 @@ UdpPacket::UdpPacket(const std::string& payload, const short srcPort, const shor
 	this->_payload = new unsigned char[payload.size() + 1];
 	memcpy_s(this->_payload, payload.size() + 1, payload.c_str(), payload.size());
 	this->_payload[payload.size()] = '\0';
-	this->_length = payload.size() + 1 + DATAGRAM_SIZE;
+	this->_length = payload.size() + DATAGRAM_SIZE;
 }
 
 UdpPacket::~UdpPacket()
@@ -34,15 +34,14 @@ output: the byteArray with the packet
 */
 void UdpPacket::convertPacketToChar(unsigned char* byteArr, int byteArrLen) const
 {
-	if (this->_length - DATAGRAM_SIZE > byteArrLen)
+	if (this->_length >= byteArrLen)
 	{
 		throw std::invalid_argument("the actual length is smaller than the byteArrayLength given");
 	}
-	convertShortToChar(this->_srcPort, byteArr);
-	convertShortToChar(this->_dstPort, byteArr + DST_PORT_POSITION);
+	convertShortToChar(htons(this->_srcPort), byteArr);
+	convertShortToChar(htons(this->_dstPort), byteArr + DST_PORT_POSITION);
 	convertShortToChar(this->_length, byteArr + LENGTH_POSITION);
-	memcpy_s(byteArr, byteArrLen, this->_payload, this->_length - DATAGRAM_SIZE);
-	byteArr[byteArrLen - 1] = '\0';
+	memcpy_s(byteArr + DATAGRAM_SIZE, byteArrLen, this->_payload, this->_length - DATAGRAM_SIZE);
 }
 
 unsigned short UdpPacket::getLength() const
