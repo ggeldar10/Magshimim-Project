@@ -1,6 +1,7 @@
 #pragma once
 #include "winapi.h"
 #include <string>
+#include "UdpPacket.h"
 
 #define DATAGRAM_SIZE 8
 #define EIGHT_BITS 8
@@ -14,6 +15,8 @@ protected:
 	int _port = 0;
 
 	void convertShortToChar(short num, char* str);
+	virtual UdpPacket createPacket(std::string message, sockaddr_in* addrsInfo);
+
 public:
 	UdpSocket();
 	~UdpSocket();

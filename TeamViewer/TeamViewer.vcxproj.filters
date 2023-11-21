@@ -27,12 +27,18 @@
     <ClInclude Include="UdpSocket.h">
       <Filter>Header Files\Communication</Filter>
     </ClInclude>
+    <ClInclude Include="UdpPacket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UdpSocket.cpp">
       <Filter>Source Files\Communication</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UdpPacket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

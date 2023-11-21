@@ -18,6 +18,11 @@ void UdpSocket::convertShortToChar(short num, char* str)
 	str[1] = num & 0xFF;
 }
 
+UdpPacket UdpSocket::createPacket(std::string message, sockaddr_in* addrsInfo)
+{
+	return UdpPacket(message, htons(this->_port), addrsInfo->sin_port);
+}
+
 UdpSocket::UdpSocket() : _socket(NULL), _port(0)
 {
 	WSADATA wsaData;
@@ -63,6 +68,7 @@ void UdpSocket::sendMsg(std::string msg, sockaddr_in* to) // maybe change later 
 		std::cerr << "Invalid socket" << std::endl;
 		throw "Error socket is null"; //todo add an excpetion
 	}
+	UdpPacket udpPacket = createPacket(msg, to);
 	short length = msg.size() + DATAGRAM_SIZE;
 	short srcPort = this->_port;
 	char* packet = new char[length + 1];
