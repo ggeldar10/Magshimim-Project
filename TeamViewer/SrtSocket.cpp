@@ -19,6 +19,8 @@ SrtSocket::SrtSocket()
 
 SrtSocket::~SrtSocket()
 {
+	closesocket(this->_srtSocket);
+	WSACleanup();
 }
 
 void SrtSocket::listen()
