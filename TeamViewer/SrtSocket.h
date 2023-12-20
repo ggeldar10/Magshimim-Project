@@ -1,13 +1,13 @@
 #pragma once
 #include "headers.h"
-#include <deque>
+#include <queue>
 #include <thread>
 #include <string>
 
 struct ConnectionRequestInfo // change if needed
 {
-	short clientPort;
-	short clientIP;
+	uint16_t clientPort;
+	uint16_t clientIP;
 };
 
 class SrtSocket
@@ -15,17 +15,19 @@ class SrtSocket
 private:
 	SOCKET _srtSocket;
 	struct {
-		short _srcPort;
-		short _srcIP;
-		short _dstPort;
-		short _dstIP;
+		uint16_t _srcPort;
+		std::string _srcIP;
+		uint16_t _dstPort;
+		std::string _dstIP;
 	} _packetInfo;
-	std::deque<ConnectionRequestInfo> _connectionQueue;
+	std::queue<ConnectionRequestInfo> _connectionQueue; 
 	std::thread _connectionThread;
 
 public:
+	SrtSocket();
+	~SrtSocket();
 	void listen();
-	void bind();
+	void srtBind(sockaddr_in* sockaddr);
 	SrtSocket accept();
 	void connection();
 	void sendSrt();
