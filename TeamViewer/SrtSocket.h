@@ -4,10 +4,9 @@
 #include <thread>
 #include <string>
 
-struct ConnectionRequestInfo // change if needed
+enum ControlPacketType
 {
-	uint16_t clientPort;
-	uint16_t clientIP;
+	HANDSHAKE_PACKET=0
 };
 
 class SrtSocket
@@ -22,7 +21,8 @@ private:
 		std::string _srcIP;
 		uint16_t _dstPort;
 		std::string _dstIP;
-	} _commInfo;
+		uint32_t _seqNum;
+	} _commInfo; // add connection information here
 	std::queue<std::string> _userRecvDataQueue; // for the recv to save the given information
 	std::thread controlThread;
 	//
