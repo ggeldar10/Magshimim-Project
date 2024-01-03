@@ -40,16 +40,24 @@ output:
 void SrtSocket::listenAndAccept()
 {
 	bool packetNotFound = true;
-	char buffer[UDP_HEADERS_SIZE] = { 0 };
+	char buffer[UDP_HEADERS_SIZE + IP_HEADERS_SIZE + 1] = { 0 };
 	while (packetNotFound)
 	{
-		sockaddr_in fromAddrs;
-		int fromAddrslen;
-		if (recvfrom(this->_srtSocket, buffer, UDP_HEADERS_SIZE, MSG_PEEK, ((sockaddr*)&fromAddrs), &fromAddrslen) < 0)
+		if (recv(this->_srtSocket, buffer, UDP_HEADERS_SIZE + IP_HEADERS_SIZE + 1, MSG_PEEK) < 0)
 		{
 			std::cerr << "Error while trying to get connection" << std::endl;
 			throw "Error while trying to get connection";
 		}
+		std::string ipHeaders = buffer;
+		ipHeaders = ipHeaders.substr(0, IP_HEADERS_SIZE);
+		// todo make a check if the ip header protocol is the number we are using for ip 
+		std::string udpHeaders = buffer;
+		udpHeaders = udpHeaders.substr(IP_HEADERS_SIZE, UDP_HEADERS_SIZE);
+		int srcPort = atoi(udpHeaders.substr(0, UDP_HEADER_SIZE).c_str());
+		int dstPort = atoi(udpHeaders.substr(UDP_HEADER_SIZE, UDP_HEADER_SIZE).c_str());
+
+
+		
 	}
 }
 

@@ -3,6 +3,10 @@
 #include <queue>
 #include <thread>
 #include <string>
+#define UDP_HEADERS_SIZE 8
+#define UDP_HEADER_SIZE 16
+#define IP_HEADERS_SIZE 20
+#define IP_SRT_PROTOCOL_NUMBER 160
 
 enum ControlPacketType
 {
