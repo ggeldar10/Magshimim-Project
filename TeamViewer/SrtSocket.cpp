@@ -39,6 +39,18 @@ output:
 */
 void SrtSocket::listenAndAccept()
 {
+	bool packetNotFound = true;
+	char buffer[UDP_HEADERS_SIZE] = { 0 };
+	while (packetNotFound)
+	{
+		sockaddr_in fromAddrs;
+		int fromAddrslen;
+		if (recvfrom(this->_srtSocket, buffer, UDP_HEADERS_SIZE, MSG_PEEK, ((sockaddr*)&fromAddrs), &fromAddrslen) < 0)
+		{
+			std::cerr << "Error while trying to get connection" << std::endl;
+			throw "Error while trying to get connection";
+		}
+	}
 }
 
 /*
