@@ -1,13 +1,9 @@
 #pragma once
-#include "headers.h"
+#include "windowsHeaders.h"
 #include <queue>
 #include <thread>
 #include <string>
-
-enum ControlPacketType
-{
-	HANDSHAKE_PACKET=0
-};
+#include "packets.h"
 
 class SrtSocket
 {
