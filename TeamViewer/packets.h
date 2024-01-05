@@ -14,6 +14,11 @@ enum cursorButtonsActions
 	leftButtonDown = 0, leftButtonUp, rightButtonDown, rightButtonUp, middleButtonDwon, middleButtonUp, middleButtonScroll
 };
 
+enum keyboardKeysActions
+{
+	keyUp = 0, keyDown
+};
+
 enum controlPacketTypes
 {
 	HANDSHAKE = 0, KEEPALIVE, ACK, NAK, Congestion_Warning, SHUTDOWN, ACKACK, DROPREQ, PEERERROR
@@ -48,20 +53,30 @@ typedef struct cursorActionDataPacket : defaultDataPacket {
 }cursorActionDataPacket;
 
 typedef struct keyboardDataPacket : defaultDataPacket {
-	char key;
+	keyboardKeysActions action;
+	int keyCode;
 }cursorActionDataPacket;
 
-
-
-
-
-
-
-
-
-
+//will add chat and screen data packets later
 
 typedef struct defaultControlPacket : defaultPacket {
 	controlPacketTypes controlPacketType;
-
+	defaultControlPacket* data;
 }defaultControlPacket;
+
+typedef struct handshakeControlPacket : defaultControlPacket {
+	string senderIP;
+	bool encryption;
+	unsigned int windowSize;
+}handshakeControlPacket;
+
+//There is no need for keep-alive, ACK, ACKACK, shutdown, congestion-warning, peer-error packet staructs.
+//Instead, we will send defaultControlPacket with the right controlPacketTypes.
+
+typedef struct NAKControlPacket : defaultControlPacket {
+	unsigned int lostSequenceNumbers[];
+}NAKControlPacket;
+
+typedef struct messageDropRequestControlPacket : defaultControlPacket {
+	unsigned int lostSequenceNumbers[];
+}messageDropRequestControlPacket;
