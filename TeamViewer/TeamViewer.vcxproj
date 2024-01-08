@@ -127,11 +127,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="headers.h" />
+    <ClInclude Include="cursorAndKeyboard.h" />
+    <ClInclude Include="TeamViewerExeptions.h" />
+    <ClInclude Include="windowsHeaders.h" />
+    <ClInclude Include="packets.h" />
     <ClInclude Include="SrtSocket.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SrtSocket.cpp" />
+    <ClCompile Include="TeamViewerExeptions.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
