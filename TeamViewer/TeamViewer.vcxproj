@@ -127,13 +127,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="cursorAndKeyboard.h" />
+    <ClInclude Include="cursor.h" />
     <ClInclude Include="TeamViewerExeptions.h" />
     <ClInclude Include="windowsHeaders.h" />
     <ClInclude Include="packets.h" />
     <ClInclude Include="SrtSocket.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cursor.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="SrtSocket.cpp" />
     <ClCompile Include="TeamViewerExeptions.cpp" />
