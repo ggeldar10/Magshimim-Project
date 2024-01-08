@@ -28,3 +28,5 @@ bool setCursorPosition(POINT point)
 	}
 }
 
+
+
