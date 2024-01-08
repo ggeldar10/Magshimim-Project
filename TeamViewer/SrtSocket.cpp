@@ -7,6 +7,11 @@ void SrtSocket::controlThreadFunction()
 {
 }
 
+bool SrtSocket::isValidIpv4Checksum(const IpPacket& ipPacket)
+{
+	return true; // todo make the check for the valid checksum
+}
+
 SrtSocket::SrtSocket()
 {
 	WSADATA wsaData;
@@ -101,4 +106,14 @@ void SrtSocket::sendSrt()
 std::string SrtSocket::recvSrt()
 {
 	return std::string();
+}
+
+IpPacket SrtSocket::createIpPacketFromString(const std::string& ipPacketBuffer)
+{
+	if (ipPacketBuffer.length() > MAX_IP_SIZE || ipPacketBuffer.length() < MIN_IP_SIZE)
+	{
+		std::cerr << "Error: the buffer that was given is not valid" << std::endl;
+		throw std::invalid_argument("Error: the buffer that was given is not valid");
+	}
+	return IpPacket();
 }
