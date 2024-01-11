@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include <ctime>
 #include <iostream>
 #include <string>
@@ -8,12 +9,12 @@ using namespace std;
 
 enum DataPacketTypes
 {
-    CursorPosition = 0, CursorAction, Keyboard, Screen, Chat
+    Cursor = 0, Keyboard, Screen, Chat
 };
 
-enum CursorButtonsActions
+enum CursorActions
 {
-    LeftButtonDown = 0, LeftButtonUp, RightButtonDown, RightButtonUp, MiddleButtonDown, MiddleButtonUp, MiddleButtonScroll
+    CursorPosition = 0, LeftButtonDown, LeftButtonUp, RightButtonDown, RightButtonUp, MiddleButtonDown, MiddleButtonUp, WheelScroll
 };
 
 enum KeyboardKeysActions
@@ -44,14 +45,11 @@ struct DefaultDataPacket : DefaultPacket {
     DefaultDataPacket* data;
 };
 
-struct CursorPositionDataPacket : DefaultDataPacket {
+struct CursorDataPacket : DefaultDataPacket {
+    CursorActions action;
+    int scrollValue;
     unsigned int x;
     unsigned int y;
-};
-
-struct CursorActionDataPacket : DefaultDataPacket {
-    CursorButtonsActions action;
-    int scrollValue;
 };
 
 struct KeyboardDataPacket : DefaultDataPacket {

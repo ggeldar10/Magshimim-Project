@@ -5,4 +5,5 @@
 
 POINT getCursorPosition();
 bool setCursorPosition(POINT point);
-bool makeCursorButtonAction(CursorButtonsActions action, int scrollValue);
+bool makeCursorButtonAction(CursorActions action, int scrollValue);
+DefaultDataPacket* createPacket(CursorActions action, int ackSequenceNumber, int packetSequenceNumber);
