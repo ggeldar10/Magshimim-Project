@@ -29,7 +29,6 @@ bool setCursorPosition(POINT point)
 bool makeCursorButtonAction(CursorActions action, int scrollValue)
 {
     INPUT input = { 0 };
-
     input.type = INPUT_MOUSE;
 
     switch (action)
@@ -57,13 +56,13 @@ bool makeCursorButtonAction(CursorActions action, int scrollValue)
         input.mi.mouseData = scrollValue;
         break;
     default:
-        throw MakeCursorActionException();
+        throw CursorButtonActionException();
     }
 
     return SendInput(1, &input, sizeof(INPUT)) > 0;
 }
 
-DefaultDataPacket* createPacket(CursorActions action, int ackSequenceNumber, int packetSequenceNumber)
+CursorDataPacket createPacket(CursorActions action, int ackSequenceNumber, int packetSequenceNumber, POINT position, int scrollValue)
 {
     CursorDataPacket packet;
     packet.packetType = DataPacket;
@@ -76,15 +75,13 @@ DefaultDataPacket* createPacket(CursorActions action, int ackSequenceNumber, int
     switch (action)
     {
     case CursorPosition:
-        POINT point;
-        point = getCursorPosition();
-        packet.x = point.x;
-        packet.y = point.y;
+        packet.x = position.x;
+        packet.y = position.y;
         break;
 
-    /*case WheelScroll:
+    case WheelScroll:
         packet.scrollValue = scrollValue;
-        break;*/
+        break;
 
     default:
         packet.x = -1;
@@ -92,5 +89,5 @@ DefaultDataPacket* createPacket(CursorActions action, int ackSequenceNumber, int
         packet.scrollValue = 0;
         break;
     }
-    return &packet;
+    return packet;
 }

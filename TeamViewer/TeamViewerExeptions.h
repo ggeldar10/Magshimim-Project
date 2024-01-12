@@ -15,9 +15,9 @@ class SetCursorPositionException : public std::exception
 	};
 };
 
-class MakeCursorActionException : public std::exception
+class CursorButtonActionException : public std::exception
 {
 	virtual const char* what() const override {
-		return "Error: Failed to make cursor action";
+		return "Error: Failed to make cursor button action";
 	};
 };
