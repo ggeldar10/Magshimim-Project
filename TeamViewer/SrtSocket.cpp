@@ -1,7 +1,8 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "SrtSocket.h"
 #include <iostream>
-
+#define NETWORK_TO_HOST_16_BIT(buffer, index) ntohs((buffer[index] << BYTE_IN_BITS) | buffer[index + 1])
+#define NETWORK_TO_HOST_8_BIT(buffer, index) ntohs(buffer[index]);
 
 void SrtSocket::controlThreadFunction()
 {
@@ -55,14 +56,13 @@ void SrtSocket::listenAndAccept()
 		}
 		std::string ipHeaders = buffer;
 		ipHeaders = ipHeaders.substr(0, IP_HEADERS_SIZE);
+
 		// todo make a check if the ip header protocol is the number we are using for ip 
 		std::string udpHeaders = buffer;
 		udpHeaders = udpHeaders.substr(IP_HEADERS_SIZE, UDP_HEADERS_SIZE);
 		int srcPort = atoi(udpHeaders.substr(0, UDP_HEADER_SIZE).c_str());
 		int dstPort = atoi(udpHeaders.substr(UDP_HEADER_SIZE, UDP_HEADER_SIZE).c_str());
 
-
-		
 	}
 }
 
@@ -115,5 +115,30 @@ IpPacket SrtSocket::createIpPacketFromString(const std::string& ipPacketBuffer)
 		std::cerr << "Error: the buffer that was given is not valid" << std::endl;
 		throw std::invalid_argument("Error: the buffer that was given is not valid");
 	}
-	return IpPacket();
+	IpPacket ipPacket;
+	memset(&ipPacket, 0, sizeof(IpPacket));
+	int index = 0;
+	// might be a problem of big and smalle endians so check when the srt is complete
+	ipPacket.version = (ipPacketBuffer[index] & 0xF0) >> FOUR_BITS;
+	ipPacket.lengthOfHeaders = ipPacketBuffer[index] & 0x0F;
+	index += sizeof(uint8_t);
+	ipPacket.typeOfService = NETWORK_TO_HOST_8_BIT(ipPacketBuffer, index);
+	index += sizeof(uint8_t);
+	ipPacket.totalLength = NETWORK_TO_HOST_16_BIT(ipPacketBuffer, index);
+	index += sizeof(uint16_t);
+	ipPacket.identification = NETWORK_TO_HOST_16_BIT(ipPacketBuffer, index);
+	index += sizeof(uint16_t);
+	ipPacket.identification = NETWORK_TO_HOST_16_BIT(ipPacketBuffer, index);
+	index += sizeof(uint16_t);
+	ipPacket.ttl = NETWORK_TO_HOST_8_BIT(ipPacketBuffer, index);
+	index += sizeof(uint8_t);
+	ipPacket.protocol = NETWORK_TO_HOST_8_BIT(ipPacketBuffer, index);
+	index += sizeof(uint8_t);
+
+
+
+
+
+
+	return ipPacket;
 }
