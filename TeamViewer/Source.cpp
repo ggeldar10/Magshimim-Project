@@ -36,8 +36,18 @@ int main() {
 
        
         // Sleep for a short duration to avoid high CPU usage
+        //Sleep(100);
+        for (int keyCode = 0; keyCode < 256; ++keyCode) {
+            // Check the state of the key
+            short keyState = GetAsyncKeyState(keyCode);
+
+            // Check if the most significant bit is set, indicating the key is pressed
+            if (keyState & 0x8001) {
+                std::cout << "Key with code " << (char)keyCode << " is pressed." << std::endl;
+                
+            }
+        }
         Sleep(100);
     }
-    
     return 0;
 }
