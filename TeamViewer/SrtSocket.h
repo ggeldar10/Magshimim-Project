@@ -103,6 +103,7 @@ public:
 	void sendSrt();
 	std::string recvSrt();
 	static IpPacket createIpPacketFromString(const std::string& ipPacketBuffer);
-	
+	template<typename nthSize>
+	inline static nthSize networkToHost(const std::string& buffer, int index);
 };
 

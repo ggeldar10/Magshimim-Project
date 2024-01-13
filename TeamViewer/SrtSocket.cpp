@@ -1,8 +1,6 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "SrtSocket.h"
 #include <iostream>
-#define NETWORK_TO_HOST_16_BIT(buffer, index) ntohs((buffer[index] << BYTE_IN_BITS) | buffer[index + 1])
-#define NETWORK_TO_HOST_8_BIT(buffer, index) ntohs(buffer[index]);
 
 void SrtSocket::controlThreadFunction()
 {
@@ -122,23 +120,49 @@ IpPacket SrtSocket::createIpPacketFromString(const std::string& ipPacketBuffer)
 	ipPacket.version = (ipPacketBuffer[index] & 0xF0) >> FOUR_BITS;
 	ipPacket.lengthOfHeaders = ipPacketBuffer[index] & 0x0F;
 	index += sizeof(uint8_t);
-	ipPacket.typeOfService = NETWORK_TO_HOST_8_BIT(ipPacketBuffer, index);
+	ipPacket.typeOfService = networkToHost<uint8_t>(ipPacketBuffer, index);
 	index += sizeof(uint8_t);
-	ipPacket.totalLength = NETWORK_TO_HOST_16_BIT(ipPacketBuffer, index);
+	ipPacket.totalLength = networkToHost<uint16_t>(ipPacketBuffer, index);
 	index += sizeof(uint16_t);
-	ipPacket.identification = NETWORK_TO_HOST_16_BIT(ipPacketBuffer, index);
+	ipPacket.identification = networkToHost<uint16_t>(ipPacketBuffer, index);
 	index += sizeof(uint16_t);
-	ipPacket.identification = NETWORK_TO_HOST_16_BIT(ipPacketBuffer, index);
+	ipPacket.identification = networkToHost<uint16_t>(ipPacketBuffer, index);
 	index += sizeof(uint16_t);
-	ipPacket.ttl = NETWORK_TO_HOST_8_BIT(ipPacketBuffer, index);
+	ipPacket.ttl = networkToHost<uint8_t>(ipPacketBuffer, index);
 	index += sizeof(uint8_t);
-	ipPacket.protocol = NETWORK_TO_HOST_8_BIT(ipPacketBuffer, index);
+	ipPacket.protocol = networkToHost<uint8_t>(ipPacketBuffer, index);
 	index += sizeof(uint8_t);
-
-
-
-
-
-
+	ipPacket.headerChecksum = networkToHost<uint16_t>(ipPacketBuffer, index);
+	index += sizeof(uint16_t);
+	ipPacket.srcAddrs = networkToHost<uint32_t>(ipPacketBuffer, index);
+	index += sizeof(uint32_t);
+	ipPacket.dstAddrs = networkToHost<uint32_t>(ipPacketBuffer, index);
+	index += sizeof(uint32_t);
+	std::string help = ipPacketBuffer.substr(index);
+	for (int i = 0; i < help.size() && i < MAX_IP_OPTIONS_SIZE; i++)
+	{
+		ipPacket.options[i] = help[i];
+	}
 	return ipPacket;
+}
+
+template<typename nthSize>
+inline nthSize SrtSocket::networkToHost(const std::string& buffer, int index)
+{
+	if (index + sizeof(nthSize) > buffer.size())
+	{
+		std::cerr << "Error buffer size is not big enough" << std::endl;
+		throw "Error buffer size is not big enough";
+	}
+	nthSize networkToHostNum = 0;
+	for (int i = 0; i < sizeof(nthSize); i++)
+	{
+		networkToHostNum = networkToHostNum << BYTE_IN_BITS;
+		networkToHostNum = networkToHostNum | static_cast<nthSize>(buffer[index + i]);
+	}
+	if constexpr (sizeof(nthSize) >= sizeof(uint32_t))
+	{
+		return ntohl(networkToHostNum);
+	}
+	return ntohs(networkToHostNum)
 }
