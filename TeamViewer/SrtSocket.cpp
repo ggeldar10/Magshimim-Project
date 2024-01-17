@@ -2,9 +2,13 @@
 #include "SrtSocket.h"
 #include <iostream>
 
-
 void SrtSocket::controlThreadFunction()
 {
+}
+
+bool SrtSocket::isValidIpv4Checksum(const IpPacket& ipPacket)
+{
+	return true; // todo make the check for the valid checksum
 }
 
 SrtSocket::SrtSocket()
@@ -39,6 +43,25 @@ output:
 */
 void SrtSocket::listenAndAccept()
 {
+	bool packetNotFound = true;
+	char buffer[UDP_HEADERS_SIZE + IP_HEADERS_SIZE + 1] = { 0 };
+	while (packetNotFound)
+	{
+		if (recv(this->_srtSocket, buffer, UDP_HEADERS_SIZE + IP_HEADERS_SIZE + 1, MSG_PEEK) < 0)
+		{
+			std::cerr << "Error while trying to get connection" << std::endl;
+			throw "Error while trying to get connection";
+		}
+		std::string ipHeaders = buffer;
+		ipHeaders = ipHeaders.substr(0, IP_HEADERS_SIZE);
+
+		// todo make a check if the ip header protocol is the number we are using for ip 
+		std::string udpHeaders = buffer;
+		udpHeaders = udpHeaders.substr(IP_HEADERS_SIZE, UDP_HEADERS_SIZE);
+		int srcPort = atoi(udpHeaders.substr(0, UDP_HEADER_SIZE).c_str());
+		int dstPort = atoi(udpHeaders.substr(UDP_HEADER_SIZE, UDP_HEADER_SIZE).c_str());
+
+	}
 }
 
 /*
@@ -81,4 +104,65 @@ void SrtSocket::sendSrt()
 std::string SrtSocket::recvSrt()
 {
 	return std::string();
+}
+
+IpPacket SrtSocket::createIpPacketFromString(const std::string& ipPacketBuffer)
+{
+	if (ipPacketBuffer.length() > MAX_IP_SIZE || ipPacketBuffer.length() < MIN_IP_SIZE)
+	{
+		std::cerr << "Error: the buffer that was given is not valid" << std::endl;
+		throw std::invalid_argument("Error: the buffer that was given is not valid");
+	}
+	IpPacket ipPacket;
+	memset(&ipPacket, 0, sizeof(IpPacket));
+	int index = 0;
+	// might be a problem of big and smalle endians so check when the srt is complete
+	ipPacket.version = (ipPacketBuffer[index] & 0xF0) >> FOUR_BITS;
+	ipPacket.lengthOfHeaders = ipPacketBuffer[index] & 0x0F;
+	index += sizeof(uint8_t);
+	ipPacket.typeOfService = networkToHost<uint8_t>(ipPacketBuffer, index);
+	index += sizeof(uint8_t);
+	ipPacket.totalLength = networkToHost<uint16_t>(ipPacketBuffer, index);
+	index += sizeof(uint16_t);
+	ipPacket.identification = networkToHost<uint16_t>(ipPacketBuffer, index);
+	index += sizeof(uint16_t);
+	ipPacket.identification = networkToHost<uint16_t>(ipPacketBuffer, index);
+	index += sizeof(uint16_t);
+	ipPacket.ttl = networkToHost<uint8_t>(ipPacketBuffer, index);
+	index += sizeof(uint8_t);
+	ipPacket.protocol = networkToHost<uint8_t>(ipPacketBuffer, index);
+	index += sizeof(uint8_t);
+	ipPacket.headerChecksum = networkToHost<uint16_t>(ipPacketBuffer, index);
+	index += sizeof(uint16_t);
+	ipPacket.srcAddrs = networkToHost<uint32_t>(ipPacketBuffer, index);
+	index += sizeof(uint32_t);
+	ipPacket.dstAddrs = networkToHost<uint32_t>(ipPacketBuffer, index);
+	index += sizeof(uint32_t);
+	std::string help = ipPacketBuffer.substr(index);
+	for (int i = 0; i < help.size() && i < MAX_IP_OPTIONS_SIZE; i++)
+	{
+		ipPacket.options[i] = help[i];
+	}
+	return ipPacket;
+}
+
+template<typename nthSize>
+inline nthSize SrtSocket::networkToHost(const std::string& buffer, int index)
+{
+	if (index + sizeof(nthSize) > buffer.size())
+	{
+		std::cerr << "Error buffer size is not big enough" << std::endl;
+		throw "Error buffer size is not big enough";
+	}
+	nthSize networkToHostNum = 0;
+	for (int i = 0; i < sizeof(nthSize); i++)
+	{
+		networkToHostNum = networkToHostNum << BYTE_IN_BITS;
+		networkToHostNum = networkToHostNum | static_cast<nthSize>(buffer[index + i]);
+	}
+	if constexpr (sizeof(nthSize) >= sizeof(uint32_t))
+	{
+		return ntohl(networkToHostNum);
+	}
+	return ntohs(networkToHostNum)
 }
