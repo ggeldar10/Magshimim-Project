@@ -127,8 +127,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="headers.h" />
+    <ClInclude Include="packets.h" />
     <ClInclude Include="SrtSocket.h" />
+    <ClInclude Include="windowsHeaders.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SrtSocket.cpp" />

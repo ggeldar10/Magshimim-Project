@@ -164,5 +164,5 @@ inline nthSize SrtSocket::networkToHost(const std::string& buffer, int index)
 	{
 		return ntohl(networkToHostNum);
 	}
-	return ntohs(networkToHostNum)
+	return ntohs(networkToHostNum);
 }
