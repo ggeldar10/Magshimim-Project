@@ -28,7 +28,7 @@
       <Filter>Source Files\cursor and keyboard</Filter>
     </ClCompile>
     <ClCompile Include="keyboard.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\cursor and keyboard</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
