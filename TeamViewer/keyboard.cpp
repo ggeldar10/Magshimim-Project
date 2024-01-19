@@ -1,6 +1,6 @@
 #include "keyboard.h"
 
-bool makeKeyboardAction(KeyboardKeysActions action, int keyCode)
+void makeKeyboardAction(KeyboardKeysActions action, int keyCode)
 {
     INPUT input;
     input.type = INPUT_KEYBOARD;
@@ -17,13 +17,11 @@ bool makeKeyboardAction(KeyboardKeysActions action, int keyCode)
     input.ki.time = 0;
     input.ki.dwExtraInfo = 0;
 
-    if (SendInput(1, &input, sizeof(INPUT)) == 0) 
+    if (SendInput(1, &input, sizeof(INPUT)) != 1) 
     {
-        std::cerr << "Failed to send keyboard input. Error code: " << GetLastError() << std::endl;
-        return false;
+        throw(KeyboardButtonActionException("Failed to send keyboard input. Error code: " + GetLastError()));
+       
     }
-
-    return true;
 }
 
 KeyboardDataPacket createPacket(KeyboardKeysActions action, int ackSequenceNumber, int packetSequenceNumber, int keyCode)
@@ -41,18 +39,26 @@ KeyboardDataPacket createPacket(KeyboardKeysActions action, int ackSequenceNumbe
 
 void listenToKeyboard()
 {
-    while (true)
+    bool runLoop = true;
+    while (runLoop)
     {
-        for (int keyCode = 1; keyCode <= NUM_OF_KEY_CODES; keyCode++)
-        {
-            // Check the state of the key
-            short keyState = GetAsyncKeyState(keyCode);
+        try {
+            for (int keyCode = 1; keyCode <= NUM_OF_KEY_CODES; keyCode++)
+            {
+                // Check the state of the key
+                short keyState = GetAsyncKeyState(keyCode);
 
-            // Check if the most significant bit is set, indicating the key is pressed
-            if (keyState & WAS_PRESSED) {
-                std::cout << "Key with code " << (char)keyCode << " is pressed." << std::endl;
+                // Check if the most significant bit is set, indicating the key is pressed
+                if (keyState & WAS_PRESSED) {
+                    std::cout << "Key with code " << (char)keyCode << " is pressed." << std::endl;
 
+                }
             }
+        }
+        catch (const std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+            runLoop = false;
         }
         Sleep(100);
     }
