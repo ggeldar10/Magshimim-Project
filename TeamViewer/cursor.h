@@ -3,7 +3,10 @@
 #include "windowsHeaders.h"
 #include "TeamViewerExeptions.h"
 
+#define IS_PRESSED 0x8000
+
 POINT getCursorPosition();
-bool setCursorPosition(POINT point);
-bool makeCursorButtonAction(CursorActions action, int scrollValue);
-CursorDataPacket createPacket(CursorActions action, int ackSequenceNumber, int packetSequenceNumber, POINT position, int scrollValue);
+bool setCursorPosition(const POINT point);
+bool makeCursorButtonAction(const CursorActions action, const int scrollValue);
+CursorDataPacket createPacket(const CursorActions action, const int ackSequenceNumber, const int packetSequenceNumber, const POINT position, const int scrollValue);
+void listenToCursor();

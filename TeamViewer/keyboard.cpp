@@ -38,3 +38,22 @@ KeyboardDataPacket createPacket(KeyboardKeysActions action, int ackSequenceNumbe
     packet.keyCode = keyCode;
     return packet;
 }
+
+void listenToKeyboard()
+{
+    while (true)
+    {
+        for (int keyCode = 1; keyCode <= NUM_OF_KEY_CODES; keyCode++)
+        {
+            // Check the state of the key
+            short keyState = GetAsyncKeyState(keyCode);
+
+            // Check if the most significant bit is set, indicating the key is pressed
+            if (keyState & WAS_PRESSED) {
+                std::cout << "Key with code " << (char)keyCode << " is pressed." << std::endl;
+
+            }
+        }
+        Sleep(100);
+    }
+}

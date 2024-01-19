@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
 
 enum DataPacketTypes
 {
@@ -65,7 +64,7 @@ struct DefaultControlPacket : DefaultPacket {
 };
 
 struct HandshakeControlPacket : DefaultControlPacket {
-    string senderIP;
+    std::string senderIP;
     bool encryption;
     unsigned int windowSize;
 };
@@ -74,9 +73,9 @@ struct HandshakeControlPacket : DefaultControlPacket {
 // Instead, we will send DefaultControlPacket with the right ControlPacketTypes.
 
 struct NAKControlPacket : DefaultControlPacket {
-    vector<unsigned int> lostSequenceNumbers;
+    std::vector<unsigned int> lostSequenceNumbers;
 };
 
 struct MessageDropRequestControlPacket : DefaultControlPacket {
-    vector<unsigned int> lostSequenceNumbers;
+    std::vector<unsigned int> lostSequenceNumbers;
 };
