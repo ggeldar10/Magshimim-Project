@@ -1,8 +1,10 @@
 #pragma once
-#include "headers.h"
+#include "windowsHeaders.h"
+#include "packets.h"
 #include <queue>
 #include <thread>
 #include <string>
+<<<<<<< HEAD
 #include <bitset>
 
 #define UDP_HEADERS_SIZE 8
@@ -13,12 +15,16 @@
 #define MAX_IP_OPTIONS_SIZE 10
 #define MAX_IP_SIZE 60
 #define MIN_IP_SIZE 40
+=======
+
+>>>>>>> d671933d4627d721924db90d737a753c5b319c6f
 #define FOUR_BITS 4
 #define BYTE_IN_BITS 8
 #define IPV4 4
 #define DEFAULT_TTL 64
 #define UDP_PROTOCOL_CODE 17
 
+<<<<<<< HEAD
 // todo later change to the packet file
 enum ControlPacketType
 {
@@ -71,6 +77,8 @@ struct IpPacket
 };
 
 
+=======
+>>>>>>> d671933d4627d721924db90d737a753c5b319c6f
 class SrtSocket
 {
 private:
