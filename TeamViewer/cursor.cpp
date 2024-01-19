@@ -4,29 +4,28 @@
 POINT getCursorPosition()
 {
     POINT point;
-    if (GetCursorPos(&point))
-    {
+    try {
+        GetCursorPos(&point);
         return point;
     }
-    else
+    catch(const std::exception& e)
     {
-        throw GetCursorPositionException();
+        throw GetCursorPositionException(e.what());
     }
 }
 
-bool setCursorPosition(const POINT point)
+void setCursorPosition(const POINT& point)
 {
-    if (SetCursorPos(point.x, point.y))
-    {
-        return true;
+    try{
+        SetCursorPos(point.x, point.y);
     }
-    else
+    catch (const std::exception& e)
     {
-        throw SetCursorPositionException();
+        throw SetCursorPositionException(e.what());
     }
 }
 
-bool makeCursorButtonAction(const CursorActions action, const int scrollValue)
+void makeCursorButtonAction(const CursorActions action, const int scrollValue)
 {
     INPUT input = { 0 };
     input.type = INPUT_MOUSE;
@@ -56,10 +55,13 @@ bool makeCursorButtonAction(const CursorActions action, const int scrollValue)
         input.mi.mouseData = scrollValue;
         break;
     default:
-        throw CursorButtonActionException();
+        throw CursorButtonActionException_IllegalAction();
     }
 
-    return SendInput(1, &input, sizeof(INPUT)) > 0;
+    if (SendInput(1, &input, sizeof(INPUT)) == 0)
+    {
+        throw(CursorButtonActionException_ActionFailed());
+    }
 }
 
 CursorDataPacket createPacket(const CursorActions action, const int ackSequenceNumber, const int packetSequenceNumber, const POINT position, const int scrollValue)
@@ -94,27 +96,42 @@ CursorDataPacket createPacket(const CursorActions action, const int ackSequenceN
 
 void listenToCursor()
 {
-    while (true) 
+    bool runLoop = true;
+    while (runLoop) 
     {
-        POINT point = getCursorPosition();
-        std::cout << "Cursor position - x: " << point.x << ", y: " << point.y << std::endl;
-
-        // Check the state of the left mouse button
-        if (GetAsyncKeyState(VK_LBUTTON) & IS_PRESSED) {
-            std::cout << "Left mouse button pressed." << std::endl;
+        try {
+            POINT point = getCursorPosition();
+            std::cout << "Cursor position - x: " << point.x << ", y: " << point.y << std::endl;
+        }
+        catch (GetCursorPositionException& e)
+        {
+            std::cerr << e.what() << std::endl;
+            runLoop = false;
         }
 
-        // Check the state of the right mouse button
-        if (GetAsyncKeyState(VK_RBUTTON) & IS_PRESSED) {
-            std::cout << "Right mouse button pressed." << std::endl;
-        }
+        try
+        {
+            // Check the state of the left mouse button
+            if (GetAsyncKeyState(VK_LBUTTON) & IS_PRESSED) {
+                std::cout << "Left mouse button pressed." << std::endl;
+            }
 
-        // Check the state of the middle mouse button
-        if (GetAsyncKeyState(VK_MBUTTON) & IS_PRESSED) {
-            std::cout << "Middle mouse button pressed." << std::endl;
-        }
+            // Check the state of the right mouse button
+            if (GetAsyncKeyState(VK_RBUTTON) & IS_PRESSED) {
+                std::cout << "Right mouse button pressed." << std::endl;
+            }
 
-         // Sleep for a short duration to avoid high CPU usage
-         Sleep(100);
+            // Check the state of the middle mouse button
+            if (GetAsyncKeyState(VK_MBUTTON) & IS_PRESSED) {
+                std::cout << "Middle mouse button pressed." << std::endl;
+            }
+        }
+        catch (const std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+            runLoop = false;
+        }
+        // Sleep for a short duration to avoid high CPU usage
+        Sleep(100);
     }
 }

@@ -129,7 +129,6 @@
   <ItemGroup>
     <ClInclude Include="cursor.h" />
     <ClInclude Include="keyboard.h" />
-    <ClInclude Include="TeamViewerExeptions.h" />
     <ClInclude Include="windowsHeaders.h" />
     <ClInclude Include="packets.h" />
     <ClInclude Include="SrtSocket.h" />

@@ -44,9 +44,6 @@
     <ClInclude Include="cursor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TeamViewerExeptions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="keyboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
