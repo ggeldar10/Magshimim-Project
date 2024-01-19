@@ -146,6 +146,27 @@ IpPacket SrtSocket::createIpPacketFromString(const std::string& ipPacketBuffer)
 	return ipPacket;
 }
 
+IpPacket SrtSocket::createIpPacket(IpPacketTypesOfServices serviceType, int totalLength, int packetID, int flags, int checksum, uint32_t srcAddr, uint32_t dstAddr)
+{
+	IpPacket packet;
+	packet.version = IPV4;
+	packet.lengthOfHeaders = IP_HEADERS_SIZE;
+	packet.typeOfService = static_cast<uint8_t>(serviceType);
+	packet.totalLength = htons(static_cast<uint16_t>(totalLength)); 
+	packet.identification = htons(static_cast<uint16_t>(packetID)); 
+	packet.fragmentOffsetIncludingFlags = htons(static_cast<uint16_t>(flags)); 
+	packet.ttl = DEFAULT_TTL;
+	packet.protocol = UDP_PROTOCOL_CODE;
+	packet.headerChecksum = htons(static_cast<uint16_t>(checksum)); 
+	packet.srcAddrs = srcAddr;
+	packet.dstAddrs = dstAddr;
+
+	std::memset(packet.options, 0, sizeof(packet.options));
+
+	return packet;
+}
+
+
 template<typename nthSize>
 inline nthSize SrtSocket::networkToHost(const std::string& buffer, int index)
 {

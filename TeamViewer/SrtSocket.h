@@ -4,6 +4,7 @@
 #include <thread>
 #include <string>
 #include <bitset>
+
 #define UDP_HEADERS_SIZE 8
 #define UDP_HEADER_SIZE 16
 #define IP_HEADERS_SIZE 20
@@ -14,12 +15,16 @@
 #define MIN_IP_SIZE 40
 #define FOUR_BITS 4
 #define BYTE_IN_BITS 8
+#define IPV4 4
+#define DEFAULT_TTL 64
+#define UDP_PROTOCOL_CODE 17
 
 // todo later change to the packet file
 enum ControlPacketType
 {
 	HANDSHAKE_PACKET=0
 };
+enum IpPacketTypesOfServices { IPv4, IPv6, ICMPv4,ICMPv6, TCP, UDP, IGMP, IPsec, ARP, RARP };
 /*
  0                   1
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
@@ -103,6 +108,8 @@ public:
 	void sendSrt();
 	std::string recvSrt();
 	static IpPacket createIpPacketFromString(const std::string& ipPacketBuffer);
+	static IpPacket createIpPacket(IpPacketTypesOfServices serviceType, int totalLength, int packetID, int flags, int checksum, uint32_t srcAddr, uint32_t dstAddr);
+
 	template<typename nthSize>
 	inline static nthSize networkToHost(const std::string& buffer, int index);
 };
