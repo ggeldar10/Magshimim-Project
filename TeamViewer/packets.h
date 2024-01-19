@@ -63,7 +63,7 @@ typedef struct cursorActionDataPacket : defaultDataPacket {
 typedef struct keyboardDataPacket : defaultDataPacket {
 	keyboardKeysActions action;
 	int keyCode;
-}cursorActionDataPacket;
+}keyboardDataPacket;
 
 //will add chat and screen data packets later
 

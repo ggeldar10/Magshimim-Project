@@ -4,7 +4,6 @@
 #include <queue>
 #include <thread>
 #include <string>
-<<<<<<< HEAD
 #include <bitset>
 
 #define UDP_HEADERS_SIZE 8
@@ -15,16 +14,12 @@
 #define MAX_IP_OPTIONS_SIZE 10
 #define MAX_IP_SIZE 60
 #define MIN_IP_SIZE 40
-=======
-
->>>>>>> d671933d4627d721924db90d737a753c5b319c6f
 #define FOUR_BITS 4
 #define BYTE_IN_BITS 8
 #define IPV4 4
 #define DEFAULT_TTL 64
 #define UDP_PROTOCOL_CODE 17
 
-<<<<<<< HEAD
 // todo later change to the packet file
 enum ControlPacketType
 {
@@ -60,25 +55,7 @@ enum IpPacketTypesOfServices { IPv4, IPv6, ICMPv4,ICMPv6, TCP, UDP, IGMP, IPsec,
 |               |    Padding    |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
-struct IpPacket 
-{
-	uint8_t version; 
-	uint8_t lengthOfHeaders;
-	uint8_t typeOfService; // we need to look at it to know what to send
-	uint16_t totalLength;
-	uint16_t identification;
-	uint16_t fragmentOffsetIncludingFlags; // about this one it does fragmentation to the data if sent too big
-	uint8_t ttl;
-	uint8_t protocol;
-	uint16_t headerChecksum;
-	uint32_t srcAddrs;
-	uint32_t dstAddrs;
-	byte options[MAX_IP_OPTIONS_SIZE]; // we need to check if we have important options here
-};
 
-
-=======
->>>>>>> d671933d4627d721924db90d737a753c5b319c6f
 class SrtSocket
 {
 private:
