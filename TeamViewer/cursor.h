@@ -38,19 +38,15 @@ public:
     }
 };
 
-
-class CursorButtonActionException_IllegalAction : public std::exception
+class CursorButtonActionException : public std::exception
 {
-public:
-	virtual const char* what() const override {
-		return "Error: Illegal cursor button action";
-	};
-};
+private:
+    std::string message;
 
-class CursorButtonActionException_ActionFailed : public std::exception
-{
 public:
-	virtual const char* what() const override {
-		return "Error: Failed to make the cursor button action";
-	};
+    explicit CursorButtonActionException(const char* msg) : message(msg) {}
+
+    virtual const char* what() const noexcept override {
+        return message.c_str();
+    }
 };

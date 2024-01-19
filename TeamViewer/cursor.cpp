@@ -4,24 +4,18 @@
 POINT getCursorPosition()
 {
     POINT point;
-    try {
-        GetCursorPos(&point);
-        return point;
-    }
-    catch(const std::exception& e)
+    if (!GetCursorPos(&point))
     {
-        throw GetCursorPositionException(e.what());
+        throw GetCursorPositionException("Error: Failed to get cursor position");
     }
+    return point;
 }
 
 void setCursorPosition(const POINT& point)
 {
-    try{
-        SetCursorPos(point.x, point.y);
-    }
-    catch (const std::exception& e)
+    if (!SetCursorPos(point.x, point.y))
     {
-        throw SetCursorPositionException(e.what());
+        throw SetCursorPositionException("Error: Failed to set cursor position");
     }
 }
 
@@ -55,12 +49,12 @@ void makeCursorButtonAction(const CursorActions action, const int scrollValue)
         input.mi.mouseData = scrollValue;
         break;
     default:
-        throw CursorButtonActionException_IllegalAction();
+        throw CursorButtonActionException("Error: Illegal cursor button action");
     }
 
-    if (SendInput(1, &input, sizeof(INPUT)) == 0)
+    if (SendInput(1, &input, sizeof(INPUT)) != 1)
     {
-        throw(CursorButtonActionException_ActionFailed());
+        throw(CursorButtonActionException("Error: Failed to make the cursor button action"));
     }
 }
 
