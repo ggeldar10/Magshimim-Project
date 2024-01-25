@@ -25,6 +25,12 @@ SrtSocket::SrtSocket()
 		std::cerr << "Error while trying to open a socket" << std::endl;
 		throw "Error while trying to open a socket";
 	}
+	const char enable = 1;
+	if (setsockopt(this->_srtSocket, IPPROTO_IP, IP_HDRINCL, &enable, sizeof(enable)) < 0) {
+		std::cerr << "Error setting IP_HDRINCL option" << std::endl;
+		closesocket(this->_srtSocket);
+		throw "Error setting IP_HDRINCL option";
+	}
 	
 }
 
@@ -93,8 +99,12 @@ void SrtSocket::srtBind(sockaddr_in* addrs)
 
 }
 
-void SrtSocket::connectToServer() // bind the client to a port
+void SrtSocket::connectToServer(sockaddr_in* addrs)
 {
+	this->_commInfo._dstPort = addrs->sin_port;
+	this->_commInfo._dstIP = inet_ntoa(addrs->sin_addr);
+	this->srtBind(addrs); 
+
 }
 
 void SrtSocket::sendSrt()

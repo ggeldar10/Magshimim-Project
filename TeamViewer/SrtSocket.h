@@ -77,9 +77,11 @@ private:
 	// Methods
 	//
 	void controlThreadFunction(); // we need to think how we implement it 
-
 	bool isValidIpv4Checksum(const IpPacket& ipPacket);
-
+	static IpPacket createIpPacketFromString(const std::string& ipPacketBuffer);
+	static IpPacket createIpPacket(IpPacketTypesOfServices serviceType, int totalLength, int packetID, int flags, int checksum, uint32_t srcAddr, uint32_t dstAddr);
+	template<typename nthSize>
+	inline static nthSize networkToHost(const std::string& buffer, int index);
 
 public:
 	//
@@ -92,10 +94,8 @@ public:
 	void connectToServer();
 	void sendSrt();
 	std::string recvSrt();
-	static IpPacket createIpPacketFromString(const std::string& ipPacketBuffer);
-	static IpPacket createIpPacket(IpPacketTypesOfServices serviceType, int totalLength, int packetID, int flags, int checksum, uint32_t srcAddr, uint32_t dstAddr);
 
-	template<typename nthSize>
-	inline static nthSize networkToHost(const std::string& buffer, int index);
+
+	
 };
 
