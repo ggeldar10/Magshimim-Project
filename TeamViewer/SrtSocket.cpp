@@ -25,7 +25,7 @@ SrtSocket::SrtSocket()
 		std::cerr << "Error while trying to open a socket" << std::endl;
 		throw "Error while trying to open a socket";
 	}
-	
+
 }
 
 SrtSocket::~SrtSocket()
@@ -35,8 +35,8 @@ SrtSocket::~SrtSocket()
 }
 
 /*
-intiates the communicatations and wait untill a client has 
-connected only one client at a time 
+intiates the communicatations and wait untill a client has
+connected only one client at a time
 does the handshake and the intilize the missing commInfo
 input:
 output:
@@ -68,7 +68,7 @@ void SrtSocket::listenAndAccept()
 binds the socket to a specific port and ip on the computer
 input: a ptr to the addrs to bind to and the port to bind to
 using the struct sockaddr_in
-output: 
+output:
 */
 void SrtSocket::srtBind(sockaddr_in* addrs)
 {
@@ -146,6 +146,27 @@ IpPacket SrtSocket::createIpPacketFromString(const std::string& ipPacketBuffer)
 	return ipPacket;
 }
 
+IpPacket SrtSocket::createIpPacket(IpPacketTypesOfServices serviceType, int totalLength, int packetID, int flags, int checksum, uint32_t srcAddr, uint32_t dstAddr)
+{
+	IpPacket packet;
+	packet.version = IPV4;
+	packet.lengthOfHeaders = IP_HEADERS_SIZE;
+	packet.typeOfService = static_cast<uint8_t>(serviceType);
+	packet.totalLength = htons(static_cast<uint16_t>(totalLength));
+	packet.identification = htons(static_cast<uint16_t>(packetID));
+	packet.fragmentOffsetIncludingFlags = htons(static_cast<uint16_t>(flags));
+	packet.ttl = DEFAULT_TTL;
+	packet.protocol = UDP_PROTOCOL_CODE;
+	packet.headerChecksum = htons(static_cast<uint16_t>(checksum));
+	packet.srcAddrs = srcAddr;
+	packet.dstAddrs = dstAddr;
+
+	std::memset(packet.options, 0, sizeof(packet.options));
+
+	return packet;
+}
+
+
 template<typename nthSize>
 inline nthSize SrtSocket::networkToHost(const std::string& buffer, int index)
 {
@@ -164,5 +185,5 @@ inline nthSize SrtSocket::networkToHost(const std::string& buffer, int index)
 	{
 		return ntohl(networkToHostNum);
 	}
-	return ntohs(networkToHostNum)
+	return ntohs(networkToHostNum);
 }

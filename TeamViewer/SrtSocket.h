@@ -1,9 +1,11 @@
 #pragma once
 #include "windowsHeaders.h"
+#include "packets.h"
 #include <queue>
 #include <thread>
 #include <string>
 #include <bitset>
+
 #define UDP_HEADERS_SIZE 8
 #define UDP_HEADER_SIZE 16
 #define IP_HEADERS_SIZE 20
@@ -14,12 +16,16 @@
 #define MIN_IP_SIZE 40
 #define FOUR_BITS 4
 #define BYTE_IN_BITS 8
+#define IPV4 4
+#define DEFAULT_TTL 64
+#define UDP_PROTOCOL_CODE 17
 
 // todo later change to the packet file
 enum ControlPacketType
 {
-	HANDSHAKE_PACKET=0
+	HANDSHAKE_PACKET = 0
 };
+enum IpPacketTypesOfServices { IPv4, IPv6, ICMPv4, ICMPv6, TCP, UDP, IGMP, IPsec, ARP, RARP };
 /*
  0                   1
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
@@ -49,22 +55,6 @@ enum ControlPacketType
 |               |    Padding    |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
-struct IpPacket 
-{
-	uint8_t version; 
-	uint8_t lengthOfHeaders;
-	uint8_t typeOfService; // we need to look at it to know what to send
-	uint16_t totalLength;
-	uint16_t identification;
-	uint16_t fragmentOffsetIncludingFlags; // about this one it does fragmentation to the data if sent too big
-	uint8_t ttl;
-	uint8_t protocol;
-	uint16_t headerChecksum;
-	uint32_t srcAddrs;
-	uint32_t dstAddrs;
-	byte options[MAX_IP_OPTIONS_SIZE]; // we need to check if we have important options here
-};
-
 
 class SrtSocket
 {
@@ -73,7 +63,7 @@ private:
 	// Fields
 	//
 	SOCKET _srtSocket;
-	struct 
+	struct
 	{
 		uint16_t _srcPort;
 		std::string _srcIP;
@@ -103,6 +93,8 @@ public:
 	void sendSrt();
 	std::string recvSrt();
 	static IpPacket createIpPacketFromString(const std::string& ipPacketBuffer);
+	static IpPacket createIpPacket(IpPacketTypesOfServices serviceType, int totalLength, int packetID, int flags, int checksum, uint32_t srcAddr, uint32_t dstAddr);
+
 	template<typename nthSize>
 	inline static nthSize networkToHost(const std::string& buffer, int index);
 };
