@@ -6,55 +6,14 @@
 #include <string>
 #include <bitset>
 
-#define UDP_HEADERS_SIZE 8
-#define UDP_HEADER_SIZE 16
-#define IP_HEADERS_SIZE 20
-#define IP_SRT_PROTOCOL_NUMBER 160
-#define IP_VERSION_HEADER_SIZE 4
-#define MAX_IP_OPTIONS_SIZE 10
-#define MAX_IP_SIZE 60
-#define MIN_IP_SIZE 40
+
 #define FOUR_BITS 4
 #define BYTE_IN_BITS 8
 #define IPV4 4
 #define DEFAULT_TTL 64
 #define UDP_PROTOCOL_CODE 17
 
-// todo later change to the packet file
-enum ControlPacketType
-{
-	HANDSHAKE_PACKET=0
-};
 enum IpPacketTypesOfServices { IPv4, IPv6, ICMPv4,ICMPv6, TCP, UDP, IGMP, IPsec, ARP, RARP };
-/*
- 0                   1
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|Version|  IHL  |Type of Service|
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|          Total Length         |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|         Identification        |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|Flags|     Fragment Offset     |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|  Time to Live |    Protocol   |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|        Header Checksum        |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                               |
-+         Source Address        +
-|                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                               |
-+      Destination Address      +
-|                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|            Options            |
-+               +-+-+-+-+-+-+-+-+
-|               |    Padding    |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-*/
 
 class SrtSocket
 {
@@ -91,7 +50,7 @@ public:
 	~SrtSocket();
 	void listenAndAccept(); // needs to block the current thread and start the thread function 
 	void srtBind(sockaddr_in* sockaddr);
-	void connectToServer();
+	void connectToServer(sockaddr_in* addrs);
 	void sendSrt();
 	std::string recvSrt();
 
