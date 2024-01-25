@@ -127,12 +127,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="cursor.h" />
+    <ClInclude Include="keyboard.h" />
+    <ClInclude Include="windowsHeaders.h" />
     <ClInclude Include="packets.h" />
     <ClInclude Include="SrtSocket.h" />
     <ClInclude Include="windowsHeaders.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="cursor.cpp" />
+    <ClCompile Include="keyboard.cpp" />
+    <ClCompile Include="Source.cpp" />
     <ClCompile Include="SrtSocket.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include <ctime>
 #include <iostream>
 #include <string>
@@ -14,74 +15,79 @@
 
 using namespace std;
 
-enum dataPacketTypes
+
+enum DataPacketTypes
 {
-	cursorPosition = 0, cursorAction, keyboard, screen, chat
+    Cursor = 0, Keyboard, Screen, Chat
 };
 
-enum cursorButtonsActions
+enum CursorActions
 {
-	leftButtonDown = 0, leftButtonUp, rightButtonDown, rightButtonUp, middleButtonDwon, middleButtonUp, middleButtonScroll
+    CursorPosition = 0, LeftButtonDown, LeftButtonUp, RightButtonDown, RightButtonUp, MiddleButtonDown, MiddleButtonUp, WheelScroll
 };
 
-enum keyboardKeysActions
+enum KeyboardKeysActions
 {
-	keyUp = 0, keyDown
+    KeyUp = 0, KeyDown
 };
 
-enum controlPacketTypes
+enum ControlPacketTypes
 {
-	HANDSHAKE = 0, KEEPALIVE, ACK, NAK, Congestion_Warning, SHUTDOWN, ACKACK, DROPREQ, PEERERROR
+    HANDSHAKE = 0, KEEPALIVE, ACK, NAK, CongestionWarning, SHUTDOWN, ACKACK, DROPREQ, PEERERROR
 };
 
-enum defaultPacketTypes
+enum DefaultPacketTypes
 {
-	dataPacket = 0, controlPacket
+    DataPacket = 0, ControlPacket
 };
 
-typedef struct defaultPacket {
-	defaultPacketTypes packetType;
-	unsigned int ackSequenceNumber;
-	unsigned int packetSequenceNumber;
-	time_t timeStamp;
-	defaultPacket* data;
-}defaultPacket;
+struct DefaultPacket {
+    DefaultPacketTypes packetType;
+    unsigned int ackSequenceNumber;
+    unsigned int packetSequenceNumber;
+    time_t timeStamp;
+    DefaultPacket* data;
+};
 
-typedef struct defaultDataPacket : defaultPacket {
-	dataPacketTypes dataPacketType;
-	defaultDataPacket* data;
-}defaultDataPacket;
+struct DefaultDataPacket : DefaultPacket {
+    DataPacketTypes dataPacketType;
+    DefaultDataPacket* data;
+};
 
-typedef struct cursorPositionDataPacket : defaultDataPacket {
-	unsigned int x;
-	unsigned int y;
-}cursorPositionDataPacket;
+struct CursorDataPacket : DefaultDataPacket {
+    CursorActions action;
+    int scrollValue;
+    unsigned int x;
+    unsigned int y;
+};
 
-typedef struct cursorActionDataPacket : defaultDataPacket {
-	cursorButtonsActions action;
-	int scrollValue;
-}cursorActionDataPacket;
+struct KeyboardDataPacket : DefaultDataPacket {
+    KeyboardKeysActions action;
+    int keyCode;
+};
 
 typedef struct keyboardDataPacket : defaultDataPacket {
 	keyboardKeysActions action;
 	int keyCode;
 }keyboardDataPacket;
 
-//will add chat and screen data packets later
+struct DefaultControlPacket : DefaultPacket {
+    ControlPacketTypes controlPacketType;
+    DefaultControlPacket* data;
+};
 
-typedef struct defaultControlPacket : defaultPacket {
-	controlPacketTypes controlPacketType;
-	defaultControlPacket* data;
-}defaultControlPacket;
+struct HandshakeControlPacket : DefaultControlPacket {
+    std::string senderIP;
+    bool encryption;
+    unsigned int windowSize;
+};
 
-typedef struct handshakeControlPacket : defaultControlPacket {
-	string senderIP;
-	bool encryption;
-	unsigned int windowSize;
-}handshakeControlPacket;
+// There is no need for keep-alive, ACK, ACKACK, shutdown, congestion-warning, peer-error packet structs.
+// Instead, we will send DefaultControlPacket with the right ControlPacketTypes.
 
-//There is no need for keep-alive, ACK, ACKACK, shutdown, congestion-warning, peer-error packet staructs.
-//Instead, we will send defaultControlPacket with the right controlPacketTypes.
+struct NAKControlPacket : DefaultControlPacket {
+    std::vector<unsigned int> lostSequenceNumbers;
+};
 
 typedef struct NAKControlPacket : defaultControlPacket {
 	unsigned int lostSequenceNumbers[];
