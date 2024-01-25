@@ -166,6 +166,38 @@ IpPacket SrtSocket::createIpPacket(IpPacketTypesOfServices serviceType, int tota
 	return packet;
 }
 
+HandshakeControlPacket SrtSocket::createHandshakePacketFromString(const std::string& handshakePacketBuffer)
+{
+	if (handshakePacketBuffer.length() > MAX_IP_SIZE || handshakePacketBuffer.length() < MIN_IP_SIZE)
+	{
+		std::cerr << "Error: the buffer that was given is not valid" << std::endl;
+		throw std::invalid_argument("Error: the buffer that was given is not valid");
+	}
+
+	HandshakeControlPacket handshakePacket;
+	std::memset(&handshakePacket, 0, sizeof(handshakePacket));
+
+	int index = 0;
+	handshakePacket.hasEncryption = networkToHost<unsigned int>(handshakePacketBuffer, index);
+	index += sizeof(handshakePacket.hasEncryption);
+
+	handshakePacket.encryption_key = networkToHost<uint16_t>(handshakePacketBuffer, index);
+	index += sizeof(handshakePacket.encryption_key);
+
+	handshakePacket.windowSize = networkToHost<uint32_t>(handshakePacketBuffer, index);
+	index += sizeof(handshakePacket.windowSize);
+
+	handshakePacket.initialPacketSequenceNumber = networkToHost<uint32_t>(handshakePacketBuffer, index);
+	index += sizeof(handshakePacket.initialPacketSequenceNumber);
+
+	handshakePacket.maxTransmission = networkToHost<uint32_t>(handshakePacketBuffer, index);
+	index += sizeof(handshakePacket.maxTransmission);
+
+	handshakePacket.phase = static_cast<HandshakePhases>(networkToHost<uint8_t>(handshakePacketBuffer, index));
+
+	return handshakePacket;
+}
+
 
 template<typename nthSize>
 inline nthSize SrtSocket::networkToHost(const std::string& buffer, int index)

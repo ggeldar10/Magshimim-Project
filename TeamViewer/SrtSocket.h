@@ -20,41 +20,9 @@
 #define DEFAULT_TTL 64
 #define UDP_PROTOCOL_CODE 17
 
-// todo later change to the packet file
-enum ControlPacketType
-{
-	HANDSHAKE_PACKET = 0
-};
+
 enum IpPacketTypesOfServices { IPv4, IPv6, ICMPv4, ICMPv6, TCP, UDP, IGMP, IPsec, ARP, RARP };
-/*
- 0                   1
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|Version|  IHL  |Type of Service|
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|          Total Length         |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|         Identification        |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|Flags|     Fragment Offset     |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|  Time to Live |    Protocol   |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|        Header Checksum        |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                               |
-+         Source Address        +
-|                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                               |
-+      Destination Address      +
-|                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|            Options            |
-+               +-+-+-+-+-+-+-+-+
-|               |    Padding    |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-*/
+
 
 class SrtSocket
 {
@@ -79,8 +47,13 @@ private:
 	void controlThreadFunction(); // we need to think how we implement it 
 
 	bool isValidIpv4Checksum(const IpPacket& ipPacket);
+	static IpPacket createIpPacketFromString(const std::string& ipPacketBuffer);
+	static IpPacket createIpPacket(IpPacketTypesOfServices serviceType, int totalLength, int packetID, int flags, int checksum, uint32_t srcAddr, uint32_t dstAddr);
+	static HandshakeControlPacket createHandshakePacketFromString(const std::string& handshakePacketBuffer);
 
 
+	template<typename nthSize>
+	inline static nthSize networkToHost(const std::string& buffer, int index);
 public:
 	//
 	// Methods
@@ -92,10 +65,7 @@ public:
 	void connectToServer();
 	void sendSrt();
 	std::string recvSrt();
-	static IpPacket createIpPacketFromString(const std::string& ipPacketBuffer);
-	static IpPacket createIpPacket(IpPacketTypesOfServices serviceType, int totalLength, int packetID, int flags, int checksum, uint32_t srcAddr, uint32_t dstAddr);
+	
 
-	template<typename nthSize>
-	inline static nthSize networkToHost(const std::string& buffer, int index);
 };
 

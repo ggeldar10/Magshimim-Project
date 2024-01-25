@@ -34,6 +34,11 @@ enum ControlPacketTypes
     HANDSHAKE = 0, KEEPALIVE, ACK, NAK, CongestionWarning, SHUTDOWN, ACKACK, DROPREQ, PEERERROR
 };
 
+enum HandshakePhases : uint8_t
+{
+    INDUCTION_1 = 0, INDUCTION_2, SUMMARY_1, SUMMARY_2
+};
+
 enum DefaultPacketTypes
 {
     DataPacket = 0, ControlPacket
@@ -41,8 +46,8 @@ enum DefaultPacketTypes
 
 struct DefaultPacket {
     DefaultPacketTypes packetType;
-    unsigned int ackSequenceNumber;
-    unsigned int packetSequenceNumber;
+    uint32_t ackSequenceNumber;
+    uint32_t packetSequenceNumber;
     time_t timeStamp;
     DefaultPacket* data;
 };
@@ -72,9 +77,12 @@ struct DefaultControlPacket : DefaultPacket {
 };
 
 struct HandshakeControlPacket : DefaultControlPacket {
-    std::string senderIP;
-    bool encryption;
-    unsigned int windowSize;
+    bool hasEncryption;
+    uint16_t encryption_key;
+    uint32_t windowSize;
+    uint32_t initialPacketSequenceNumber;
+    uint32_t maxTransmission;
+    HandshakePhases phase;
 };
 
 // There is no need for keep-alive, ACK, ACKACK, shutdown, congestion-warning, peer-error packet structs.
