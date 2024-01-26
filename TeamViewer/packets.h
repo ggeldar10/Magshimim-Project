@@ -159,18 +159,36 @@ public:
 |               |    Padding    |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 */
-struct IpPacket
-{
+class IpPacket {
+private:
     uint8_t version;
     uint8_t lengthOfHeaders;
-    uint8_t typeOfService; // we need to look at it to know what to send
+    uint8_t typeOfService;
     uint16_t totalLength;
     uint16_t identification;
-    uint16_t fragmentOffsetIncludingFlags; // about this one it does fragmentation to the data if sent too big
+    uint16_t fragmentOffsetIncludingFlags;
     uint8_t ttl;
     uint8_t protocol;
     uint16_t headerChecksum;
     uint32_t srcAddrs;
     uint32_t dstAddrs;
-    unsigned char options[MAX_IP_OPTIONS_SIZE]; // we need to check if we have important options here
+    unsigned char options[MAX_IP_OPTIONS_SIZE];
+public:
+    IpPacket(uint8_t version, uint8_t lengthOfHeaders, uint8_t typeOfService,
+        uint16_t totalLength, uint16_t identification, uint16_t fragmentOffsetIncludingFlags,
+        uint8_t ttl, uint8_t protocol, uint16_t headerChecksum, uint32_t srcAddrs, uint32_t dstAddrs,
+        const unsigned char* options);
+    uint8_t getVersion() const;
+    uint8_t getLengthOfHeaders() const;
+    uint8_t getTypeOfService() const;
+    uint16_t getTotalLength() const;
+    uint16_t getIdentification() const;
+    uint16_t getFragmentOffsetIncludingFlags() const;
+    uint8_t getTtl() const;
+    uint8_t getProtocol() const;
+    uint16_t getHeaderChecksum() const;
+    uint32_t getSrcAddrs() const;
+    uint32_t getDstAddrs() const;
+    const unsigned char* getOptions() const;
 };
+

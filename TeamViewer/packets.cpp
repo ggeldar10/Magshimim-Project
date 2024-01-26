@@ -107,3 +107,72 @@ MessageDropRequestControlPacket::MessageDropRequestControlPacket(uint32_t ackNum
 const std::vector<unsigned int>& MessageDropRequestControlPacket::getLostSequenceNumbers() const {
     return lostSequenceNumbers;
 }
+
+
+IpPacket::IpPacket(uint8_t version, uint8_t lengthOfHeaders, uint8_t typeOfService,
+    uint16_t totalLength, uint16_t identification, uint16_t fragmentOffsetIncludingFlags,
+    uint8_t ttl, uint8_t protocol, uint16_t headerChecksum, uint32_t srcAddrs, uint32_t dstAddrs,
+    const unsigned char* options) :
+    version(version),
+    lengthOfHeaders(lengthOfHeaders),
+    typeOfService(typeOfService),
+    totalLength(totalLength),
+    identification(identification),
+    fragmentOffsetIncludingFlags(fragmentOffsetIncludingFlags),
+    ttl(ttl),
+    protocol(protocol),
+    headerChecksum(headerChecksum),
+    srcAddrs(srcAddrs),
+    dstAddrs(dstAddrs) {
+
+    std::memcpy(this->options, options, MAX_IP_OPTIONS_SIZE);
+}
+
+
+uint8_t IpPacket::getVersion() const {
+    return version;
+}
+
+uint8_t IpPacket::getLengthOfHeaders() const {
+    return lengthOfHeaders;
+}
+
+uint8_t IpPacket::getTypeOfService() const {
+    return typeOfService;
+}
+
+uint16_t IpPacket::getTotalLength() const {
+    return totalLength;
+}
+
+uint16_t IpPacket::getIdentification() const {
+    return identification;
+}
+
+uint16_t IpPacket::getFragmentOffsetIncludingFlags() const {
+    return fragmentOffsetIncludingFlags;
+}
+
+uint8_t IpPacket::getTtl() const {
+    return ttl;
+}
+
+uint8_t IpPacket::getProtocol() const {
+    return protocol;
+}
+
+uint16_t IpPacket::getHeaderChecksum() const {
+    return headerChecksum;
+}
+
+uint32_t IpPacket::getSrcAddrs() const {
+    return srcAddrs;
+}
+
+uint32_t IpPacket::getDstAddrs() const {
+    return dstAddrs;
+}
+
+const unsigned char* IpPacket::getOptions() const {
+    return options;
+}
