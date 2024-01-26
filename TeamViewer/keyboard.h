@@ -5,8 +5,7 @@
 #define WAS_PRESSED 0x8001
 #define NUM_OF_KEY_CODES 255
 
-void makeKeyboardAction(KeyboardKeysActions action, int keyCode);
-KeyboardDataPacket createPacket(KeyboardKeysActions action, int ackSequenceNumber, int packetSequenceNumber, int keyCode);
+void makeKeyboardAction(KeyboardActions action, int keyCode);
 void listenToKeyboard();
 
 class KeyboardButtonActionException : public std::exception
