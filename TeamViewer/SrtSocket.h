@@ -1,6 +1,6 @@
 #pragma once
 #include "packets.h"
-
+#include "packetParser.h"
 #include <queue>
 #include <thread>
 #include <string>
