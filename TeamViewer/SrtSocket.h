@@ -1,6 +1,5 @@
 #pragma once
 #include "packets.h"
-#include "packetParser.h"
 #include <queue>
 #include <thread>
 #include <string>
@@ -16,9 +15,9 @@ private:
 	struct
 	{
 		uint16_t _srcPort;
-		std::string _srcIP;
+		uint32_t _srcIP;
 		uint16_t _dstPort;
-		std::string _dstIP;
+		uint32_t _dstIP;
 		uint32_t _seqNum;
 	} _commInfo; // add connection information here
 	std::queue<std::string> _userRecvDataQueue; // for the recv to save the given information

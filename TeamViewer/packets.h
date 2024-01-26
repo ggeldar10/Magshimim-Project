@@ -38,7 +38,26 @@ enum DefaultPacketTypes
     DataPacket = 0, ControlPacket
 };
 
-enum IpPacketTypesOfServices { IPv4 = 0, IPv6, ICMPv4, ICMPv6, TCP, UDP, IGMP, IPsec, ARP, RARP };
+class UdpPacket
+{
+private:
+    uint16_t _srcPort;
+    uint16_t _dstPort;
+    uint16_t _length;
+    uint16_t _checksum;
+
+public:
+    
+    UdpPacket(uint16_t srcPort, uint16_t dstPort, uint16_t length, uint16_t checksum);    
+    int getSrcPort() const;
+    void setSrcPort(uint16_t srcPort);
+    int getDstPort() const;
+    void setDstPort(uint16_t dstPort);
+    int getLength() const;
+    void setLength(uint16_t length);
+    int getChecksum() const;
+    void setChecksum(uint16_t checksum);
+};
 
 class DefaultPacket {
 protected:
@@ -46,6 +65,7 @@ protected:
     uint32_t ackSequenceNumber;
     uint32_t packetSequenceNumber;
     time_t timeStamp;
+
 public:
     DefaultPacket(DefaultPacketTypes type, uint32_t ackNum, uint32_t packetNum, time_t time);
     DefaultPacketTypes getPacketType() const;
@@ -83,8 +103,8 @@ public:
     unsigned int getKeyCode() const;
 };
 
-typedef struct keyboardDataPacket : defaultDataPacket {
-	keyboardKeysActions action;
+typedef struct keyboardDataPacket : DefaultDataPacket {
+	KeyboardActions action;
 	int keyCode;
 }keyboardDataPacket;
 

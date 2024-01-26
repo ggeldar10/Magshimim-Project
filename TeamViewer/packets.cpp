@@ -176,3 +176,47 @@ uint32_t IpPacket::getDstAddrs() const {
 const unsigned char* IpPacket::getOptions() const {
     return options;
 }
+
+UdpPacket::UdpPacket(uint16_t srcPort, uint16_t dstPort, uint16_t length, uint16_t checksum) : _srcPort(srcPort), _dstPort(dstPort), _length(length), _checksum(checksum)
+{
+}
+
+int UdpPacket::getSrcPort() const
+{
+    return this->_srcPort;
+}
+
+void UdpPacket::setSrcPort(uint16_t srcPort)
+{
+    this->_srcPort = srcPort;
+}
+
+int UdpPacket::getDstPort() const
+{
+    return this->_dstPort;
+}
+
+void UdpPacket::setDstPort(uint16_t dstPort)
+{
+    this->_dstPort = dstPort;
+}
+
+int UdpPacket::getLength() const
+{
+    return _length;
+}
+
+void UdpPacket::setLength(uint16_t length)
+{
+    this->_length = length;
+}
+
+int UdpPacket::getChecksum() const
+{
+    return this->_checksum;
+}
+
+void UdpPacket::setChecksum(uint16_t checksum)
+{
+    this->_checksum = checksum;
+}

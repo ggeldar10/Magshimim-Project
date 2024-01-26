@@ -1,6 +1,7 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "SrtSocket.h"
 #include <iostream>
+#include "packetParser.h"
 
 void SrtSocket::controlThreadFunction()
 {
@@ -58,7 +59,7 @@ void SrtSocket::listenAndAccept()
 		// todo make a check if the ip header protocol is the number we are using for ip 
 		std::string udpHeaders = buffer;
 		udpHeaders = udpHeaders.substr(IP_HEADERS_SIZE, UDP_HEADERS_SIZE);
-		int srcPort = atoi(udpHeaders.substr(0, UDP_HEADER_SIZE).c_str());
+		//int srcPort = atoi(udpHeaders.substr(0, UDP_HEADER_SIZE).c_str());
 		int dstPort = atoi(udpHeaders.substr(UDP_HEADER_SIZE, UDP_HEADER_SIZE).c_str());
 
 	}
@@ -89,15 +90,22 @@ void SrtSocket::srtBind(sockaddr_in* addrs)
 		}
 	}
 	this->_commInfo._srcPort = addrs->sin_port == 0 ? addrs->sin_port : output.sin_port;
-	this->_commInfo._srcIP = addrs->sin_port == 0 ? inet_ntoa(addrs->sin_addr) : inet_ntoa(output.sin_addr);
+	this->_commInfo._srcIP = addrs->sin_port == 0 ?addrs->sin_addr.s_addr : output.sin_addr.s_addr;
 
 }
 
 void SrtSocket::connectToServer(sockaddr_in* addrs)
 {
 	this->_commInfo._dstPort = addrs->sin_port;
-	this->_commInfo._dstIP = inet_ntoa(addrs->sin_addr);
+	this->_commInfo._dstIP = addrs->sin_addr.s_addr;
 	this->srtBind(addrs); 
+	IpPacket ipHeaders = IpPacket(IPV4, MIN_IP_SIZE, 0, /*I think of doing it programticly so right now ill do 0*/ 0, 0, 0, DEFAULT_TTL, IP_SRT_PROTOCOL_NUMBER, 0, this->_commInfo._srcIP, this->_commInfo._dstIP, NULL);
+	HandshakeControlPacket handshakeHeaders = HandshakeControlPacket(0, 0, std::time(nullptr),false, 0, /*find the defualt mtu on the pc*/ 100, 0, /*figure out the max transmission */ 5, INDUCTION_1); // todo create the handshake packet
+	UdpPacket packet = UdpPacket(this->_commInfo._srcPort, this->_commInfo._dstPort, /*do it progmaticly*/ 0, 0);
+	//todo connect them all to one char with the inforamtion needed and do the others
+	
+
+
 
 }
 
