@@ -58,36 +58,6 @@ void makeCursorButtonAction(const CursorActions action, const int scrollValue)
     }
 }
 
-CursorDataPacket createPacket(const CursorActions action, const int ackSequenceNumber, const int packetSequenceNumber, const POINT position, const int scrollValue)
-{
-    CursorDataPacket packet;
-    packet.packetType = DataPacket;
-    packet.dataPacketType = Cursor;
-    packet.timeStamp = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    packet.ackSequenceNumber = ackSequenceNumber;
-    packet.packetSequenceNumber = packetSequenceNumber;
-    packet.action = action;
-
-    switch (action)
-    {
-    case CursorPosition:
-        packet.x = position.x;
-        packet.y = position.y;
-        break;
-
-    case WheelScroll:
-        packet.scrollValue = scrollValue;
-        break;
-
-    default:
-        packet.x = -1;
-        packet.y = -1;
-        packet.scrollValue = 0;
-        break;
-    }
-    return packet;
-}
-
 void listenToCursor()
 {
     bool runLoop = true;

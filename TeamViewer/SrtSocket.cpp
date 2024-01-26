@@ -25,13 +25,7 @@ SrtSocket::SrtSocket()
 		std::cerr << "Error while trying to open a socket" << std::endl;
 		throw "Error while trying to open a socket";
 	}
-	const char enable = 1;
-	if (setsockopt(this->_srtSocket, IPPROTO_IP, IP_HDRINCL, &enable, sizeof(enable)) < 0) {
-		std::cerr << "Error setting IP_HDRINCL option" << std::endl;
-		closesocket(this->_srtSocket);
-		throw "Error setting IP_HDRINCL option";
-	}
-	
+
 }
 
 SrtSocket::~SrtSocket()
@@ -41,8 +35,8 @@ SrtSocket::~SrtSocket()
 }
 
 /*
-intiates the communicatations and wait untill a client has 
-connected only one client at a time 
+intiates the communicatations and wait untill a client has
+connected only one client at a time
 does the handshake and the intilize the missing commInfo
 input:
 output:
@@ -74,7 +68,7 @@ void SrtSocket::listenAndAccept()
 binds the socket to a specific port and ip on the computer
 input: a ptr to the addrs to bind to and the port to bind to
 using the struct sockaddr_in
-output: 
+output:
 */
 void SrtSocket::srtBind(sockaddr_in* addrs)
 {
@@ -114,86 +108,4 @@ void SrtSocket::sendSrt()
 std::string SrtSocket::recvSrt()
 {
 	return std::string();
-}
-
-IpPacket SrtSocket::createIpPacketFromString(const std::string& ipPacketBuffer)
-{
-	if (ipPacketBuffer.length() > MAX_IP_SIZE || ipPacketBuffer.length() < MIN_IP_SIZE)
-	{
-		std::cerr << "Error: the buffer that was given is not valid" << std::endl;
-		throw std::invalid_argument("Error: the buffer that was given is not valid");
-	}
-	IpPacket ipPacket;
-	memset(&ipPacket, 0, sizeof(IpPacket));
-	int index = 0;
-	// might be a problem of big and smalle endians so check when the srt is complete
-	ipPacket.version = (ipPacketBuffer[index] & 0xF0) >> FOUR_BITS;
-	ipPacket.lengthOfHeaders = ipPacketBuffer[index] & 0x0F;
-	index += sizeof(uint8_t);
-	ipPacket.typeOfService = networkToHost<uint8_t>(ipPacketBuffer, index);
-	index += sizeof(uint8_t);
-	ipPacket.totalLength = networkToHost<uint16_t>(ipPacketBuffer, index);
-	index += sizeof(uint16_t);
-	ipPacket.identification = networkToHost<uint16_t>(ipPacketBuffer, index);
-	index += sizeof(uint16_t);
-	ipPacket.identification = networkToHost<uint16_t>(ipPacketBuffer, index);
-	index += sizeof(uint16_t);
-	ipPacket.ttl = networkToHost<uint8_t>(ipPacketBuffer, index);
-	index += sizeof(uint8_t);
-	ipPacket.protocol = networkToHost<uint8_t>(ipPacketBuffer, index);
-	index += sizeof(uint8_t);
-	ipPacket.headerChecksum = networkToHost<uint16_t>(ipPacketBuffer, index);
-	index += sizeof(uint16_t);
-	ipPacket.srcAddrs = networkToHost<uint32_t>(ipPacketBuffer, index);
-	index += sizeof(uint32_t);
-	ipPacket.dstAddrs = networkToHost<uint32_t>(ipPacketBuffer, index);
-	index += sizeof(uint32_t);
-	std::string help = ipPacketBuffer.substr(index);
-	for (int i = 0; i < help.size() && i < MAX_IP_OPTIONS_SIZE; i++)
-	{
-		ipPacket.options[i] = help[i];
-	}
-	return ipPacket;
-}
-
-IpPacket SrtSocket::createIpPacket(IpPacketTypesOfServices serviceType, int totalLength, int packetID, int flags, int checksum, uint32_t srcAddr, uint32_t dstAddr)
-{
-	IpPacket packet;
-	packet.version = IPV4;
-	packet.lengthOfHeaders = IP_HEADERS_SIZE;
-	packet.typeOfService = static_cast<uint8_t>(serviceType);
-	packet.totalLength = htons(static_cast<uint16_t>(totalLength)); 
-	packet.identification = htons(static_cast<uint16_t>(packetID)); 
-	packet.fragmentOffsetIncludingFlags = htons(static_cast<uint16_t>(flags)); 
-	packet.ttl = DEFAULT_TTL;
-	packet.protocol = UDP_PROTOCOL_CODE;
-	packet.headerChecksum = htons(static_cast<uint16_t>(checksum)); 
-	packet.srcAddrs = srcAddr;
-	packet.dstAddrs = dstAddr;
-
-	std::memset(packet.options, 0, sizeof(packet.options));
-
-	return packet;
-}
-
-
-template<typename nthSize>
-inline nthSize SrtSocket::networkToHost(const std::string& buffer, int index)
-{
-	if (index + sizeof(nthSize) > buffer.size())
-	{
-		std::cerr << "Error buffer size is not big enough" << std::endl;
-		throw "Error buffer size is not big enough";
-	}
-	nthSize networkToHostNum = 0;
-	for (int i = 0; i < sizeof(nthSize); i++)
-	{
-		networkToHostNum = networkToHostNum << BYTE_IN_BITS;
-		networkToHostNum = networkToHostNum | static_cast<nthSize>(buffer[index + i]);
-	}
-	if constexpr (sizeof(nthSize) >= sizeof(uint32_t))
-	{
-		return ntohl(networkToHostNum);
-	}
-	return ntohs(networkToHostNum);
 }
