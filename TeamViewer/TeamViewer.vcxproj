@@ -129,6 +129,7 @@
   <ItemGroup>
     <ClInclude Include="cursor.h" />
     <ClInclude Include="keyboard.h" />
+    <ClInclude Include="packetParser.h" />
     <ClInclude Include="windowsHeaders.h" />
     <ClInclude Include="packets.h" />
     <ClInclude Include="SrtSocket.h" />
@@ -136,6 +137,7 @@
   <ItemGroup>
     <ClCompile Include="cursor.cpp" />
     <ClCompile Include="keyboard.cpp" />
+    <ClCompile Include="packetParser.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="SrtSocket.cpp" />
   </ItemGroup>

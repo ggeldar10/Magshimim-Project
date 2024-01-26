@@ -39,6 +39,9 @@
     <ClCompile Include="SrtSocket.cpp">
       <Filter>Source Files\communication</Filter>
     </ClCompile>
+    <ClCompile Include="packetParser.cpp">
+      <Filter>Source Files\communication</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cursor.h">
@@ -54,6 +57,9 @@
       <Filter>Header Files\communication</Filter>
     </ClInclude>
     <ClInclude Include="packets.h">
+      <Filter>Header Files\communication</Filter>
+    </ClInclude>
+    <ClInclude Include="packetParser.h">
       <Filter>Header Files\communication</Filter>
     </ClInclude>
   </ItemGroup>

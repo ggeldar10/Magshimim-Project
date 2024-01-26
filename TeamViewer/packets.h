@@ -5,14 +5,7 @@
 #include <string>
 #include <vector>
 
-#define UDP_HEADERS_SIZE 8
-#define UDP_HEADER_SIZE 16
-#define IP_HEADERS_SIZE 20
-#define IP_SRT_PROTOCOL_NUMBER 160
-#define IP_VERSION_HEADER_SIZE 4
 #define MAX_IP_OPTIONS_SIZE 10
-#define MAX_IP_SIZE 60
-#define MIN_IP_SIZE 40
 
 enum DataPacketTypes
 {
@@ -43,6 +36,8 @@ enum DefaultPacketTypes
 {
     DataPacket = 0, ControlPacket
 };
+
+enum IpPacketTypesOfServices { IPv4, IPv6, ICMPv4, ICMPv6, TCP, UDP, IGMP, IPsec, ARP, RARP };
 
 struct DefaultPacket {
     DefaultPacketTypes packetType;
