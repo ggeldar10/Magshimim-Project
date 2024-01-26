@@ -1,6 +1,6 @@
 #include "packetParser.h"
 
-IpPacket createIpPacketFromString(const std::string& ipPacketBuffer)
+IpPacket packetParser::createIpPacketFromString(const std::string& ipPacketBuffer)
 {
 	if (ipPacketBuffer.length() > MAX_IP_SIZE || ipPacketBuffer.length() < MIN_IP_SIZE)
 	{
@@ -40,7 +40,7 @@ IpPacket createIpPacketFromString(const std::string& ipPacketBuffer)
 	return ipPacket;
 }
 
-IpPacket createIpPacket(IpPacketTypesOfServices serviceType, int totalLength, int packetID, int flags, int checksum, uint32_t srcAddr, uint32_t dstAddr)
+IpPacket packetParser::createIpPacket(IpPacketTypesOfServices serviceType, int totalLength, int packetID, int flags, int checksum, uint32_t srcAddr, uint32_t dstAddr)
 {
 	IpPacket packet;
 	packet.version = IPV4;
@@ -60,7 +60,13 @@ IpPacket createIpPacket(IpPacketTypesOfServices serviceType, int totalLength, in
 	return packet;
 }
 
-HandshakeControlPacket createHandshakePacketFromString(const std::string& handshakePacketBuffer)
+DefaultPacket packetParser::createDefualtPacket(DefaultPacketTypes type, uint32_t ackSequenceNumber, uint32_t packetSequenceNumber, time_t timeStamp)
+{
+	DefaultPacket packet;
+	packet
+}
+
+HandshakeControlPacket packetParser::createHandshakePacketFromString(const std::string& handshakePacketBuffer)
 {
 	if (handshakePacketBuffer.length() > MAX_IP_SIZE || handshakePacketBuffer.length() < MIN_IP_SIZE)
 	{
@@ -94,7 +100,7 @@ HandshakeControlPacket createHandshakePacketFromString(const std::string& handsh
 
 
 template<typename nthSize>
-inline nthSize networkToHost(const std::string& buffer, int index)
+inline nthSize packetParser::networkToHost(const std::string& buffer, int index)
 {
 	if (index + sizeof(nthSize) > buffer.size())
 	{
@@ -114,7 +120,3 @@ inline nthSize networkToHost(const std::string& buffer, int index)
 	return ntohs(networkToHostNum);
 }
 
-IpPacket createIpPacketFromString(const std::string& ipPacketBuffer)
-{
-	return IpPacket();
-}

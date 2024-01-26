@@ -15,11 +15,20 @@
 #define DEFAULT_TTL 64
 #define UDP_PROTOCOL_CODE 17
 
-IpPacket createIpPacketFromString(const std::string& ipPacketBuffer);
-IpPacket createIpPacket(IpPacketTypesOfServices serviceType, int totalLength, int packetID, int flags, int checksum, uint32_t srcAddr, uint32_t dstAddr);
+class packetParser
+{
+public:
+	template<typename nthSize>
+	inline static nthSize networkToHost(const std::string& buffer, int index);
 
-HandshakeControlPacket createHandshakePacketFromString(const std::string& handshakePacketBuffer);
+	IpPacket static createIpPacketFromString(const std::string& ipPacketBuffer);
+	IpPacket static createIpPacket(IpPacketTypesOfServices serviceType, int totalLength, int packetID, int flags, int checksum, uint32_t srcAddr, uint32_t dstAddr);
 
-template<typename nthSize>
-inline nthSize networkToHost(const std::string& buffer, int index);
+	DefaultPacket static createDefualtPacket(DefaultPacketTypes type, uint32_t ackSequenceNumber, uint32_t packetSequenceNumber, time_t timeStamp);
+
+	HandshakeControlPacket static createHandshakePacketFromString(const std::string& handshakePacketBuffer);
+
+private:
+
+};
 

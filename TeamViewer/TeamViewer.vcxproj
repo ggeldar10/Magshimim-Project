@@ -138,6 +138,7 @@
     <ClCompile Include="cursor.cpp" />
     <ClCompile Include="keyboard.cpp" />
     <ClCompile Include="packetParser.cpp" />
+    <ClCompile Include="packets.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="SrtSocket.cpp" />
   </ItemGroup>

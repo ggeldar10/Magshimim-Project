@@ -39,39 +39,52 @@ enum DefaultPacketTypes
 
 enum IpPacketTypesOfServices { IPv4, IPv6, ICMPv4, ICMPv6, TCP, UDP, IGMP, IPsec, ARP, RARP };
 
-struct DefaultPacket {
+class DefaultPacket {
+private:
     DefaultPacketTypes packetType;
     uint32_t ackSequenceNumber;
     uint32_t packetSequenceNumber;
     time_t timeStamp;
     DefaultPacket* data;
+
+public:
+    DefaultPacket(DefaultPacketTypes type, uint32_t ackNum, uint32_t packetNum, time_t time);
+    void setData(DefaultPacket* data);
+    DefaultPacketTypes getPacketType() const;
+    uint32_t getAckSequenceNumber() const;
+    uint32_t getPacketSequenceNumber() const;
+    time_t getTimeStamp() const;
+    DefaultPacket* getData() const;
 };
 
-struct DefaultDataPacket : DefaultPacket {
+class DefaultDataPacket : DefaultPacket {
+private:
     DataPacketTypes dataPacketType;
     DefaultDataPacket* data;
 };
 
-struct CursorDataPacket : DefaultDataPacket {
+class CursorDataPacket : DefaultDataPacket {
     CursorActions action;
     int scrollValue;
     unsigned int x;
     unsigned int y;
 };
 
-struct KeyboardDataPacket : DefaultDataPacket {
+class KeyboardDataPacket : DefaultDataPacket {
+private:
     KeyboardKeysActions action;
     int keyCode;
 };
 
 // Will add chat and screen data packets later
 
-struct DefaultControlPacket : DefaultPacket {
+class DefaultControlPacket : DefaultPacket {
+private:
     ControlPacketTypes controlPacketType;
     DefaultControlPacket* data;
 };
 
-struct HandshakeControlPacket : DefaultControlPacket {
+class HandshakeControlPacket : DefaultControlPacket {
     bool hasEncryption;
     uint16_t encryption_key;
     uint32_t windowSize;
@@ -83,11 +96,11 @@ struct HandshakeControlPacket : DefaultControlPacket {
 // There is no need for keep-alive, ACK, ACKACK, shutdown, congestion-warning, peer-error packet structs.
 // Instead, we will send DefaultControlPacket with the right ControlPacketTypes.
 
-struct NAKControlPacket : DefaultControlPacket {
+class NAKControlPacket : DefaultControlPacket {
     std::vector<unsigned int> lostSequenceNumbers;
 };
 
-struct MessageDropRequestControlPacket : DefaultControlPacket {
+class MessageDropRequestControlPacket : DefaultControlPacket {
     std::vector<unsigned int> lostSequenceNumbers;
 };
 
