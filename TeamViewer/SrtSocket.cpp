@@ -93,8 +93,12 @@ void SrtSocket::srtBind(sockaddr_in* addrs)
 
 }
 
-void SrtSocket::connectToServer() // bind the client to a port
+void SrtSocket::connectToServer(sockaddr_in* addrs)
 {
+	this->_commInfo._dstPort = addrs->sin_port;
+	this->_commInfo._dstIP = inet_ntoa(addrs->sin_addr);
+	this->srtBind(addrs); 
+
 }
 
 void SrtSocket::sendSrt()

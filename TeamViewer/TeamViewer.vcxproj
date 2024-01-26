@@ -133,6 +133,7 @@
     <ClInclude Include="windowsHeaders.h" />
     <ClInclude Include="packets.h" />
     <ClInclude Include="SrtSocket.h" />
+    <ClInclude Include="windowsHeaders.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cursor.cpp" />

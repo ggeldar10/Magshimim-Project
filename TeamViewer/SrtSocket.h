@@ -27,7 +27,6 @@ private:
 	// Methods
 	//
 	void controlThreadFunction(); // we need to think how we implement it 
-
 	bool isValidIpv4Checksum(const IpPacket& ipPacket);
 	
 public:
@@ -38,7 +37,7 @@ public:
 	~SrtSocket();
 	void listenAndAccept(); // needs to block the current thread and start the thread function 
 	void srtBind(sockaddr_in* sockaddr);
-	void connectToServer();
+	void connectToServer(sockaddr_in* addrs);
 	void sendSrt();
 	std::string recvSrt();
 };

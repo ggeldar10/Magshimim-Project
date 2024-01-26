@@ -83,7 +83,10 @@ public:
     unsigned int getKeyCode() const;
 };
 
-// Will add chat and screen data packets later
+typedef struct keyboardDataPacket : defaultDataPacket {
+	keyboardKeysActions action;
+	int keyCode;
+}keyboardDataPacket;
 
 class DefaultControlPacket : DefaultPacket {
 protected:
