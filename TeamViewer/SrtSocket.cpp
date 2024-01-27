@@ -44,8 +44,23 @@ std::vector<unsigned char> SrtSocket::packetToBytes(const IpPacket& ipHeaders, c
 			buffer.push_back(ipHeaders.getOptions()[i]);
 		}
 	}
+
+	hostToNetworkIntoVector<uint16_t>(&buffer, udpHeaders.getSrcPort());
+	hostToNetworkIntoVector<uint16_t>(&buffer, udpHeaders.getDstPort());
+	hostToNetworkIntoVector<uint16_t>(&buffer, udpHeaders.getLength());
+	hostToNetworkIntoVector<uint16_t>(&buffer, udpHeaders.getChecksum());
+
+
+	return buffer;
 }
 
+/*
+* insert the value to the vector in a big endian order 
+* input:
+* addVector - a pointer to the vector to insert to 
+* value - the value to insert to the vector
+* output: none
+*/
 template<typename htnSize>
 inline void SrtSocket::hostToNetworkIntoVector(std::vector<unsigned char>* addVector, htnSize value)
 {
