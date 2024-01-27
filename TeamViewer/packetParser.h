@@ -7,9 +7,10 @@
 #define IP_HEADERS_SIZE 20
 #define IP_SRT_PROTOCOL_NUMBER 160
 #define IP_VERSION_HEADER_SIZE 4
-#define MAX_IP_SIZE 60
-#define MIN_IP_SIZE 40
+#define MAX_IP_SIZE 40
+#define MIN_IP_SIZE 20
 #define FOUR_BITS 4
+#define TURN_WORD_TO_BYTES_FACTOR 4
 #define BYTE_IN_BITS 8
 #define IPV4 4
 #define DEFAULT_TTL 64
