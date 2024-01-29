@@ -21,7 +21,9 @@ class packetParser
 public:
 	template<typename nthSize>
 	inline static nthSize networkToHost(const std::string& buffer, int index);
-
+	static std::vector<unsigned char> packetToBytes(const IpPacket& ipHeaders, const UdpPacket& udpHeaders, const DefaultPacket& strHeaders, const std::vector<unsigned char>& data);
+	template<typename htnSize>
+	static inline void hostToNetworkIntoVector(std::vector<unsigned char>* addVector, htnSize value);
 	static IpPacket createIpPacketFromString(const std::string& ipPacketBuffer);
 	static DefaultPacket createDefaultPacketFromString(const std::string& defaultPacketBuffer);
 	static DefaultDataPacket createDefaultDataPacketFromString(const std::string& defaultDataPacketBuffer, int startingIndex);

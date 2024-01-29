@@ -13,66 +13,6 @@ bool SrtSocket::isValidIpv4Checksum(const IpPacket& ipPacket)
 	return true; // todo make the check for the valid checksum
 }
 
-/*
-* this turns the packets into one packet that we send
-* it turns everysingle one of the headers into bytes 
-* and put it inside the given char array
-* input: 
-* ipHeaders - the headers of the ip 
-* udpHeaders - the headers of the udp
-* handshakeHeaders - the headers of the 
-* output:
-* a vector with all the bytes of the packet in bigendian order
-*/
-std::vector<unsigned char> SrtSocket::packetToBytes(const IpPacket& ipHeaders, const UdpPacket& udpHeaders, const DefaultPacket& srtHeaders, const std::vector<unsigned char>& data)
-{
-	std::vector<unsigned char> buffer;
-	buffer.push_back((ipHeaders.getVersion() << FOUR_BITS) | ipHeaders.getLengthOfHeaders());
-	buffer.push_back(ipHeaders.getTypeOfService());
-	hostToNetworkIntoVector<uint16_t>(&buffer, ipHeaders.getTotalLength());
-	hostToNetworkIntoVector<uint16_t>(&buffer, ipHeaders.getIdentification());
-	hostToNetworkIntoVector<uint16_t>(&buffer, ipHeaders.getFragmentOffsetIncludingFlags());
-	buffer.push_back(ipHeaders.getTtl());
-	buffer.push_back(ipHeaders.getProtocol());
-	hostToNetworkIntoVector<uint16_t>(&buffer, ipHeaders.getHeaderChecksum());
-	hostToNetworkIntoVector<uint32_t>(&buffer, ipHeaders.getSrcAddrs());
-	hostToNetworkIntoVector<uint32_t>(&buffer, ipHeaders.getDstAddrs());
-	if (ipHeaders.getOptions())
-	{
-		for (int i = 0; i < ipHeaders.getLengthOfHeaders() * TURN_WORD_TO_BYTES_FACTOR - MIN_IP_SIZE; i++)
-		{
-			buffer.push_back(ipHeaders.getOptions()[i]);
-		}
-	}
-
-	// todo srtHeaders.getBytes() to buffer
-
-	for (int i = 0; i < data.size(); i++)
-	{
-		buffer.push_back(data[i]);
-	}
-
-	return buffer;
-}
-
-/*
-* insert the value to the vector in a big endian order 
-* input:
-* addVector - a pointer to the vector to insert to 
-* value - the value to insert to the vector
-* output: none
-*/
-template<typename htnSize>
-inline void SrtSocket::hostToNetworkIntoVector(std::vector<unsigned char>* addVector, htnSize value)
-{
-	htnSize andFactor = 0xFF << ((sizeof(htnSize) - 1) * BYTE_IN_BITS);
-	for (int i = 0; i < sizeof(htnSize); i++)
-	{
-		addVector->push_back(value & andFactor);
-		andFactor >>= BYTE_IN_BITS;
-	}
-}
-
 SrtSocket::SrtSocket()
 {
 	WSADATA wsaData;
