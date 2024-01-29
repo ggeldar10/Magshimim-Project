@@ -24,7 +24,7 @@ bool SrtSocket::isValidIpv4Checksum(const IpPacket& ipPacket)
 * output:
 * a vector with all the bytes of the packet in bigendian order
 */
-std::vector<unsigned char> SrtSocket::packetToBytes(const IpPacket& ipHeaders, const UdpPacket& udpHeaders, const HandshakeControlPacket& handshakeHeaders, const std::vector<unsigned char>& data)
+std::vector<unsigned char> SrtSocket::packetToBytes(const IpPacket& ipHeaders, const UdpPacket& udpHeaders, const DefaultPacket& srtHeaders, const std::vector<unsigned char>& data)
 {
 	std::vector<unsigned char> buffer;
 	buffer.push_back((ipHeaders.getVersion() << FOUR_BITS) | ipHeaders.getLengthOfHeaders());
@@ -45,11 +45,12 @@ std::vector<unsigned char> SrtSocket::packetToBytes(const IpPacket& ipHeaders, c
 		}
 	}
 
-	hostToNetworkIntoVector<uint16_t>(&buffer, udpHeaders.getSrcPort());
-	hostToNetworkIntoVector<uint16_t>(&buffer, udpHeaders.getDstPort());
-	hostToNetworkIntoVector<uint16_t>(&buffer, udpHeaders.getLength());
-	hostToNetworkIntoVector<uint16_t>(&buffer, udpHeaders.getChecksum());
+	// todo srtHeaders.getBytes() to buffer
 
+	for (int i = 0; i < data.size(); i++)
+	{
+		buffer.push_back(data[i]);
+	}
 
 	return buffer;
 }

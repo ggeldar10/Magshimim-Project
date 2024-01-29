@@ -27,7 +27,7 @@ private:
 	//
 	void controlThreadFunction(); // we need to think how we implement it 
 	bool isValidIpv4Checksum(const IpPacket& ipPacket);
-	static std::vector<unsigned char> packetToBytes(const IpPacket& ipHeaders, const UdpPacket& udpHeaders, const HandshakeControlPacket& handshakeHeaders, const std::vector<unsigned char>& data);
+	static std::vector<unsigned char> packetToBytes(const IpPacket& ipHeaders, const UdpPacket& udpHeaders, const DefaultPacket& strHeaders, const std::vector<unsigned char>& data);
 	template<typename htnSize>
 	static inline void hostToNetworkIntoVector(std::vector<unsigned char>* addVector, htnSize value);
 
