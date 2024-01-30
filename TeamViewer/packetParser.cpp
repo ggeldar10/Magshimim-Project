@@ -98,7 +98,7 @@ DefaultPacket packetParser::createDefaultPacketFromString(const std::string& def
 * output:
 * a vector with all the bytes of the packet in bigendian order
 */
-std::vector<unsigned char> packetParser::packetToBytes(const IpPacket& ipHeaders, const UdpPacket& udpHeaders, const DefaultPacket& srtHeaders, const std::vector<unsigned char>& data)
+std::vector<unsigned char> packetParser::packetToBytes(const IpPacket& ipHeaders, const UdpPacket& udpHeaders, const DefaultPacket& srtHeaders, const std::vector<unsigned char>* data)
 {
 	std::vector<unsigned char> buffer;
 	buffer.push_back((ipHeaders.getVersion() << FOUR_BITS) | ipHeaders.getLengthOfHeaders());
@@ -121,9 +121,9 @@ std::vector<unsigned char> packetParser::packetToBytes(const IpPacket& ipHeaders
 
 	// todo srtHeaders.getBytes() to buffer
 
-	for (int i = 0; i < data.size(); i++)
+	for (int i = 0; i < data->size(); i++)
 	{
-		buffer.push_back(data[i]);
+		buffer.push_back(data->at(i));
 	}
 
 	return buffer;
