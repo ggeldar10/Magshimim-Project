@@ -98,9 +98,9 @@ DefaultPacket packetParser::createDefaultPacketFromString(const std::string& def
 * output:
 * a vector with all the bytes of the packet in bigendian order
 */
-std::vector<unsigned char> packetParser::packetToBytes(const IpPacket& ipHeaders, const UdpPacket& udpHeaders, const DefaultPacket& srtHeaders, const std::vector<unsigned char>* data)
+std::vector<const char> packetParser::packetToBytes(const IpPacket& ipHeaders, const UdpPacket& udpHeaders, const DefaultPacket& srtHeaders, const std::vector<const char>* data)
 {
-	std::vector<unsigned char> buffer;
+	std::vector<const char> buffer;
 	buffer.push_back((ipHeaders.getVersion() << FOUR_BITS) | ipHeaders.getLengthOfHeaders());
 	buffer.push_back(ipHeaders.getTypeOfService());
 	hostToNetworkIntoVector<uint16_t>(&buffer, ipHeaders.getTotalLength());
@@ -138,7 +138,7 @@ std::vector<unsigned char> packetParser::packetToBytes(const IpPacket& ipHeaders
 * output: none
 */
 template<typename htnSize>
-inline void packetParser::hostToNetworkIntoVector(std::vector<unsigned char>* addVector, htnSize value)
+inline void packetParser::hostToNetworkIntoVector(std::vector<const char>* addVector, htnSize value)
 {
 	htnSize andFactor = 0xFF << ((sizeof(htnSize) - 1) * BYTE_IN_BITS);
 	for (int i = 0; i < sizeof(htnSize); i++)

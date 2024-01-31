@@ -16,15 +16,16 @@
 #define DEFAULT_TTL 64
 #define UDP_PROTOCOL_CODE 17
 #define DEFUALT_MTU_SIZE 1500
+#define DEFUALT_MAX_TRANSMISSION 10
 
 class packetParser
 {
 public:
 	template<typename nthSize>
 	inline static nthSize networkToHost(const std::string& buffer, int index);
-	static std::vector<unsigned char> packetToBytes(const IpPacket& ipHeaders, const UdpPacket& udpHeaders, const DefaultPacket& strHeaders, const std::vector<unsigned char>& data);
+	static std::vector<const char> packetToBytes(const IpPacket& ipHeaders, const UdpPacket& udpHeaders, const DefaultPacket& strHeaders, const std::vector<const char>* data);
 	template<typename htnSize>
-	static inline void hostToNetworkIntoVector(std::vector<unsigned char>* addVector, htnSize value);
+	static inline void hostToNetworkIntoVector(std::vector<const char>* addVector, htnSize value);
 	static IpPacket createIpPacketFromString(const std::string& ipPacketBuffer);
 	static DefaultPacket createDefaultPacketFromString(const std::string& defaultPacketBuffer);
 	static DefaultDataPacket createDefaultDataPacketFromString(const std::string& defaultDataPacketBuffer, int startingIndex);

@@ -137,7 +137,7 @@ void SrtSocket::connectToServer(sockaddr_in* addrs)
 	std::string parser = recvBuffer;
 	uint8_t headerLength = parser[1] & 0x0F;
 	ipHeaders = packetParser::createIpPacketFromString(parser.substr(headerLength));
-	if (!isValidIpHeaders(ipHeaders))
+	if (!isValidIpHeaders(ipHeaders)) // maybe do a while loop to make sure it will get the right response
 	{
 		std::cerr << "Error in the ip packet recieved" << std::endl;
 		throw "Error in the ip packet recieved";
@@ -149,16 +149,29 @@ void SrtSocket::connectToServer(sockaddr_in* addrs)
 		throw "Error in the udp packet recieved";
 	}
 	handshakeHeaders = packetParser::createHandshakePacketFromString(parser, headerLength + UDP_HEADERS_SIZE);
-
-
-
-
-	
-	
-
-
-
-
+	//do a check for the handshake headers 
+	this->_commInfo.otherComputerMaxTransmission = handshakeHeaders.getMaxTransmission();
+	this->_commInfo.otherComputerMtu = handshakeHeaders.getWindowSize();
+	handshakeHeaders = HandshakeControlPacket(4, 0, time(nullptr), false, 0, DEFUALT_MTU_SIZE, 5, DEFUALT_MAX_TRANSMISSION, SUMMARY_1);
+	if (!recv(this->_srtSocket, recvBuffer, RECV_BUFFER_SIZE, 0))
+	{
+		std::cerr << "Error occured while doing handshake" << std::endl;
+		throw "Error occured while doing handshake";
+	}
+	std::string parser = recvBuffer;
+	uint8_t headerLength = parser[1] & 0x0F;
+	ipHeaders = packetParser::createIpPacketFromString(parser.substr(headerLength));
+	if (!isValidIpHeaders(ipHeaders)) // maybe do a while loop to make sure it will get the right response
+	{
+		std::cerr << "Error in the ip packet recieved" << std::endl;
+		throw "Error in the ip packet recieved";
+	}
+	udpHeaders = packetParser::createUdpPacketFromString(parser.substr(headerLength, UDP_HEADERS_SIZE));
+	if (!isValidUdpHeaders(udpHeaders))
+	{
+		std::cerr << "Error in the udp packet recieved" << std::endl;
+		throw "Error in the udp packet recieved";
+	}
 }
 
 void SrtSocket::sendSrt()
