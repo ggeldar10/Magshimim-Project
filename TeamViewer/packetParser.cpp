@@ -171,3 +171,57 @@ HandshakeControlPacket PacketParser::createHandshakeControlPacketFromString(cons
 	HandshakeControlPacket packet = HandshakeControlPacket(defaultControlPacket.getAckSequenceNumber(), defaultControlPacket.getPacketSequenceNumber(), defaultControlPacket.getTimeStamp(), isEncrypted, encryption_key, windowSize, initialPacketSequenceNumber, maxTransmission, phase);
 	return packet;
 }
+
+NAKControlPacket PacketParser::createNAKControlPacketFromString(const std::string& nakControlPacketBuffer) {
+	ControlPacketTypes controlPacketType;
+	uint32_t ackSequenceNumber;
+	uint32_t packetSequenceNumber;
+	time_t timeStamp;
+
+	int index = 0;
+
+	DefaultControlPacket defaultControlPacket = createDefaultControlPacketFromString(nakControlPacketBuffer, index);
+	controlPacketType = static_cast<ControlPacketTypes>((nakControlPacketBuffer[index] & 0xF0) >> FOUR_BITS);
+	index += sizeof(ControlPacketTypes);
+	ackSequenceNumber = networkToHost<uint32_t>(nakControlPacketBuffer, index);
+	index += sizeof(uint32_t);
+	packetSequenceNumber = networkToHost<uint32_t>(nakControlPacketBuffer, index);
+	index += sizeof(uint32_t);
+	timeStamp = networkToHost<uint32_t>(nakControlPacketBuffer, index);
+
+	std::vector<unsigned int> lostSeqNums;
+	while (index < nakControlPacketBuffer.size()) {
+		lostSeqNums.push_back(networkToHost<unsigned int>(nakControlPacketBuffer, index));
+		index += sizeof(unsigned int);
+	}
+
+	NAKControlPacket packet = NAKControlPacket(defaultControlPacket.getAckSequenceNumber(), defaultControlPacket.getPacketSequenceNumber(), defaultControlPacket.getTimeStamp(), lostSeqNums);
+	return packet;
+}
+
+MessageDropRequestControlPacket PacketParser::createMessageDropRequestControlPacketFromString(const std::string& messageDropRequestControlPacketBuffer) {
+	ControlPacketTypes controlPacketType;
+	uint32_t ackSequenceNumber;
+	uint32_t packetSequenceNumber;
+	time_t timeStamp;
+
+	int index = 0;
+
+	DefaultControlPacket defaultControlPacket = createDefaultControlPacketFromString(messageDropRequestControlPacketBuffer, index);
+	controlPacketType = static_cast<ControlPacketTypes>((messageDropRequestControlPacketBuffer[index] & 0xF0) >> FOUR_BITS);
+	index += sizeof(ControlPacketTypes);
+	ackSequenceNumber = networkToHost<uint32_t>(messageDropRequestControlPacketBuffer, index);
+	index += sizeof(uint32_t);
+	packetSequenceNumber = networkToHost<uint32_t>(messageDropRequestControlPacketBuffer, index);
+	index += sizeof(uint32_t);
+	timeStamp = networkToHost<uint32_t>(messageDropRequestControlPacketBuffer, index);
+
+	std::vector<unsigned int> lostSeqNums;
+	while (index < messageDropRequestControlPacketBuffer.size()) {
+		lostSeqNums.push_back(networkToHost<unsigned int>(messageDropRequestControlPacketBuffer, index));
+		index += sizeof(unsigned int);
+	}
+
+	MessageDropRequestControlPacket packet = MessageDropRequestControlPacket(defaultControlPacket.getAckSequenceNumber(), defaultControlPacket.getPacketSequenceNumber(), defaultControlPacket.getTimeStamp(), lostSeqNums);
+	return packet;
+}
