@@ -38,7 +38,7 @@ public:
 	void listenAndAccept(); // needs to block the current thread and start the thread function 
 	void srtBind(sockaddr_in* sockaddr);
 	void connectToServer(sockaddr_in* addrs);
-	void sendSrt();
+	void sendSrt(const DefaultPacket* packet);
 	std::string recvSrt();
 };
 

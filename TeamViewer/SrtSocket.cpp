@@ -4,7 +4,14 @@
 
 void SrtSocket::controlThreadFunction()
 {
-
+	while (true)
+	{
+		std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+		std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
+		DefaultControlPacket packet = DefaultControlPacket(-1, -1, currentTime, KEEPALIVE);
+		sendSrt(&packet);
+		Sleep(1000);
+	}
 }
 
 bool SrtSocket::isValidIpv4Checksum(const IpPacket& ipPacket)
@@ -102,9 +109,10 @@ void SrtSocket::connectToServer(sockaddr_in* addrs)
 
 }
 
-void SrtSocket::sendSrt()
-{
+void SrtSocket::sendSrt(const DefaultPacket* packet) {
+	std::vector<uint8_t> buffer = packet->toBuffer();
 }
+
 
 std::string SrtSocket::recvSrt()
 {
