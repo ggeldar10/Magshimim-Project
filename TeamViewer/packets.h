@@ -8,33 +8,27 @@
 
 #define MAX_IP_OPTIONS_SIZE 10
 
-enum DataPacketTypes
-{
+enum DataPacketTypes {
     Cursor = 0, Keyboard, Screen, Chat
 };
 
-enum CursorActions
-{
+enum CursorActions {
     CursorPosition = 0, LeftButtonDown, LeftButtonUp, RightButtonDown, RightButtonUp, MiddleButtonDown, MiddleButtonUp, WheelScroll
 };
 
-enum KeyboardActions
-{
+enum KeyboardActions {
     KeyUp = 0, KeyDown
 };
 
-enum ControlPacketTypes
-{
+enum ControlPacketTypes {
     HANDSHAKE = 0, KEEPALIVE, ACK, NAK, CongestionWarning, SHUTDOWN, ACKACK, DROPREQ, PEERERROR
 };
 
-enum HandshakePhases : uint8_t
-{
+enum HandshakePhases : uint8_t {
     INDUCTION_1 = 0, INDUCTION_2, SUMMARY_1, SUMMARY_2
 };
 
-enum DefaultPacketTypes
-{
+enum DefaultPacketTypes {
     DataPacket = 0, ControlPacket
 };
 
@@ -46,20 +40,26 @@ protected:
     uint32_t ackSequenceNumber;
     uint32_t packetSequenceNumber;
     time_t timeStamp;
+
 public:
     DefaultPacket(DefaultPacketTypes type, uint32_t ackNum, uint32_t packetNum, time_t time);
     DefaultPacketTypes getPacketType() const;
     uint32_t getAckSequenceNumber() const;
     uint32_t getPacketSequenceNumber() const;
     time_t getTimeStamp() const;
+
+    virtual std::vector<uint8_t> toBuffer() const;
 };
 
 class DefaultDataPacket : public DefaultPacket {
 protected:
     DataPacketTypes dataPacketType;
+
 public:
     DefaultDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, DataPacketTypes dataPacketType);
     DataPacketTypes getDataType() const;
+
+    std::vector<uint8_t> toBuffer() const override;
 };
 
 class CursorDataPacket : public DefaultDataPacket {
@@ -67,34 +67,38 @@ private:
     CursorActions action;
     int scrollValue;
     POINT location;
+
 public:
     CursorDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, CursorActions action, int scrollValue, unsigned int x, unsigned int y);
-    CursorActions getAction(CursorActions action);
+    CursorActions getAction() const;
     POINT getLocation() const;
     int getScrollValue() const;
+
+    std::vector<uint8_t> toBuffer() const override;
 };
 
 class KeyboardDataPacket : public DefaultDataPacket {
 private:
     KeyboardActions action;
     unsigned int keyCode;
+
 public:
     KeyboardDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, KeyboardActions action, int keyCode);
     KeyboardActions getAction() const;
     unsigned int getKeyCode() const;
-};
 
-typedef struct keyboardDataPacket : defaultDataPacket {
-	keyboardKeysActions action;
-	int keyCode;
-}keyboardDataPacket;
+    std::vector<uint8_t> toBuffer() const override;
+};
 
 class DefaultControlPacket : public DefaultPacket {
 protected:
     ControlPacketTypes controlPacketType;
+
 public:
     DefaultControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, ControlPacketTypes controlPacketType);
     ControlPacketTypes getControlType() const;
+
+    std::vector<uint8_t> toBuffer() const override;
 };
 
 class HandshakeControlPacket : public DefaultControlPacket {
@@ -105,6 +109,7 @@ private:
     uint32_t initialPacketSequenceNumber;
     uint32_t maxTransmission;
     HandshakePhases phase;
+
 public:
     HandshakeControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, bool hasEncryption, uint16_t encryption_key, uint32_t windowSize, uint32_t initialPacketSequenceNumber, uint32_t maxTransmission, HandshakePhases phase);
     bool hasEncryption() const;
@@ -113,57 +118,32 @@ public:
     uint32_t getInitialPacketSequenceNumber() const;
     uint32_t getMaxTransmission() const;
     HandshakePhases getPhase() const;
-};
 
-// There is no need for keep-alive, ACK, ACKACK, shutdown, congestion-warning, peer-error packet structs.
-// Instead, we will send DefaultControlPacket with the right ControlPacketTypes.
+    std::vector<uint8_t> toBuffer() const override;
+};
 
 class NAKControlPacket : public DefaultControlPacket {
 private:
     std::vector<unsigned int> lostSequenceNumbers;
+
 public:
     NAKControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, const std::vector<unsigned int>& lostSeqNums);
     const std::vector<unsigned int>& getLostSequenceNumbers() const;
+
+    std::vector<uint8_t> toBuffer() const override;
 };
 
 class MessageDropRequestControlPacket : public DefaultControlPacket {
+private:
     std::vector<unsigned int> lostSequenceNumbers;
+
 public:
     MessageDropRequestControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, const std::vector<unsigned int>& lostSeqNums);
     const std::vector<unsigned int>& getLostSequenceNumbers() const;
 
+    std::vector<uint8_t> toBuffer() const override;
 };
 
-
-/*
- 0                   1
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|Version|  IHL  |Type of Service|
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|          Total Length         |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|         Identification        |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|Flags|     Fragment Offset     |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|  Time to Live |    Protocol   |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|        Header Checksum        |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                               |
-+         Source Address        +
-|                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                               |
-+      Destination Address      +
-|                               |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|            Options            |
-+               +-+-+-+-+-+-+-+-+
-|               |    Padding    |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-*/
 class IpPacket {
 private:
     uint8_t version;
@@ -178,11 +158,13 @@ private:
     uint32_t srcAddrs;
     uint32_t dstAddrs;
     unsigned char options[MAX_IP_OPTIONS_SIZE];
+
 public:
     IpPacket(uint8_t version, uint8_t lengthOfHeaders, uint8_t typeOfService,
         uint16_t totalLength, uint16_t identification, uint16_t fragmentOffsetIncludingFlags,
         uint8_t ttl, uint8_t protocol, uint16_t headerChecksum, uint32_t srcAddrs, uint32_t dstAddrs,
         const unsigned char* options);
+
     uint8_t getVersion() const;
     uint8_t getLengthOfHeaders() const;
     uint8_t getTypeOfService() const;
@@ -195,5 +177,6 @@ public:
     uint32_t getSrcAddrs() const;
     uint32_t getDstAddrs() const;
     const unsigned char* getOptions() const;
-};
 
+    std::vector<uint8_t> toBuffer() const;
+};

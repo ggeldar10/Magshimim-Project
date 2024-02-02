@@ -4,6 +4,7 @@
 
 void SrtSocket::controlThreadFunction()
 {
+
 }
 
 bool SrtSocket::isValidIpv4Checksum(const IpPacket& ipPacket)
