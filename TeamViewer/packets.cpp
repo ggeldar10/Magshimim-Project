@@ -24,6 +24,11 @@ time_t DefaultPacket::getTimeStamp() const {
 DefaultDataPacket::DefaultDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, DataPacketTypes dataPacketType)
     : DefaultPacket(DataPacket, ackNum, packetNum, time), dataPacketType(dataPacketType) {}
 
+DataPacketTypes DefaultDataPacket::getDataType() const
+{
+    return dataPacketType;
+}
+
 // CursorDataPacket Definitions
 CursorDataPacket::CursorDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, CursorActions action, int scrollValue, unsigned int x, unsigned int y)
     : DefaultDataPacket(ackNum, packetNum, time, Cursor), action(action), scrollValue(scrollValue) {
@@ -59,6 +64,11 @@ unsigned int KeyboardDataPacket::getKeyCode() const {
 // DefaultControlPacket Definitions
 DefaultControlPacket::DefaultControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, ControlPacketTypes controlPacketType)
     : DefaultPacket(ControlPacket, ackNum, packetNum, time), controlPacketType(controlPacketType) {}
+
+ControlPacketTypes DefaultControlPacket::getControlType() const
+{
+    return controlPacketType;
+}
 
 // HandshakeControlPacket Definitions
 HandshakeControlPacket::HandshakeControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, bool hasEncryption, uint16_t encryption_key, uint32_t windowSize,

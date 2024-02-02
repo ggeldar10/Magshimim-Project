@@ -15,21 +15,20 @@
 #define DEFAULT_TTL 64
 #define UDP_PROTOCOL_CODE 17
 
-class packetParser
+class PacketParser
 {
 public:
 	template<typename nthSize>
 	inline static nthSize networkToHost(const std::string& buffer, int index);
 
 	static IpPacket createIpPacketFromString(const std::string& ipPacketBuffer);
-	static DefaultPacket createDefaultPacketFromString(const std::string& defaultPacketBuffer);
-	static DefaultDataPacket createDefaultDataPacketFromString(const std::string& defaultDataPacketBuffer, int startingIndex);
-	static CursorDataPacket createCursorDataPacketFromString(const std::string& cursorDataPacketBuffer, int startingIndex);
-	static KeyboardDataPacket createKeyboardDataPacketFromString(const std::string& keyboardDataPacketBuffer, int startingIndex);
-	static DefaultControlPacket createDefaultControlPacketFromString(const std::string& defaultControlPacketBuffer, int startingIndex);
-	static HandshakeControlPacket createHandshakeControlPacketFromString(const std::string& handshakeControlPacketBuffer, int startingIndex);
-	static NAKControlPacket createNAKControlPacketFromString(const std::string& nakControlPacketBuffer, int startingIndex);
-	static MessageDropRequestControlPacket createMessageDropRequestControlPacketFromString(const std::string& messageDropRequestControlPacketBuffer, int startingIndex);
-	HandshakeControlPacket static createHandshakePacketFromString(const std::string& handshakePacketBuffer, int startingIndex);
+	static DefaultPacket createDefaultPacketFromString(const std::string& defaultPacketBuffer, int& index);
+	static DefaultDataPacket createDefaultDataPacketFromString(const std::string& defaultDataPacketBuffer, int& index);
+	static CursorDataPacket createCursorDataPacketFromString(const std::string& cursorDataPacketBuffer);
+	static KeyboardDataPacket createKeyboardDataPacketFromString(const std::string& keyboardDataPacketBuffer);
+	static DefaultControlPacket createDefaultControlPacketFromString(const std::string& defaultControlPacketBuffer, int& index);
+	static HandshakeControlPacket createHandshakeControlPacketFromString(const std::string& handshakeControlPacketBuffer);
+	static NAKControlPacket createNAKControlPacketFromString(const std::string& nakControlPacketBuffer);
+	static MessageDropRequestControlPacket createMessageDropRequestControlPacketFromString(const std::string& messageDropRequestControlPacketBuffer);
 };
 

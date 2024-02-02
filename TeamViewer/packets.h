@@ -54,14 +54,15 @@ public:
     time_t getTimeStamp() const;
 };
 
-class DefaultDataPacket : DefaultPacket {
+class DefaultDataPacket : public DefaultPacket {
 protected:
     DataPacketTypes dataPacketType;
 public:
     DefaultDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, DataPacketTypes dataPacketType);
+    DataPacketTypes getDataType() const;
 };
 
-class CursorDataPacket : DefaultDataPacket {
+class CursorDataPacket : public DefaultDataPacket {
 private:
     CursorActions action;
     int scrollValue;
@@ -73,7 +74,7 @@ public:
     int getScrollValue() const;
 };
 
-class KeyboardDataPacket : DefaultDataPacket {
+class KeyboardDataPacket : public DefaultDataPacket {
 private:
     KeyboardActions action;
     unsigned int keyCode;
@@ -85,14 +86,15 @@ public:
 
 // Will add chat and screen data packets later
 
-class DefaultControlPacket : DefaultPacket {
+class DefaultControlPacket : public DefaultPacket {
 protected:
     ControlPacketTypes controlPacketType;
 public:
     DefaultControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, ControlPacketTypes controlPacketType);
+    ControlPacketTypes getControlType() const;
 };
 
-class HandshakeControlPacket : DefaultControlPacket {
+class HandshakeControlPacket : public DefaultControlPacket {
 private:
     bool isEncrypted;
     uint16_t encryption_key;
@@ -113,7 +115,7 @@ public:
 // There is no need for keep-alive, ACK, ACKACK, shutdown, congestion-warning, peer-error packet structs.
 // Instead, we will send DefaultControlPacket with the right ControlPacketTypes.
 
-class NAKControlPacket : DefaultControlPacket {
+class NAKControlPacket : public DefaultControlPacket {
 private:
     std::vector<unsigned int> lostSequenceNumbers;
 public:
@@ -121,7 +123,7 @@ public:
     const std::vector<unsigned int>& getLostSequenceNumbers() const;
 };
 
-class MessageDropRequestControlPacket : DefaultControlPacket {
+class MessageDropRequestControlPacket : public DefaultControlPacket {
     std::vector<unsigned int> lostSequenceNumbers;
 public:
     MessageDropRequestControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, const std::vector<unsigned int>& lostSeqNums);
