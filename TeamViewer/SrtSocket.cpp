@@ -9,7 +9,7 @@ waits for the packet with the srt protocol and with the right port and ip
 input: none
 output: none
 */
-void SrtSocket::waitForCorrectPacket()
+void SrtSocket::waitForValidPacket()
 {
 
 }
@@ -87,6 +87,7 @@ void SrtSocket::listenAndAccept()
 {
 	bool packetNotFound = true;
 	char buffer[RECV_BUFFER_SIZE] = {0};
+	std::string bufferString;
 	while (packetNotFound)
 	{
 		if (recv(this->_srtSocket, buffer, UDP_HEADERS_SIZE + IP_HEADERS_SIZE + 1, MSG_PEEK) < 0)
@@ -94,7 +95,7 @@ void SrtSocket::listenAndAccept()
 			std::cerr << "Error while trying to get connection" << std::endl;
 			throw "Error while trying to get connection";
 		}
-		std::string bufferString = buffer;
+		bufferString = buffer;
 		IpPacket ipPacketRecv = PacketParser::createIpPacketFromString(bufferString.substr(0, IP_HEADERS_SIZE));
 		if (!isValidIpHeaders(ipPacketRecv))
 		{
@@ -120,8 +121,25 @@ void SrtSocket::listenAndAccept()
 	delete help;
 
 	memset(buffer, 0, RECV_BUFFER_SIZE);
-	waitForCorrectPacket();
+	waitForValidPacket();
 	recv(this->_srtSocket, buffer, RECV_BUFFER_SIZE, 0);
+	bufferString = buffer;
+	IpPacket ipPacketRecv = PacketParser::createIpPacketFromString(bufferString.substr(0, IP_HEADERS_SIZE));
+	UdpPacket udpPacketRecv = PacketParser::createUdpPacketFromString(bufferString.substr(IP_HEADERS_SIZE, UDP_HEADERS_SIZE));
+	HandshakeControlPacket handshakePacketRecv = PacketParser::createHandshakeControlPacketFromString(bufferString.substr(IP_HEADERS_SIZE + UDP_HEADERS_SIZE));
+	
+	// other logic here
+
+	HandshakeControlPacket handshakeSend = HandshakeControlPacket(4, 0, time(nullptr), false, 0, DEFUALT_MTU_SIZE, 0/*Change later*/, DEFUALT_MAX_TRANSMISSION, SUMMARY_2);
+	UdpPacket udpPacketSend = UdpPacket(this->_commInfo._srcPort, this->_commInfo._dstPort, UDP_HEADERS_SIZE/*not the right one*/, 0);
+	IpPacket ipPacketSend = IpPacket(IPV4, IP_HEADERS_SIZE, 0, /*not the right one*/0, 0, 0, DEFAULT_TTL, IP_SRT_PROTOCOL_NUMBER, 0, this->_commInfo._srcIP, this->_commInfo._dstIP, nullptr);
+	std::vector<const char> sendBufferVector = PacketParser::packetToBytes(ipPacketSend, udpPacketSend, handshakeSend, nullptr);
+	char* help = new char[sendBufferVector.size()];
+	std::copy(sendBufferVector.begin(), sendBufferVector.end(), help);
+	send(this->_srtSocket, help, sendBufferVector.size(), 0);// check if i need sendto or not
+	delete help;
+
+
 }
 /*
 binds the socket to a specific port and ip on the computer
@@ -152,7 +170,7 @@ void SrtSocket::srtBind(sockaddr_in* addrs)
 
 }
 
-void SrtSocket::connectToServer(sockaddr_in* addrs)
+void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidPacket
 {
 	this->_commInfo._dstPort = addrs->sin_port;
 	this->_commInfo._dstIP = addrs->sin_addr.s_addr;
@@ -186,8 +204,8 @@ void SrtSocket::connectToServer(sockaddr_in* addrs)
 	
 	handshakeHeaders = PacketParser::createHandshakeControlPacketFromString(parser.substr(headerLength + UDP_HEADERS_SIZE));
 	//do a check for the handshake headers 
-	this->_commInfo.otherComputerMaxTransmission = handshakeHeaders.getMaxTransmission();
-	this->_commInfo.otherComputerMtu = handshakeHeaders.getWindowSize();
+	this->_commInfo._otherComputerMaxTransmission = handshakeHeaders.getMaxTransmission();
+	this->_commInfo._otherComputerMtu = handshakeHeaders.getWindowSize();
 	handshakeHeaders = HandshakeControlPacket(4, 0, time(nullptr), false, 0, DEFUALT_MTU_SIZE, 5, DEFUALT_MAX_TRANSMISSION, SUMMARY_1);
 	if (!recv(this->_srtSocket, recvBuffer, RECV_BUFFER_SIZE, 0))
 	{

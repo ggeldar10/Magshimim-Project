@@ -28,7 +28,7 @@ private:
 	//
 	// Methods
 	//
-	void waitForCorrectPacket();
+	void waitForValidPacket();
 	void controlThreadFunction(); // we need to think how we implement it 
 	bool isValidIpv4Checksum(const IpPacket& ipPacket); // add data
 	bool isValidIpHeaders(const IpPacket& ipHeaders);
