@@ -167,8 +167,8 @@ void SrtSocket::connectToServer(sockaddr_in* addrs)
 		std::cerr << "Error occured while doing handshake" << std::endl;
 		throw "Error occured while doing handshake";
 	}
-	std::string parser = recvBuffer;
-	uint8_t headerLength = parser[1] & 0x0F;
+	parser = recvBuffer;
+	headerLength = parser[1] & 0x0F;
 	ipHeaders = PacketParser::createIpPacketFromString(parser.substr(headerLength));
 	if (!isValidIpHeaders(ipHeaders)) // maybe do a while loop to make sure it will get the right response
 	{

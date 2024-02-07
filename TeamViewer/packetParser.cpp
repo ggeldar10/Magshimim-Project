@@ -240,7 +240,7 @@ MessageDropRequestControlPacket PacketParser::createMessageDropRequestControlPac
 * output:
 * a vector with all the bytes of the packet in bigendian order
 */
-std::vector<const char> packetParser::packetToBytes(const IpPacket& ipHeaders, const UdpPacket& udpHeaders, const DefaultPacket& srtHeaders, const std::vector<const char>* data)
+std::vector<const char> PacketParser::packetToBytes(const IpPacket& ipHeaders, const UdpPacket& udpHeaders, const DefaultPacket& srtHeaders, const std::vector<const char>* data)
 {
 	std::vector<const char> buffer;
 	buffer.push_back((ipHeaders.getVersion() << FOUR_BITS) | ipHeaders.getLengthOfHeaders());
@@ -280,7 +280,7 @@ std::vector<const char> packetParser::packetToBytes(const IpPacket& ipHeaders, c
 * output: none
 */
 template<typename htnSize>
-inline void packetParser::hostToNetworkIntoVector(std::vector<const char>* addVector, htnSize value)
+inline void PacketParser::hostToNetworkIntoVector(std::vector<const char>* addVector, htnSize value)
 {
 	htnSize andFactor = 0xFF << ((sizeof(htnSize) - 1) * BYTE_IN_BITS);
 	for (int i = 0; i < sizeof(htnSize); i++)
