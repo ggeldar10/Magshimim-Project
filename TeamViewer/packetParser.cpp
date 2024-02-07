@@ -226,6 +226,14 @@ MessageDropRequestControlPacket PacketParser::createMessageDropRequestControlPac
 	return packet;
 }
 
+UdpPacket PacketParser::createUdpPacketFromString(const std::string& udpBuffer)
+{
+	
+
+
+	return UdpPacket();
+}
+
 
 
 

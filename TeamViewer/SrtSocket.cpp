@@ -122,7 +122,6 @@ void SrtSocket::listenAndAccept()
 	memset(buffer, 0, RECV_BUFFER_SIZE);
 	waitForCorrectPacket();
 	recv(this->_srtSocket, buffer, RECV_BUFFER_SIZE, 0);
-
 }
 /*
 binds the socket to a specific port and ip on the computer

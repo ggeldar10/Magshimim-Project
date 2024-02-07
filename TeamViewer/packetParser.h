@@ -35,5 +35,6 @@ public:
 	static HandshakeControlPacket createHandshakeControlPacketFromString(const std::string& handshakeControlPacketBuffer);
 	static NAKControlPacket createNAKControlPacketFromString(const std::string& nakControlPacketBuffer);
 	static MessageDropRequestControlPacket createMessageDropRequestControlPacketFromString(const std::string& messageDropRequestControlPacketBuffer);
+	static UdpPacket createUdpPacketFromString(const std::string& udpBuffer);
 };
 
