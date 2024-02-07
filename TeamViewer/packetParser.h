@@ -15,7 +15,7 @@
 #define IPV4 4
 #define DEFAULT_TTL 64
 #define UDP_PROTOCOL_CODE 17
-#define DEFUALT_MTU_SIZE 1500
+#define DEFUALT_MTU_SIZE 1024
 #define DEFUALT_MAX_TRANSMISSION 10
 
 class PacketParser

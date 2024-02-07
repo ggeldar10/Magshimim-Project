@@ -20,14 +20,15 @@ private:
 		uint16_t _dstPort;
 		uint32_t _dstIP;
 		uint32_t _seqNum;
-		unsigned int otherComputerMaxTransmission;
-		unsigned int otherComputerMtu;
+		unsigned int _otherComputerMaxTransmission;
+		unsigned int _otherComputerMtu;
 	} _commInfo; // add connection information here
 	std::queue<std::string> _userRecvDataQueue; // for the recv to save the given information
 	std::thread controlThread;
 	//
 	// Methods
 	//
+	void waitForCorrectPacket();
 	void controlThreadFunction(); // we need to think how we implement it 
 	bool isValidIpv4Checksum(const IpPacket& ipPacket); // add data
 	bool isValidIpHeaders(const IpPacket& ipHeaders);
