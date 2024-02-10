@@ -67,6 +67,7 @@ SrtSocket::SrtSocket()
 		std::cerr << "Error while trying to open a socket" << std::endl;
 		throw "Error while trying to open a socket";
 	}
+	this->_commInfo = {0};
 
 }
 
@@ -102,6 +103,7 @@ void SrtSocket::listenAndAccept()
 			continue;
 		}
 		UdpPacket udpPacketRecv = PacketParser::createUdpPacketFromString(bufferString.substr(IP_HEADERS_SIZE, UDP_HEADERS_SIZE));
+
 		HandshakeControlPacket handshakePacketRecv = PacketParser::createHandshakeControlPacketFromString(bufferString.substr(IP_HEADERS_SIZE + UDP_HEADERS_SIZE));
 
 		this->_commInfo._otherComputerMaxTransmission = htonl(handshakePacketRecv.getMaxTransmission());
@@ -114,11 +116,11 @@ void SrtSocket::listenAndAccept()
 	HandshakeControlPacket handshakeSend = HandshakeControlPacket(2, 0, time(nullptr), false, 0, DEFUALT_MTU_SIZE, 0/*Change later*/, DEFUALT_MAX_TRANSMISSION, INDUCTION_2);
 	UdpPacket udpPacketSend = UdpPacket(this->_commInfo._srcPort, this->_commInfo._dstPort, UDP_HEADERS_SIZE/*not the right one*/, 0);
 	IpPacket ipPacketSend = IpPacket(IPV4, IP_HEADERS_SIZE, 0, /*not the right one*/0, 0, 0, DEFAULT_TTL, IP_SRT_PROTOCOL_NUMBER, 0, this->_commInfo._srcIP, this->_commInfo._dstIP, nullptr);
-	std::vector<const char> sendBufferVector = PacketParser::packetToBytes(ipPacketSend, udpPacketSend, handshakeSend, nullptr);
+	std::vector<char> sendBufferVector = PacketParser::packetToBytes(ipPacketSend, udpPacketSend, handshakeSend, nullptr);
 	char* help = new char[sendBufferVector.size()];
 	std::copy(sendBufferVector.begin(), sendBufferVector.end(), help);
 	send(this->_srtSocket, help, sendBufferVector.size(), 0);// check if i need sendto or not
-	delete help;
+	delete[] help;
 
 	memset(buffer, 0, RECV_BUFFER_SIZE);
 	waitForValidPacket();
@@ -130,14 +132,14 @@ void SrtSocket::listenAndAccept()
 	
 	// other logic here
 
-	HandshakeControlPacket handshakeSend = HandshakeControlPacket(4, 0, time(nullptr), false, 0, DEFUALT_MTU_SIZE, 0/*Change later*/, DEFUALT_MAX_TRANSMISSION, SUMMARY_2);
-	UdpPacket udpPacketSend = UdpPacket(this->_commInfo._srcPort, this->_commInfo._dstPort, UDP_HEADERS_SIZE/*not the right one*/, 0);
-	IpPacket ipPacketSend = IpPacket(IPV4, IP_HEADERS_SIZE, 0, /*not the right one*/0, 0, 0, DEFAULT_TTL, IP_SRT_PROTOCOL_NUMBER, 0, this->_commInfo._srcIP, this->_commInfo._dstIP, nullptr);
-	std::vector<const char> sendBufferVector = PacketParser::packetToBytes(ipPacketSend, udpPacketSend, handshakeSend, nullptr);
-	char* help = new char[sendBufferVector.size()];
+	handshakeSend = HandshakeControlPacket(4, 0, time(nullptr), false, 0, DEFUALT_MTU_SIZE, 0/*Change later*/, DEFUALT_MAX_TRANSMISSION, SUMMARY_2);
+	udpPacketSend = UdpPacket(this->_commInfo._srcPort, this->_commInfo._dstPort, UDP_HEADERS_SIZE/*not the right one*/, 0);
+	ipPacketSend = IpPacket(IPV4, IP_HEADERS_SIZE, 0, /*not the right one*/0, 0, 0, DEFAULT_TTL, IP_SRT_PROTOCOL_NUMBER, 0, this->_commInfo._srcIP, this->_commInfo._dstIP, nullptr);
+	sendBufferVector = PacketParser::packetToBytes(ipPacketSend, udpPacketSend, handshakeSend, nullptr);
+	help = new char[sendBufferVector.size()];
 	std::copy(sendBufferVector.begin(), sendBufferVector.end(), help);
 	send(this->_srtSocket, help, sendBufferVector.size(), 0);// check if i need sendto or not
-	delete help;
+	delete[] help;
 
 
 }
@@ -179,7 +181,7 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 	UdpPacket udpHeaders = UdpPacket(this->_commInfo._srcPort, this->_commInfo._dstPort, sizeof(handshakeHeaders) + UDP_HEADER_SIZE, 0);
 	//todo connect them all to one char with the inforamtion needed and do the others
 	IpPacket ipHeaders = IpPacket(IPV4, MIN_IP_SIZE, 0, MIN_IP_SIZE + UDP_HEADERS_SIZE + sizeof(handshakeHeaders)/*might be wrong*/, 0, 0, DEFAULT_TTL, IP_SRT_PROTOCOL_NUMBER, 0, this->_commInfo._srcIP, this->_commInfo._dstIP, NULL);
-	std::vector<const char> sendBuffer = PacketParser::packetToBytes(ipHeaders, udpHeaders, handshakeHeaders, nullptr);
+	std::vector<char> sendBuffer = PacketParser::packetToBytes(ipHeaders, udpHeaders, handshakeHeaders, nullptr);
 	sendto(this->_srtSocket, sendBuffer.data(), sendBuffer.size(), 0, reinterpret_cast<sockaddr*>(addrs), sizeof(addrs));
 	char recvBuffer[RECV_BUFFER_SIZE];
 	if (!recv(this->_srtSocket, recvBuffer, RECV_BUFFER_SIZE, 0))

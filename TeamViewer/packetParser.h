@@ -23,9 +23,9 @@ class PacketParser
 public:
 	template<typename nthSize>
 	inline static nthSize networkToHost(const std::string& buffer, int index);
-	static std::vector<const char> packetToBytes(const IpPacket& ipHeaders, const UdpPacket& udpHeaders, const DefaultPacket& strHeaders, const std::vector<const char>* data);
+	static std::vector<char> packetToBytes(const IpPacket& ipHeaders, const UdpPacket& udpHeaders, const DefaultPacket& strHeaders, const std::vector<char>* data);
 	template<typename htnSize>
-	static inline void hostToNetworkIntoVector(std::vector<const char>* addVector, htnSize value);
+	static inline void hostToNetworkIntoVector(std::vector<char>* addVector, htnSize value);
 	static IpPacket createIpPacketFromString(const std::string& ipPacketBuffer);
 	static DefaultPacket createDefaultPacketFromString(const std::string& defaultPacketBuffer, int& index);
 	static DefaultDataPacket createDefaultDataPacketFromString(const std::string& defaultDataPacketBuffer, int& index);
@@ -35,6 +35,8 @@ public:
 	static HandshakeControlPacket createHandshakeControlPacketFromString(const std::string& handshakeControlPacketBuffer);
 	static NAKControlPacket createNAKControlPacketFromString(const std::string& nakControlPacketBuffer);
 	static MessageDropRequestControlPacket createMessageDropRequestControlPacketFromString(const std::string& messageDropRequestControlPacketBuffer);
-	static UdpPacket createUdpPacketFromString(const std::string& udpBuffer);
+	static UdpPacket createUdpPacketFromString(const std::string& udpPacketBuffer);
+
+	static DefaultPacket* createPacketGlobal(const std::string& globalPacketBuffer);
 };
 
