@@ -126,7 +126,7 @@ private:
     uint16_t encryption_key;
     uint32_t windowSize;
     uint32_t initialPacketSequenceNumber;
-    uint32_t maxTransmission;
+    uint32_t maxTransmissionUnit;
     HandshakePhases phase;
 
 public:
@@ -135,7 +135,7 @@ public:
     uint16_t getEncryptionKey() const;
     uint32_t getWindowSize() const;
     uint32_t getInitialPacketSequenceNumber() const;
-    uint32_t getMaxTransmission() const;
+    uint32_t getMaxTransmissionUnit() const;
     HandshakePhases getPhase() const;
 
     std::vector<uint8_t> toBuffer() const override;

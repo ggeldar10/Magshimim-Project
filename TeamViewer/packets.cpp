@@ -102,7 +102,7 @@ std::vector<uint8_t> DefaultControlPacket::toBuffer() const {
 HandshakeControlPacket::HandshakeControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, bool hasEncryption, uint16_t encryption_key, uint32_t windowSize,
     uint32_t initialPacketSequenceNumber, uint32_t maxTransmission, HandshakePhases phase)
     : DefaultControlPacket(ackNum, packetNum, time, HANDSHAKE), isEncrypted(hasEncryption), encryption_key(encryption_key),
-    windowSize(windowSize), initialPacketSequenceNumber(initialPacketSequenceNumber), maxTransmission(maxTransmission), phase(phase) {}
+    windowSize(windowSize), initialPacketSequenceNumber(initialPacketSequenceNumber), maxTransmissionUnit(maxTransmissionUnit), phase(phase) {}
 
 bool HandshakeControlPacket::hasEncryption() const {
     return isEncrypted;
@@ -120,8 +120,8 @@ uint32_t HandshakeControlPacket::getInitialPacketSequenceNumber() const {
     return initialPacketSequenceNumber;
 }
 
-uint32_t HandshakeControlPacket::getMaxTransmission() const {
-    return maxTransmission;
+uint32_t HandshakeControlPacket::getMaxTransmissionUnit() const {
+    return maxTransmissionUnit;
 }
 
 HandshakePhases HandshakeControlPacket::getPhase() const {
@@ -134,7 +134,7 @@ std::vector<uint8_t> HandshakeControlPacket::toBuffer() const {
     buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&encryption_key), reinterpret_cast<const uint8_t*>(&encryption_key) + sizeof(encryption_key));
     buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&windowSize), reinterpret_cast<const uint8_t*>(&windowSize) + sizeof(windowSize));
     buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&initialPacketSequenceNumber), reinterpret_cast<const uint8_t*>(&initialPacketSequenceNumber) + sizeof(initialPacketSequenceNumber));
-    buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&maxTransmission), reinterpret_cast<const uint8_t*>(&maxTransmission) + sizeof(maxTransmission));
+    buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&maxTransmissionUnit), reinterpret_cast<const uint8_t*>(&maxTransmissionUnit) + sizeof(maxTransmissionUnit));
     buffer.push_back(static_cast<uint8_t>(phase));
     return buffer;
 }
