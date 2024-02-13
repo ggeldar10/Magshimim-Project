@@ -33,7 +33,12 @@ bool SrtSocket::isValidIpv4Checksum(const IpPacket& ipPacket)
 
 bool SrtSocket::isValidIpHeaders(const IpPacket& ipHeaders)
 {
-	if ( ipHeaders.getDstAddrs() != 0 && ipHeaders.getSrcAddrs() != 0 && (ipHeaders.getDstAddrs() != this->_commInfo._srcIP || ipHeaders.getSrcAddrs() != this->_commInfo._dstIP || ipHeaders.getProtocol() != IP_SRT_PROTOCOL_NUMBER))
+	bool isSrtProtocol = ipHeaders.getProtocol() == IP_SRT_PROTOCOL_NUMBER;
+	if ((this->_commInfo._dstIP == 0 || this->_commInfo._srcIP == 0) && isSrtProtocol)
+	{
+		return true;
+	}
+	if (!isSrtProtocol && this->_commInfo._srcIP != ipHeaders.getDstAddrs() && this->_commInfo._dstIP == ipHeaders.getSrcAddrs())
 	{
 		return false;
 	}
@@ -134,12 +139,19 @@ void SrtSocket::listenAndAccept()
 		IpPacket ipPacketRecv = PacketParser::createIpPacketFromString(bufferString.substr(0, IP_HEADERS_SIZE));
 		if (isValidIpHeaders)
 		{
-
+			continue;
 		}
 		UdpPacket udpPacketRecv = PacketParser::createUdpPacketFromString(bufferString.substr(IP_HEADERS_SIZE, UDP_HEADERS_SIZE));
+		if (udpPacketRecv.getLength() != UDP_HEADERS_SIZE + HANDSHAKE_PACKET_SIZE)
+		{
+			continue;
+		}
 		HandshakeControlPacket handshakePacketRecv = PacketParser::createHandshakeControlPacketFromString(bufferString.substr(IP_HEADERS_SIZE + UDP_HEADERS_SIZE));
-
-
+		if (handshakePacketRecv.getPhase() != INDUCTION_2)
+		{
+			continue;
+		}
+		packetNotFound = false;
 	}
 
 	
