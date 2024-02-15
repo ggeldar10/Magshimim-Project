@@ -4,6 +4,14 @@
 
 void SrtSocket::controlThreadFunction()
 {
+	while (true)
+	{
+		std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+		std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
+		DefaultControlPacket packet = DefaultControlPacket(-1, -1, currentTime, KEEPALIVE);
+		sendSrt(&packet);
+		Sleep(1000);
+	}
 }
 
 bool SrtSocket::isValidIpv4Checksum(const IpPacket& ipPacket)
@@ -25,7 +33,7 @@ SrtSocket::SrtSocket()
 		std::cerr << "Error while trying to open a socket" << std::endl;
 		throw "Error while trying to open a socket";
 	}
-	
+
 }
 
 SrtSocket::~SrtSocket()
@@ -35,8 +43,8 @@ SrtSocket::~SrtSocket()
 }
 
 /*
-intiates the communicatations and wait untill a client has 
-connected only one client at a time 
+intiates the communicatations and wait untill a client has
+connected only one client at a time
 does the handshake and the intilize the missing commInfo
 input:
 output:
@@ -68,7 +76,7 @@ void SrtSocket::listenAndAccept()
 binds the socket to a specific port and ip on the computer
 input: a ptr to the addrs to bind to and the port to bind to
 using the struct sockaddr_in
-output: 
+output:
 */
 void SrtSocket::srtBind(sockaddr_in* addrs)
 {
@@ -93,76 +101,20 @@ void SrtSocket::srtBind(sockaddr_in* addrs)
 
 }
 
-void SrtSocket::connectToServer() // bind the client to a port
+void SrtSocket::connectToServer(sockaddr_in* addrs)
 {
+	this->_commInfo._dstPort = addrs->sin_port;
+	this->_commInfo._dstIP = inet_ntoa(addrs->sin_addr);
+	this->srtBind(addrs); 
+
 }
 
-void SrtSocket::sendSrt()
-{
+void SrtSocket::sendSrt(const DefaultPacket* packet) {
+	std::vector<uint8_t> buffer = packet->toBuffer();
 }
+
 
 std::string SrtSocket::recvSrt()
 {
 	return std::string();
-}
-
-IpPacket SrtSocket::createIpPacketFromString(const std::string& ipPacketBuffer)
-{
-	if (ipPacketBuffer.length() > MAX_IP_SIZE || ipPacketBuffer.length() < MIN_IP_SIZE)
-	{
-		std::cerr << "Error: the buffer that was given is not valid" << std::endl;
-		throw std::invalid_argument("Error: the buffer that was given is not valid");
-	}
-	IpPacket ipPacket;
-	memset(&ipPacket, 0, sizeof(IpPacket));
-	int index = 0;
-	// might be a problem of big and smalle endians so check when the srt is complete
-	ipPacket.version = (ipPacketBuffer[index] & 0xF0) >> FOUR_BITS;
-	ipPacket.lengthOfHeaders = ipPacketBuffer[index] & 0x0F;
-	index += sizeof(uint8_t);
-	ipPacket.typeOfService = networkToHost<uint8_t>(ipPacketBuffer, index);
-	index += sizeof(uint8_t);
-	ipPacket.totalLength = networkToHost<uint16_t>(ipPacketBuffer, index);
-	index += sizeof(uint16_t);
-	ipPacket.identification = networkToHost<uint16_t>(ipPacketBuffer, index);
-	index += sizeof(uint16_t);
-	ipPacket.identification = networkToHost<uint16_t>(ipPacketBuffer, index);
-	index += sizeof(uint16_t);
-	ipPacket.ttl = networkToHost<uint8_t>(ipPacketBuffer, index);
-	index += sizeof(uint8_t);
-	ipPacket.protocol = networkToHost<uint8_t>(ipPacketBuffer, index);
-	index += sizeof(uint8_t);
-	ipPacket.headerChecksum = networkToHost<uint16_t>(ipPacketBuffer, index);
-	index += sizeof(uint16_t);
-	ipPacket.srcAddrs = networkToHost<uint32_t>(ipPacketBuffer, index);
-	index += sizeof(uint32_t);
-	ipPacket.dstAddrs = networkToHost<uint32_t>(ipPacketBuffer, index);
-	index += sizeof(uint32_t);
-	std::string help = ipPacketBuffer.substr(index);
-	for (int i = 0; i < help.size() && i < MAX_IP_OPTIONS_SIZE; i++)
-	{
-		ipPacket.options[i] = help[i];
-	}
-	return ipPacket;
-}
-
-template<typename nthSize>
-inline nthSize SrtSocket::networkToHost(const std::string& buffer, int index)
-{
-	if (index + sizeof(nthSize) > buffer.size())
-	{
-		std::cerr << "Error buffer size is not big enough" << std::endl;
-		throw "Error buffer size is not big enough";
-	}
-	nthSize networkToHostNum = 0;
-	for (int i = 0; i < sizeof(nthSize); i++)
-	{
-		networkToHostNum = networkToHostNum << BYTE_IN_BITS;
-		networkToHostNum = networkToHostNum | static_cast<nthSize>(buffer[index + i]);
-	}
-	if constexpr (sizeof(nthSize) >= sizeof(uint32_t))
-	{
-		return ntohl(networkToHostNum);
-	}
-	return ntohs(networkToHostNum)
 }

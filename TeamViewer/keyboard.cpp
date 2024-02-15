@@ -1,6 +1,6 @@
 #include "keyboard.h"
 
-void makeKeyboardAction(KeyboardKeysActions action, int keyCode)
+void makeKeyboardAction(KeyboardActions action, int keyCode)
 {
     INPUT input;
     input.type = INPUT_KEYBOARD;
@@ -22,19 +22,6 @@ void makeKeyboardAction(KeyboardKeysActions action, int keyCode)
         throw(KeyboardButtonActionException("Failed to send keyboard input. Error code: " + GetLastError()));
        
     }
-}
-
-KeyboardDataPacket createPacket(KeyboardKeysActions action, int ackSequenceNumber, int packetSequenceNumber, int keyCode)
-{
-    KeyboardDataPacket packet;
-    packet.packetType = DataPacket;
-    packet.dataPacketType = Keyboard;
-    packet.timeStamp = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    packet.ackSequenceNumber = ackSequenceNumber;
-    packet.packetSequenceNumber = packetSequenceNumber;
-    packet.action = action;
-    packet.keyCode = keyCode;
-    return packet;
 }
 
 void listenToKeyboard()

@@ -16,11 +16,17 @@
     <Filter Include="Source Files\cursor and keyboard">
       <UniqueIdentifier>{e6d0f9fc-964d-489f-9b8e-ddf7ab8e7286}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\cursor and keyboard">
+      <UniqueIdentifier>{94c6645d-5c80-4a1a-8370-f3a0c9e5acd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\communication">
+      <UniqueIdentifier>{01308c1e-f912-4ca9-a8ec-48856af6ed2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\communication">
+      <UniqueIdentifier>{24fe6696-8558-4763-b957-dc02647a58f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SrtSocket.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -30,21 +36,52 @@
     <ClCompile Include="keyboard.cpp">
       <Filter>Source Files\cursor and keyboard</Filter>
     </ClCompile>
+    <ClCompile Include="SrtSocket.cpp">
+      <Filter>Source Files\communication</Filter>
+    </ClCompile>
+    <ClCompile Include="packetParser.cpp">
+      <Filter>Source Files\communication</Filter>
+    </ClCompile>
+    <ClCompile Include="packets.cpp">
+      <Filter>Source Files\communication</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="windowsHeaders.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="cursor.h">
+      <Filter>Header Files\cursor and keyboard</Filter>
     </ClInclude>
+    <ClInclude Include="keyboard.h">
+      <Filter>Header Files\cursor and keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="SrtSocket.h">
+      <Filter>Header Files\communication</Filter>
+    </ClInclude>
+    <ClInclude Include="windowsHeaders.h">
+      <Filter>Header Files\communication</Filter>
+    </ClInclude>
+    <ClInclude Include="packets.h">
+      <Filter>Header Files\communication</Filter>
+    </ClInclude>
+    <ClInclude Include="packetParser.h">
+      <Filter>Header Files\communication</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="SrtSocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="SrtSocket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="windowsHeaders.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="packets.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cursor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="keyboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
