@@ -6,8 +6,11 @@
 
 /*
 waits for the packet with the srt protocol and with the right port and ip
-input: none
-output: none
+input: isValid - the function that checks if the packet is valid it gets 
+a buffer and the size of it 
+and returns true if the packet is valid false if else
+buffer - the buffer to get the valid packet into 
+output: returns the valid packet inside the given buffer
 */
 void SrtSocket::waitForValidPacket(std::function<bool(char*, int)> isValid, std::vector<char>* buffer)
 {
