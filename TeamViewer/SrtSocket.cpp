@@ -56,7 +56,7 @@ void SrtSocket::controlThreadFunction()
 		std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 		std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
 		DefaultControlPacket packet = DefaultControlPacket(-1, -1, currentTime, KEEPALIVE);
-		sendSrt(&packet);
+		sendSrt();
 		Sleep(1000);
 	}
 }
@@ -273,12 +273,11 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 	}
 }
 
-void SrtSocket::sendSrt(const DefaultPacket* packet) {
-	std::vector<uint8_t> buffer = packet->toBuffer();
+void SrtSocket::sendSrt() {
+	std::vector<uint8_t> buffer;
 }
 
-
-std::string SrtSocket::recvSrt()
+const DefaultPacket* SrtSocket::recvSrt()
 {
-	return std::string();
+	return nullptr;
 }

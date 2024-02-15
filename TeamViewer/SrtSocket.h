@@ -10,9 +10,6 @@
 class SrtSocket
 {
 private:
-	//
-	// Fields
-	//
 	SOCKET _srtSocket;
 	struct
 	{
@@ -38,15 +35,12 @@ private:
 	bool isValidUdpHeaders(const UdpPacket& udpHeaders);
 
 public:
-	//
-	// Methods
-	//
 	SrtSocket();
 	~SrtSocket();
 	void listenAndAccept(); // needs to block the current thread and start the thread function 
 	void srtBind(sockaddr_in* sockaddr);
 	void connectToServer(sockaddr_in* addrs);
-	void sendSrt(const DefaultPacket* packet);
-	std::string recvSrt();
+	void sendSrt();
+	const DefaultPacket* recvSrt();
 };
 
