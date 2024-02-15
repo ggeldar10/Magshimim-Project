@@ -18,6 +18,7 @@
 #define DEFUALT_MTU_SIZE 1024
 #define DEFUALT_MAX_TRANSMISSION 10
 #define HANDSHAKE_PACKET_SIZE 19
+#define IP_FIRST_HEADER_ROW 4
 
 class PacketParser
 {

@@ -3,6 +3,7 @@
 #include <queue>
 #include <thread>
 #include <string>
+#include <functional>
 
 #define RECV_BUFFER_SIZE 1024
 
@@ -22,13 +23,15 @@ private:
 		uint32_t _seqNum;
 		unsigned int _otherComputerMaxTransmission;
 		unsigned int _otherComputerMtu;
+		/*sockaddr_in */
+
 	} _commInfo; // add connection information here
 	std::queue<std::string> _userRecvDataQueue; // for the recv to save the given information
 	std::thread controlThread;
 	//
 	// Methods
 	//
-	void waitForValidPacket();
+	void waitForValidPacket(std::function<bool(char*, int)> checkFunction, std::vector<char>* buffer);
 	void controlThreadFunction(); // we need to think how we implement it 
 	bool isValidIpv4Checksum(const IpPacket& ipPacket); // add data
 	bool isValidIpHeaders(const IpPacket& ipHeaders);

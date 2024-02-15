@@ -9,9 +9,41 @@ waits for the packet with the srt protocol and with the right port and ip
 input: none
 output: none
 */
-void SrtSocket::waitForValidPacket()
+void SrtSocket::waitForValidPacket(std::function<bool(char*, int)> isValid, std::vector<char>* buffer)
 {
+	const int ipFirstHeaderRowLowerInArray = 2;
+	const int ipFirstHeaderRowHigherInArray = 3;
+	char ipFirstRow[IP_FIRST_HEADER_ROW] = { 0 };
+	bool notValid = true;
+	int totalLength = 0;
+	while (notValid)
+	{
+		if (recv(this->_srtSocket, ipFirstRow, IP_FIRST_HEADER_ROW, MSG_PEEK) < 0)
+		{
+			std::cerr << "Error while doing recv. error number from wsagetlasterror: " << WSAGetLastError() << std::endl;
+			//throw excetpion
+		}
 
+		totalLength = (ipFirstRow[ipFirstHeaderRowLowerInArray] << FOUR_BITS) | ipFirstRow[ipFirstHeaderRowHigherInArray];
+		std::unique_ptr<char[]> allBuffer = std::make_unique<char[]>(totalLength);
+
+		if(recv(this->_srtSocket, allBuffer.get(), totalLength, 0) < 0)
+		{
+			std::cerr << "Error while doing recv. error number from wsagetlasterror: " << WSAGetLastError() << std::endl;
+			//throw excetpions
+		}
+		if (isValid(allBuffer.get(), totalLength))
+		{
+			if (buffer != nullptr)
+			{
+				for (int i = 0; i < totalLength; i++)
+				{
+					buffer->push_back(allBuffer[i]);
+				}
+			}
+			notValid = false;
+		}
+	}
 }
 
 void SrtSocket::controlThreadFunction()
@@ -88,7 +120,7 @@ output:
 void SrtSocket::listenAndAccept()
 {
 	bool packetNotFound = true;
-	char buffer[RECV_BUFFER_SIZE] = {0};
+	char buffer[UDP_HEADERS_SIZE] = {0};
 	std::string bufferString;
 	while (packetNotFound)
 	{
