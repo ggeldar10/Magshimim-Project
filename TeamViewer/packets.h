@@ -32,7 +32,27 @@ enum DefaultPacketTypes {
     DataPacket = 0, ControlPacket
 };
 
-enum IpPacketTypesOfServices { IPv4 = 0, IPv6, ICMPv4, ICMPv6, TCP, UDP, IGMP, IPsec, ARP, RARP };
+class UdpPacket
+{
+private:
+    uint16_t _srcPort;
+    uint16_t _dstPort;
+    uint16_t _length;
+    uint16_t _checksum;
+
+public:
+    
+    UdpPacket(uint16_t srcPort, uint16_t dstPort, uint16_t length, uint16_t checksum);    
+    int getSrcPort() const;
+    void setSrcPort(uint16_t srcPort);
+    int getDstPort() const;
+    void setDstPort(uint16_t dstPort);
+    int getLength() const;
+    void setLength(uint16_t length);
+    int getChecksum() const;
+    void setChecksum(uint16_t checksum);
+    std::vector<char> toBuffer() const;
+};
 
 class DefaultPacket {
 protected:
@@ -107,7 +127,7 @@ private:
     uint16_t encryption_key;
     uint32_t windowSize;
     uint32_t initialPacketSequenceNumber;
-    uint32_t maxTransmission;
+    uint32_t maxTransmissionUnit;
     HandshakePhases phase;
 
 public:
@@ -116,7 +136,7 @@ public:
     uint16_t getEncryptionKey() const;
     uint32_t getWindowSize() const;
     uint32_t getInitialPacketSequenceNumber() const;
-    uint32_t getMaxTransmission() const;
+    uint32_t getMaxTransmissionUnit() const;
     HandshakePhases getPhase() const;
 
     std::vector<uint8_t> toBuffer() const override;
