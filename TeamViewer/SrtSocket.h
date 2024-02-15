@@ -9,9 +9,6 @@
 class SrtSocket
 {
 private:
-	//
-	// Fields
-	//
 	SOCKET _srtSocket;
 	struct
 	{
@@ -23,22 +20,16 @@ private:
 	} _commInfo; // add connection information here
 	std::queue<std::string> _userRecvDataQueue; // for the recv to save the given information
 	std::thread controlThread;
-	//
-	// Methods
-	//
 	void controlThreadFunction(); // we need to think how we implement it 
 	bool isValidIpv4Checksum(const IpPacket& ipPacket);
 	
 public:
-	//
-	// Methods
-	//
 	SrtSocket();
 	~SrtSocket();
 	void listenAndAccept(); // needs to block the current thread and start the thread function 
 	void srtBind(sockaddr_in* sockaddr);
 	void connectToServer(sockaddr_in* addrs);
-	void sendSrt(const DefaultPacket* packet);
-	std::string recvSrt();
+	void sendSrt();
+	const DefaultPacket* recvSrt();
 };
 
