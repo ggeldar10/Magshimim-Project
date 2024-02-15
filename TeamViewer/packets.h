@@ -51,6 +51,7 @@ public:
     void setLength(uint16_t length);
     int getChecksum() const;
     void setChecksum(uint16_t checksum);
+    std::vector<char> toBuffer() const;
 };
 
 class DefaultPacket {

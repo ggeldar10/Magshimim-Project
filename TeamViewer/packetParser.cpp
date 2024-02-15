@@ -251,28 +251,14 @@ UdpPacket PacketParser::createUdpPacketFromString(const std::string& udpPacketBu
 * output:
 * a vector with all the bytes of the packet in bigendian order
 */
-std::vector<char> PacketParser::packetToBytes(const IpPacket& ipHeaders, const UdpPacket& udpHeaders, const DefaultPacket& srtHeaders, const std::vector<char>* data)
+std::vector<char> PacketParser::packetToBytes(const UdpPacket& udpHeaders, const DefaultPacket& srtHeaders, const std::vector<char>* data)
 {
-	std::vector<char> buffer;
-	buffer.push_back((ipHeaders.getVersion() << FOUR_BITS) | ipHeaders.getLengthOfHeaders());
-	buffer.push_back(ipHeaders.getTypeOfService());
-	hostToNetworkIntoVector<uint16_t>(&buffer, ipHeaders.getTotalLength());
-	hostToNetworkIntoVector<uint16_t>(&buffer, ipHeaders.getIdentification());
-	hostToNetworkIntoVector<uint16_t>(&buffer, ipHeaders.getFragmentOffsetIncludingFlags());
-	buffer.push_back(ipHeaders.getTtl());
-	buffer.push_back(ipHeaders.getProtocol());
-	hostToNetworkIntoVector<uint16_t>(&buffer, ipHeaders.getHeaderChecksum());
-	hostToNetworkIntoVector<uint32_t>(&buffer, ipHeaders.getSrcAddrs());
-	hostToNetworkIntoVector<uint32_t>(&buffer, ipHeaders.getDstAddrs());
-	if (ipHeaders.getOptions())
+	std::vector<char> buffer = udpHeaders.toBuffer();
+	
+	for (char c : srtHeaders.toBuffer())
 	{
-		for (int i = 0; i < ipHeaders.getLengthOfHeaders() * TURN_WORD_TO_BYTES_FACTOR - MIN_IP_SIZE; i++)
-		{
-			buffer.push_back(ipHeaders.getOptions()[i]);
-		}
+		buffer.push_back(c);
 	}
-
-	// todo srtHeaders.getBytes() to buffer
 
 	for (int i = 0; i < data->size(); i++)
 	{

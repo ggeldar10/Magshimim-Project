@@ -1,4 +1,5 @@
 #include "packets.h"
+#include "packetParser.h"
 
 DefaultPacket::DefaultPacket(DefaultPacketTypes type, uint32_t ackNum, uint32_t packetNum, time_t time)
     : packetType(type), ackSequenceNumber(ackNum), packetSequenceNumber(packetNum), timeStamp(time) {}
@@ -293,4 +294,14 @@ int UdpPacket::getChecksum() const
 void UdpPacket::setChecksum(uint16_t checksum)
 {
     this->_checksum = checksum;
+}
+
+std::vector<char> UdpPacket::toBuffer() const
+{
+    std::vector<char> buffer;
+    PacketParser::hostToNetworkIntoVector<uint16_t>(&buffer, this->_srcPort);
+    PacketParser::hostToNetworkIntoVector<uint16_t>(&buffer, this->_dstPort);
+    PacketParser::hostToNetworkIntoVector<uint16_t>(&buffer, this->_length);
+    PacketParser::hostToNetworkIntoVector<uint16_t>(&buffer, this->_checksum);
+    return buffer;
 }
