@@ -1,26 +1,5 @@
 #include "packetParser.h"
 
-template<typename nthSize>
-inline nthSize PacketParser::networkToHost(const std::string& buffer, int index)
-{
-	if (index + sizeof(nthSize) > buffer.size())
-	{
-		std::cerr << "Error buffer size is not big enough" << std::endl;
-		throw "Error buffer size is not big enough";
-	}
-	nthSize networkToHostNum = 0;
-	for (int i = 0; i < sizeof(nthSize); i++)
-	{
-		networkToHostNum = networkToHostNum << BYTE_IN_BITS;
-		networkToHostNum = networkToHostNum | static_cast<nthSize>(buffer[index + i]);
-	}
-	if (sizeof(nthSize) >= sizeof(uint32_t))
-	{
-		return ntohl(networkToHostNum);
-	}
-	return ntohs(networkToHostNum);
-}
-
 IpPacket PacketParser::createIpPacketFromString(const std::string& ipPacketBuffer)
 {
 	if (ipPacketBuffer.length() > MAX_IP_SIZE || ipPacketBuffer.length() < MIN_IP_SIZE)
@@ -228,17 +207,26 @@ MessageDropRequestControlPacket PacketParser::createMessageDropRequestControlPac
 
 UdpPacket PacketParser::createUdpPacketFromString(const std::string& udpPacketBuffer)
 {
-	int index = 0;
 	uint16_t srcPort;
 	uint16_t dstPort;
 	uint16_t length;
 	uint16_t checksum;
 
-	//return UdpPacket();
+	int index = 0;
+
+	srcPort = networkToHost<uint16_t>(udpPacketBuffer, index);
+	index += sizeof(uint16_t);
+	dstPort = networkToHost<uint16_t>(udpPacketBuffer, index);
+	index += sizeof(uint16_t);
+	length = networkToHost<uint16_t>(udpPacketBuffer, index);
+	index += sizeof(uint16_t);
+	checksum = networkToHost<uint16_t>(udpPacketBuffer, index);
+	index += sizeof(uint16_t);
+
+	UdpPacket udpPacket(srcPort, dstPort, length, checksum);
+
+	return udpPacket;
 }
-
-
-
 
 /*
 * this turns the packets into one packet that we send
@@ -266,23 +254,4 @@ std::vector<char> PacketParser::packetToBytes(const UdpPacket& udpHeaders, const
 	}
 
 	return buffer;
-}
-
-
-/*
-* insert the value to the vector in a big endian order
-* input:
-* addVector - a pointer to the vector to insert to
-* value - the value to insert to the vector
-* output: none
-*/
-template<typename htnSize>
-inline void PacketParser::hostToNetworkIntoVector(std::vector<char>* addVector, htnSize value)
-{
-	htnSize andFactor = 0xFF << ((sizeof(htnSize) - 1) * BYTE_IN_BITS);
-	for (int i = 0; i < sizeof(htnSize); i++)
-	{
-		addVector->push_back(value & andFactor);
-		andFactor >>= BYTE_IN_BITS;
-	}
 }

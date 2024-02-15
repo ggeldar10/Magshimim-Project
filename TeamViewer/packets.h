@@ -51,6 +51,7 @@ public:
     void setLength(uint16_t length);
     int getChecksum() const;
     void setChecksum(uint16_t checksum);
+
     std::vector<char> toBuffer() const;
 };
 
@@ -131,7 +132,7 @@ private:
     HandshakePhases phase;
 
 public:
-    HandshakeControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, bool hasEncryption, uint16_t encryption_key, uint32_t windowSize, uint32_t initialPacketSequenceNumber, uint32_t maxTransmission, HandshakePhases phase);
+    HandshakeControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, bool hasEncryption, uint16_t encryption_key, uint32_t windowSize, uint32_t initialPacketSequenceNumber, uint32_t maxTransmissionUnit, HandshakePhases phase);
     bool hasEncryption() const;
     uint16_t getEncryptionKey() const;
     uint32_t getWindowSize() const;

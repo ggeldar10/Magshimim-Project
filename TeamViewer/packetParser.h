@@ -23,11 +23,46 @@
 class PacketParser
 {
 public:
-	template<typename nthSize>
-	inline static nthSize networkToHost(const std::string& buffer, int index);
-	static std::vector<char> packetToBytes(const UdpPacket& udpHeaders, const DefaultPacket& strHeaders, const std::vector<char>* data);
+	/*
+	* insert the value to the vector in a big endian order
+	* input:
+	* addVector - a pointer to the vector to insert to
+	* value - the value to insert to the vector
+	* output: none
+	*/
 	template<typename htnSize>
-	static inline void hostToNetworkIntoVector(std::vector<char>* addVector, htnSize value);
+	static void hostToNetworkIntoVector(std::vector<char>* addVector, htnSize value)
+	{
+		htnSize andFactor = 0xFF << ((sizeof(htnSize) - 1) * BYTE_IN_BITS);
+		for (int i = 0; i < sizeof(htnSize); i++)
+		{
+			addVector->push_back(value & andFactor);
+			andFactor >>= BYTE_IN_BITS;
+		}
+	}
+	template<typename nthSize>
+	static inline nthSize networkToHost(const std::string& buffer, int index)
+	{
+		if (index + sizeof(nthSize) > buffer.size())
+		{
+			std::cerr << "Error buffer size is not big enough" << std::endl;
+			throw "Error buffer size is not big enough";
+		}
+		nthSize networkToHostNum = 0;
+		for (int i = 0; i < sizeof(nthSize); i++)
+		{
+			networkToHostNum = networkToHostNum << BYTE_IN_BITS;
+			networkToHostNum = networkToHostNum | static_cast<nthSize>(buffer[index + i]);
+		}
+		if (sizeof(nthSize) >= sizeof(uint32_t))
+		{
+			return ntohl(networkToHostNum);
+		}
+		return ntohs(networkToHostNum);
+	}
+
+	static std::vector<char> packetToBytes(const UdpPacket& udpHeaders, const DefaultPacket& strHeaders, const std::vector<char>* data);
+
 	static IpPacket createIpPacketFromString(const std::string& ipPacketBuffer);
 	static DefaultPacket createDefaultPacketFromString(const std::string& defaultPacketBuffer, int& index);
 	static DefaultDataPacket createDefaultDataPacketFromString(const std::string& defaultDataPacketBuffer, int& index);
@@ -38,7 +73,6 @@ public:
 	static NAKControlPacket createNAKControlPacketFromString(const std::string& nakControlPacketBuffer);
 	static MessageDropRequestControlPacket createMessageDropRequestControlPacketFromString(const std::string& messageDropRequestControlPacketBuffer);
 	static UdpPacket createUdpPacketFromString(const std::string& udpPacketBuffer);
-
-	static DefaultPacket* createPacketGlobal(const std::string& globalPacketBuffer);
+	static DefaultPacket* createPacketFromStringGlobal(const std::string& globalPacketBuffer);
 };
 
