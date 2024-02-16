@@ -64,15 +64,27 @@ public:
 	static std::vector<char> packetToBytes(const UdpPacket& udpHeaders, const DefaultPacket& strHeaders, const std::vector<char>* data);
 
 	static IpPacket createIpPacketFromString(const std::string& ipPacketBuffer);
-	static DefaultPacket createDefaultPacketFromString(const std::string& defaultPacketBuffer, int& index);
-	static DefaultDataPacket createDefaultDataPacketFromString(const std::string& defaultDataPacketBuffer, int& index);
-	static CursorDataPacket createCursorDataPacketFromString(const std::string& cursorDataPacketBuffer);
-	static KeyboardDataPacket createKeyboardDataPacketFromString(const std::string& keyboardDataPacketBuffer);
-	static DefaultControlPacket createDefaultControlPacketFromString(const std::string& defaultControlPacketBuffer, int& index);
-	static HandshakeControlPacket createHandshakeControlPacketFromString(const std::string& handshakeControlPacketBuffer);
-	static NAKControlPacket createNAKControlPacketFromString(const std::string& nakControlPacketBuffer);
-	static MessageDropRequestControlPacket createMessageDropRequestControlPacketFromString(const std::string& messageDropRequestControlPacketBuffer);
+	static DefaultPacket* createDefaultPacketFromString(const std::string& defaultPacketBuffer, int& index);
+	static DefaultDataPacket* createDefaultDataPacketFromString(const std::string& defaultDataPacketBuffer, int& index);
+	static CursorDataPacket* createCursorDataPacketFromString(const std::string& cursorDataPacketBuffer);
+	static KeyboardDataPacket* createKeyboardDataPacketFromString(const std::string& keyboardDataPacketBuffer);
+	static DefaultControlPacket* createDefaultControlPacketFromString(const std::string& defaultControlPacketBuffer, int& index);
+	static HandshakeControlPacket* createHandshakeControlPacketFromString(const std::string& handshakeControlPacketBuffer);
+	static NAKControlPacket* createNAKControlPacketFromString(const std::string& nakControlPacketBuffer);
+	static MessageDropRequestControlPacket* createMessageDropRequestControlPacketFromString(const std::string& messageDropRequestControlPacketBuffer);
 	static UdpPacket createUdpPacketFromString(const std::string& udpPacketBuffer);
 	static DefaultPacket* createPacketFromStringGlobal(const std::string& globalPacketBuffer);
 };
 
+class PacketParserException : public std::exception
+{
+private:
+	std::string message;
+
+public:
+	explicit PacketParserException(const char* msg) : message(msg) {}
+
+	virtual const char* what() const noexcept override {
+		return message.c_str();
+	}
+};

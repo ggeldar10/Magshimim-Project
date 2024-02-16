@@ -50,7 +50,7 @@ IpPacket PacketParser::createIpPacketFromString(const std::string& ipPacketBuffe
 	return packet;
 }
 
-DefaultPacket PacketParser::createDefaultPacketFromString(const std::string& defaultPacketBuffer, int& index)
+DefaultPacket* PacketParser::createDefaultPacketFromString(const std::string& defaultPacketBuffer, int& index)
 {
 	DefaultPacketTypes packetType;
 	uint32_t ackSequenceNumber;
@@ -65,28 +65,28 @@ DefaultPacket PacketParser::createDefaultPacketFromString(const std::string& def
 	packetSequenceNumber = networkToHost<uint32_t>(defaultPacketBuffer, index);
 	index += sizeof(uint32_t);
 	timeStamp = networkToHost<uint32_t>(defaultPacketBuffer, index);
-	DefaultPacket packet = DefaultPacket(packetType, ackSequenceNumber, packetSequenceNumber, timeStamp);
+	DefaultPacket* packet = new DefaultPacket(packetType, ackSequenceNumber, packetSequenceNumber, timeStamp);
 	return packet;
 }
 
-DefaultDataPacket PacketParser::createDefaultDataPacketFromString(const std::string& defaultDataPacketBuffer, int& index)
-{	
+DefaultDataPacket* PacketParser::createDefaultDataPacketFromString(const std::string& defaultDataPacketBuffer, int& index)
+{
 	DataPacketTypes dataPacketType;
-	DefaultPacket defaultPacket = createDefaultPacketFromString(defaultDataPacketBuffer, index);
+	DefaultPacket* defaultPacket = createDefaultPacketFromString(defaultDataPacketBuffer, index);
 	index += sizeof(DataPacketTypes);
 	dataPacketType = static_cast<DataPacketTypes>((defaultDataPacketBuffer[index] & 0xF0) >> FOUR_BITS);
-	DefaultDataPacket  packet = DefaultDataPacket(defaultPacket.getAckSequenceNumber(), defaultPacket.getPacketSequenceNumber(), defaultPacket.getTimeStamp(), dataPacketType);
+	DefaultDataPacket* packet = new DefaultDataPacket(defaultPacket->getAckSequenceNumber(), defaultPacket->getPacketSequenceNumber(), defaultPacket->getTimeStamp(), dataPacketType);
 	return packet;
 }
 
-CursorDataPacket PacketParser::createCursorDataPacketFromString(const std::string& cursorDataPacketBuffer)
+CursorDataPacket* PacketParser::createCursorDataPacketFromString(const std::string& cursorDataPacketBuffer)
 {
 	CursorActions action;
 	int scrollValue;
 	uint32_t x;
 	uint32_t y;
 	int index = 0;
-	DefaultDataPacket defaultDataPacket = createDefaultDataPacketFromString(cursorDataPacketBuffer, index);
+	DefaultDataPacket* defaultDataPacket = createDefaultDataPacketFromString(cursorDataPacketBuffer, index);
 	index += sizeof(CursorActions);
 	action = static_cast<CursorActions>((cursorDataPacketBuffer[index] & 0xF0) >> FOUR_BITS);
 	index += sizeof(uint32_t);
@@ -95,37 +95,37 @@ CursorDataPacket PacketParser::createCursorDataPacketFromString(const std::strin
 	y = networkToHost<uint32_t>(cursorDataPacketBuffer, index);
 	index += sizeof(uint32_t);
 	scrollValue = networkToHost<uint32_t>(cursorDataPacketBuffer, index);
-	
-	CursorDataPacket packet = CursorDataPacket(defaultDataPacket.getAckSequenceNumber(), defaultDataPacket.getPacketSequenceNumber(), defaultDataPacket.getTimeStamp(), action, scrollValue, x, y);
+
+	CursorDataPacket* packet = new CursorDataPacket(defaultDataPacket->getAckSequenceNumber(), defaultDataPacket->getPacketSequenceNumber(), defaultDataPacket->getTimeStamp(), action, scrollValue, x, y);
 	return packet;
 }
 
-KeyboardDataPacket PacketParser::createKeyboardDataPacketFromString(const std::string& keyboardDataPacketBuffer)
+KeyboardDataPacket* PacketParser::createKeyboardDataPacketFromString(const std::string& keyboardDataPacketBuffer)
 {
 	KeyboardActions action;
 	unsigned int keyCode;
 	int index = 0;
-	DefaultDataPacket defaultDataPacket = createDefaultDataPacketFromString(keyboardDataPacketBuffer, index);
+	DefaultDataPacket* defaultDataPacket = createDefaultDataPacketFromString(keyboardDataPacketBuffer, index);
 	index += sizeof(KeyboardActions);
 	action = static_cast<KeyboardActions>((keyboardDataPacketBuffer[index] & 0xF0) >> FOUR_BITS);
 	index += sizeof(unsigned int);
 	keyCode = networkToHost<unsigned int>(keyboardDataPacketBuffer, index);
-	KeyboardDataPacket packet = KeyboardDataPacket(defaultDataPacket.getAckSequenceNumber(), defaultDataPacket.getPacketSequenceNumber(), defaultDataPacket.getTimeStamp(), action, keyCode);
+	KeyboardDataPacket* packet = new KeyboardDataPacket(defaultDataPacket->getAckSequenceNumber(), defaultDataPacket->getPacketSequenceNumber(), defaultDataPacket->getTimeStamp(), action, keyCode);
 	return packet;
 
 }
 
-DefaultControlPacket PacketParser::createDefaultControlPacketFromString(const std::string& defaultControlPacketBuffer, int& index)
+DefaultControlPacket* PacketParser::createDefaultControlPacketFromString(const std::string& defaultControlPacketBuffer, int& index)
 {
 	ControlPacketTypes controlPacketType;
-	DefaultPacket defaultPacket = createDefaultPacketFromString(defaultControlPacketBuffer, index);
+	DefaultPacket* defaultPacket = createDefaultPacketFromString(defaultControlPacketBuffer, index);
 	index += sizeof(DataPacketTypes);
 	controlPacketType = static_cast<ControlPacketTypes>((defaultControlPacketBuffer[index] & 0xF0) >> FOUR_BITS);
-	DefaultControlPacket  packet = DefaultControlPacket(defaultPacket.getAckSequenceNumber(), defaultPacket.getPacketSequenceNumber(), defaultPacket.getTimeStamp(), controlPacketType);
+	DefaultControlPacket* packet = new DefaultControlPacket(defaultPacket->getAckSequenceNumber(), defaultPacket->getPacketSequenceNumber(), defaultPacket->getTimeStamp(), controlPacketType);
 	return packet;
 }
 
-HandshakeControlPacket PacketParser::createHandshakeControlPacketFromString(const std::string& handshakeControlPacketBuffer)
+HandshakeControlPacket* PacketParser::createHandshakeControlPacketFromString(const std::string& handshakeControlPacketBuffer)
 {
 	bool isEncrypted;
 	uint16_t encryption_key;
@@ -134,7 +134,7 @@ HandshakeControlPacket PacketParser::createHandshakeControlPacketFromString(cons
 	uint32_t maxTransmission;
 	HandshakePhases phase;
 	int index = 0;
-	DefaultControlPacket defaultControlPacket = createDefaultControlPacketFromString(handshakeControlPacketBuffer, index);
+	DefaultControlPacket* defaultControlPacket = createDefaultControlPacketFromString(handshakeControlPacketBuffer, index);
 	index += sizeof(bool);
 	isEncrypted = networkToHost<unsigned int>(handshakeControlPacketBuffer, index);
 	index += sizeof(uint16_t);
@@ -147,11 +147,11 @@ HandshakeControlPacket PacketParser::createHandshakeControlPacketFromString(cons
 	maxTransmission = networkToHost<uint32_t>(handshakeControlPacketBuffer, index);
 	index += sizeof(HandshakePhases);
 	phase = static_cast<HandshakePhases>((handshakeControlPacketBuffer[index] & 0xF0) >> FOUR_BITS);
-	HandshakeControlPacket packet = HandshakeControlPacket(defaultControlPacket.getAckSequenceNumber(), defaultControlPacket.getPacketSequenceNumber(), defaultControlPacket.getTimeStamp(), isEncrypted, encryption_key, windowSize, initialPacketSequenceNumber, maxTransmission, phase);
+	HandshakeControlPacket* packet = new HandshakeControlPacket(defaultControlPacket->getAckSequenceNumber(), defaultControlPacket->getPacketSequenceNumber(), defaultControlPacket->getTimeStamp(), isEncrypted, encryption_key, windowSize, initialPacketSequenceNumber, maxTransmission, phase);
 	return packet;
 }
 
-NAKControlPacket PacketParser::createNAKControlPacketFromString(const std::string& nakControlPacketBuffer) {
+NAKControlPacket* PacketParser::createNAKControlPacketFromString(const std::string& nakControlPacketBuffer) {
 	ControlPacketTypes controlPacketType;
 	uint32_t ackSequenceNumber;
 	uint32_t packetSequenceNumber;
@@ -159,7 +159,7 @@ NAKControlPacket PacketParser::createNAKControlPacketFromString(const std::strin
 
 	int index = 0;
 
-	DefaultControlPacket defaultControlPacket = createDefaultControlPacketFromString(nakControlPacketBuffer, index);
+	DefaultControlPacket* defaultControlPacket = createDefaultControlPacketFromString(nakControlPacketBuffer, index);
 	controlPacketType = static_cast<ControlPacketTypes>((nakControlPacketBuffer[index] & 0xF0) >> FOUR_BITS);
 	index += sizeof(ControlPacketTypes);
 	ackSequenceNumber = networkToHost<uint32_t>(nakControlPacketBuffer, index);
@@ -174,11 +174,11 @@ NAKControlPacket PacketParser::createNAKControlPacketFromString(const std::strin
 		index += sizeof(unsigned int);
 	}
 
-	NAKControlPacket packet = NAKControlPacket(defaultControlPacket.getAckSequenceNumber(), defaultControlPacket.getPacketSequenceNumber(), defaultControlPacket.getTimeStamp(), lostSeqNums);
+	NAKControlPacket* packet = new NAKControlPacket(defaultControlPacket->getAckSequenceNumber(), defaultControlPacket->getPacketSequenceNumber(), defaultControlPacket->getTimeStamp(), lostSeqNums);
 	return packet;
 }
 
-MessageDropRequestControlPacket PacketParser::createMessageDropRequestControlPacketFromString(const std::string& messageDropRequestControlPacketBuffer) {
+MessageDropRequestControlPacket* PacketParser::createMessageDropRequestControlPacketFromString(const std::string& messageDropRequestControlPacketBuffer) {
 	ControlPacketTypes controlPacketType;
 	uint32_t ackSequenceNumber;
 	uint32_t packetSequenceNumber;
@@ -186,7 +186,7 @@ MessageDropRequestControlPacket PacketParser::createMessageDropRequestControlPac
 
 	int index = 0;
 
-	DefaultControlPacket defaultControlPacket = createDefaultControlPacketFromString(messageDropRequestControlPacketBuffer, index);
+	DefaultControlPacket* defaultControlPacket = createDefaultControlPacketFromString(messageDropRequestControlPacketBuffer, index);
 	controlPacketType = static_cast<ControlPacketTypes>((messageDropRequestControlPacketBuffer[index] & 0xF0) >> FOUR_BITS);
 	index += sizeof(ControlPacketTypes);
 	ackSequenceNumber = networkToHost<uint32_t>(messageDropRequestControlPacketBuffer, index);
@@ -201,7 +201,7 @@ MessageDropRequestControlPacket PacketParser::createMessageDropRequestControlPac
 		index += sizeof(unsigned int);
 	}
 
-	MessageDropRequestControlPacket packet = MessageDropRequestControlPacket(defaultControlPacket.getAckSequenceNumber(), defaultControlPacket.getPacketSequenceNumber(), defaultControlPacket.getTimeStamp(), lostSeqNums);
+	MessageDropRequestControlPacket* packet = new MessageDropRequestControlPacket(defaultControlPacket->getAckSequenceNumber(), defaultControlPacket->getPacketSequenceNumber(), defaultControlPacket->getTimeStamp(), lostSeqNums);
 	return packet;
 }
 
@@ -242,7 +242,7 @@ UdpPacket PacketParser::createUdpPacketFromString(const std::string& udpPacketBu
 std::vector<char> PacketParser::packetToBytes(const UdpPacket& udpHeaders, const DefaultPacket& srtHeaders, const std::vector<char>* data)
 {
 	std::vector<char> buffer = udpHeaders.toBuffer();
-	
+
 	for (char c : srtHeaders.toBuffer())
 	{
 		buffer.push_back(c);
@@ -254,4 +254,66 @@ std::vector<char> PacketParser::packetToBytes(const UdpPacket& udpHeaders, const
 	}
 
 	return buffer;
+}
+
+DefaultPacket* PacketParser::createPacketFromStringGlobal(const std::string& globalPacketBuffer)
+{
+	int index = 0;
+	DefaultPacket* packet = createDefaultPacketFromString(globalPacketBuffer, index);
+	DefaultDataPacket* dataPacket;
+	DefaultControlPacket* controlPacket;
+
+	switch (packet->getPacketType())
+	{
+	case DataPacket:
+		index = 0;
+		dataPacket = createDefaultDataPacketFromString(globalPacketBuffer, index);
+		switch (dataPacket->getDataType())
+		{
+		case Cursor:
+			break;
+		case Keyboard:
+			break;
+		case Screen:
+			break;
+		case Chat:
+			break;
+		default:
+			throw PacketParserException("Error: Invalid data type");
+			break;
+		}
+		break;
+	case ControlPacket:
+		index = 0;
+		controlPacket = createDefaultControlPacketFromString(globalPacketBuffer, index);
+		switch (controlPacket->getControlType())
+		{
+		case HANDSHAKE:
+			break;
+		case KEEPALIVE:
+			break;
+		case ACK:
+			break;
+		case NAK:
+			break;
+		case CongestionWarning:
+			break;
+		case SHUTDOWN:
+			break;
+		case ACKACK:
+			break;
+		case DROPREQ:
+			break;
+		case PEERERROR:
+			break;
+		default:
+			throw PacketParserException("Error: Invalid control type");
+			break;
+		}
+		break;
+	default:
+		throw PacketParserException("Error: Invalid control type");
+		break;
+	}
+	return nullptr;
 }

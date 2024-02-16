@@ -47,6 +47,6 @@ void listenToKeyboard()
             std::cerr << e.what() << std::endl;
             runLoop = false;
         }
-        Sleep(100);
+        Sleep(1000);
     }
 }
