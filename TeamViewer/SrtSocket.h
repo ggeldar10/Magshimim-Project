@@ -4,12 +4,14 @@
 #include <thread>
 #include <string>
 #include <functional>
-
 #define RECV_BUFFER_SIZE 1024
 
 class SrtSocket
 {
 private:
+	//
+	// Fields
+	//
 	SOCKET _srtSocket;
 	struct
 	{
@@ -18,7 +20,7 @@ private:
 		uint16_t _dstPort;
 		uint32_t _dstIP;
 		uint32_t _seqNum;
-		unsigned int _otherComputerMaxTransmission;
+		unsigned int _otherComputerWindowSize;
 		unsigned int _otherComputerMtu;
 		/*sockaddr_in */
 
@@ -28,19 +30,23 @@ private:
 	//
 	// Methods
 	//
-	void waitForValidPacket(std::function<bool(char*, int)> checkFunction, std::vector<char>* buffer);
+	void waitForValidPacket(std::vector<char>* buffer, std::function<bool(char*, int)> checkFunction);
 	void controlThreadFunction(); // we need to think how we implement it 
 	bool isValidIpv4Checksum(const IpPacket& ipPacket); // add data
 	bool isValidIpHeaders(const IpPacket& ipHeaders);
 	bool isValidUdpHeaders(const UdpPacket& udpHeaders);
+	bool isValidHeaders(const IpPacket& ipHeaders, const UdpPacket& udpHeaders);
 
 public:
+	//
+	// Methods
+	//
 	SrtSocket();
 	~SrtSocket();
 	void listenAndAccept(); // needs to block the current thread and start the thread function 
 	void srtBind(sockaddr_in* sockaddr);
 	void connectToServer(sockaddr_in* addrs);
-	void sendSrt();
-	const DefaultPacket* recvSrt();
+	void sendSrt(const DefaultPacket* packet);
+	std::string recvSrt();
 };
 
