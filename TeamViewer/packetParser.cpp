@@ -262,6 +262,11 @@ DefaultPacket* PacketParser::createPacketFromStringGlobal(const std::string& glo
 	DefaultPacket* packet = createDefaultPacketFromString(globalPacketBuffer, index);
 	DefaultDataPacket* dataPacket;
 	DefaultControlPacket* controlPacket;
+	CursorDataPacket* cursorPacket;
+	KeyboardDataPacket* keyboardPacket;
+	HandshakeControlPacket* handshakePacket;
+	NAKControlPacket* nakPacket;
+	MessageDropRequestControlPacket* dropRequestPacket;
 
 	switch (packet->getPacketType())
 	{
@@ -271,10 +276,15 @@ DefaultPacket* PacketParser::createPacketFromStringGlobal(const std::string& glo
 		switch (dataPacket->getDataType())
 		{
 		case Cursor:
+			cursorPacket = createCursorDataPacketFromString(globalPacketBuffer);
+			return cursorPacket;
 			break;
 		case Keyboard:
+			keyboardPacket = createKeyboardDataPacketFromString(globalPacketBuffer);
+			return keyboardPacket;
 			break;
 		case Screen:
+			//To Do
 			break;
 		case Chat:
 			break;
@@ -289,22 +299,34 @@ DefaultPacket* PacketParser::createPacketFromStringGlobal(const std::string& glo
 		switch (controlPacket->getControlType())
 		{
 		case HANDSHAKE:
+			handshakePacket = createHandshakeControlPacketFromString(globalPacketBuffer);
+			return handshakePacket;
 			break;
 		case KEEPALIVE:
+			return controlPacket;
 			break;
 		case ACK:
+			return controlPacket;
 			break;
 		case NAK:
+			nakPacket = createNAKControlPacketFromString(globalPacketBuffer);
+			return nakPacket;
 			break;
 		case CongestionWarning:
+			return controlPacket;
 			break;
 		case SHUTDOWN:
+			return controlPacket;
 			break;
 		case ACKACK:
+			return controlPacket;
 			break;
 		case DROPREQ:
+			dropRequestPacket = createMessageDropRequestControlPacketFromString(globalPacketBuffer);
+			return dropRequestPacket;
 			break;
 		case PEERERROR:
+			return controlPacket;
 			break;
 		default:
 			throw PacketParserException("Error: Invalid control type");
@@ -312,7 +334,7 @@ DefaultPacket* PacketParser::createPacketFromStringGlobal(const std::string& glo
 		}
 		break;
 	default:
-		throw PacketParserException("Error: Invalid control type");
+		throw PacketParserException("Error: Invalid packet type");
 		break;
 	}
 	return nullptr;
