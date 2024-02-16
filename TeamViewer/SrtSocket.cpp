@@ -308,8 +308,10 @@ void SrtSocket::sendSrt() {
 }
 
 
-const DefaultPacket* SrtSocket::recvSrt(const int length)
+const DefaultPacket* SrtSocket::recvSrt()
 {
+	UdpPacket udpPacket = recvUdp();
+	const int length = udpPacket.getLength();
 	std::vector<char> buffer(length);
 
 	int bytesReceived = recv(this->_srtSocket, buffer.data(), length, 0);

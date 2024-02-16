@@ -37,7 +37,7 @@ private:
 	void srtBind(sockaddr_in* sockaddr);
 	void connectToServer(sockaddr_in* addrs);
 	void sendSrt();
-	const DefaultPacket* recvSrt(const int length);
+	const DefaultPacket* recvSrt();
 	const UdpPacket recvUdp();
 
 public:
