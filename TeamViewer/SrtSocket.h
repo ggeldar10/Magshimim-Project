@@ -1,5 +1,5 @@
 #pragma once
-#include "packets.h"
+#include "packetParser.h"
 #include <queue>
 #include <thread>
 #include <string>
@@ -37,7 +37,8 @@ private:
 	void srtBind(sockaddr_in* sockaddr);
 	void connectToServer(sockaddr_in* addrs);
 	void sendSrt();
-	const DefaultPacket* recvSrt();
+	const DefaultPacket* recvSrt(const int length);
+	const UdpPacket recvUdp();
 
 public:
 	SrtSocket();

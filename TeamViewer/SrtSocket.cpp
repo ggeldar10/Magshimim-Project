@@ -308,7 +308,54 @@ void SrtSocket::sendSrt() {
 }
 
 
-const DefaultPacket* SrtSocket::recvSrt()
+const DefaultPacket* SrtSocket::recvSrt(const int length)
 {
-	return nullptr;
+	std::vector<char> buffer(length);
+
+	int bytesReceived = recv(this->_srtSocket, buffer.data(), length, 0);
+
+	if (bytesReceived < 0)
+	{
+		std::cerr << "Error while trying to get SRT packet" << std::endl;
+		throw std::runtime_error("Error while trying to get SRT packet");
+	}
+	else if (bytesReceived == 0)
+	{
+		throw std::runtime_error("Connection closed while trying to receive SRT packet");
+	}
+
+	std::string packetBuffer(buffer.data(), buffer.data() + bytesReceived);
+
+	DefaultPacket* packet = PacketParser::createPacketFromStringGlobal(packetBuffer);
+
+	return packet;
+}
+
+const UdpPacket SrtSocket::recvUdp()
+{
+	char buffer[UDP_HEADERS_SIZE] = { 0 };
+	std::string bufferString;
+
+	int bytesReceived = recv(this->_srtSocket, buffer, UDP_HEADERS_SIZE + IP_HEADERS_SIZE, 0);
+
+	if (bytesReceived < 0)
+	{
+		std::cerr << "Error while trying to get UDP header" << std::endl;
+		throw std::runtime_error("Error while trying to get UDP header");
+	}
+	else if (bytesReceived == 0)
+	{
+		throw std::runtime_error("Connection closed while trying to receive UDP header");
+	}
+
+	bufferString = std::string(buffer, buffer + bytesReceived);
+
+	UdpPacket udpPacketRecv = PacketParser::createUdpPacketFromString(bufferString.substr(IP_HEADERS_SIZE, UDP_HEADERS_SIZE));
+
+	if (udpPacketRecv.getLength() != UDP_HEADERS_SIZE + HANDSHAKE_PACKET_SIZE)
+	{
+		throw std::runtime_error("Invalid UDP packet length");
+	}
+
+	return udpPacketRecv;
 }
