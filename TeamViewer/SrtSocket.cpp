@@ -313,6 +313,7 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 			}
 			return true;
 		});
+	// start control thread
 }
 
 void SrtSocket::sendSrt(const DefaultPacket* packet) {
