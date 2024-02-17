@@ -11,6 +11,9 @@
 class SrtSocket
 {
 private:
+	//
+	// Fields
+	//
 	SOCKET _srtSocket;
 	struct
 	{
@@ -41,6 +44,9 @@ private:
 	const UdpPacket recvUdp();
 
 public:
+	//
+	// Methods
+	//
 	SrtSocket();
 	~SrtSocket();
 	void listenAndAccept(); // needs to block the current thread and start the thread function 
