@@ -136,11 +136,10 @@ output:
 void SrtSocket::listenAndAccept()
 {
 	bool packetNotFound = true;
-	std::vector<char>buffer;
 	std::unique_ptr<IpPacket> ipHeaders;
 	std::unique_ptr<UdpPacket> udpHeaders;
 	std::unique_ptr<HandshakeControlPacket> srtHeaders;
-	waitForValidPacket(&buffer, [&](char* buffer, int totalLength) -> bool
+	waitForValidPacket(nullptr, [&](char* buffer, int totalLength) -> bool
 	{
 		std::string bufferString = buffer;
 		ipHeaders = std::make_unique<IpPacket>(PacketParser::createIpPacketFromString(bufferString));
@@ -174,15 +173,13 @@ void SrtSocket::listenAndAccept()
 	HandshakeControlPacket handshakeSend = HandshakeControlPacket(2, 0, time(nullptr), false, 0, DEFUALT_MAX_TRANSMISSION, 0, DEFUALT_MTU_SIZE, INDUCTION_2);
 	UdpPacket udpPacketSend = UdpPacket(this->_commInfo._srcPort, this->_commInfo._dstPort, UDP_HEADERS_SIZE + HANDSHAKE_PACKET_SIZE, 0);
 	std::vector<char> sendBufferVector = PacketParser::packetToBytes(udpPacketSend, handshakeSend, nullptr);
-	std::unique_ptr<char[]> help = std::make_unique<char[]>(sendBufferVector.size());
-	std::copy(sendBufferVector.begin(), sendBufferVector.end(), help.get());
-	if (sendto(this->_srtSocket, help.get(), sendBufferVector.size(), 0, reinterpret_cast<sockaddr*>(&toAddr), sizeof(toAddr)) < 0)
+	if (sendto(this->_srtSocket, sendBufferVector.data(), sendBufferVector.size(), 0, reinterpret_cast<sockaddr*>(&toAddr), sizeof(toAddr)) < 0)
 	{
 		std::cerr << "Error while doing sendto in listenAndAccept" << std::endl;
 		throw /*todo throw the right error*/;
 	}
 
-	waitForValidPacket(&buffer, [&](char* buffer, int totalLength) -> bool
+	waitForValidPacket(nullptr, [&](char* buffer, int totalLength) -> bool
 		{
 			std::string bufferString = buffer;
 			ipHeaders = std::make_unique<IpPacket>(PacketParser::createIpPacketFromString(bufferString));
@@ -208,9 +205,7 @@ void SrtSocket::listenAndAccept()
 	handshakeSend = HandshakeControlPacket(4, 0, time(nullptr), false, 0, DEFUALT_MAX_TRANSMISSION, 0/*Change later*/, DEFUALT_MTU_SIZE, SUMMARY_2);
 	udpPacketSend = UdpPacket(this->_commInfo._srcPort, this->_commInfo._dstPort, UDP_HEADERS_SIZE + HANDSHAKE_PACKET_SIZE, 0);
 	sendBufferVector = PacketParser::packetToBytes(udpPacketSend, handshakeSend, nullptr);
-	help = std::make_unique<char[]>(sendBufferVector.size());
-	std::copy(sendBufferVector.begin(), sendBufferVector.end(), help.get());
-	sendto(this->_srtSocket, help.get(), sendBufferVector.size(), 0, reinterpret_cast<sockaddr*>(&toAddr), sizeof(toAddr));
+	sendto(this->_srtSocket, sendBufferVector.data(), sendBufferVector.size(), 0, reinterpret_cast<sockaddr*>(&toAddr), sizeof(toAddr));
 
 
 	// start the control packet thread
