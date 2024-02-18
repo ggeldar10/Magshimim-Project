@@ -1,6 +1,5 @@
 #pragma once
 #include "packets.h"
-#include "SrtSocket.h"
 #include <vector>
 
 #define UDP_HEADERS_SIZE 8
