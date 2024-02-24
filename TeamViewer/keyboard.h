@@ -7,6 +7,10 @@
 
 void makeKeyboardAction(KeyboardActions action, int keyCode);
 void listenToKeyboard();
+void SetHook();
+void Unhook();
+LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
+extern bool shiftPressed;
 
 class KeyboardButtonActionException : public std::exception
 {

@@ -101,7 +101,7 @@ std::vector<uint8_t> DefaultControlPacket::toBuffer() const {
 }
 
 HandshakeControlPacket::HandshakeControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, bool hasEncryption, uint16_t encryption_key, uint32_t windowSize,
-    uint32_t initialPacketSequenceNumber, uint32_t maxTransmission, HandshakePhases phase)
+    uint32_t initialPacketSequenceNumber, uint32_t maxTransmissionUnit, HandshakePhases phase)
     : DefaultControlPacket(ackNum, packetNum, time, HANDSHAKE), isEncrypted(hasEncryption), encryption_key(encryption_key),
     windowSize(windowSize), initialPacketSequenceNumber(initialPacketSequenceNumber), maxTransmissionUnit(maxTransmissionUnit), phase(phase) {}
 
