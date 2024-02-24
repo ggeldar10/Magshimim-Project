@@ -29,13 +29,12 @@ private:
 	std::mutex _packetSendQueueMtx;
 	std::thread _controlThread;
 	
-	void waitForValidPacket(std::function<bool(char*, int)> checkFunction, std::vector<char>* buffer);
+	void waitForValidPacket(std::vector<char>* buffer, std::function<bool(char*, int)> checkFunction);
 	void controlThreadFunction();
 	bool isValidIpv4Checksum(const IpPacket& ipPacket); // add data
 	bool isValidIpHeaders(const IpPacket& ipHeaders);
 	bool isValidUdpHeaders(const UdpPacket& udpHeaders);
-	void srtBind(sockaddr_in* sockaddr);
-	void connectToServer(sockaddr_in* addrs);
+	bool isValidHeaders(const IpPacket& ipHeaders, const UdpPacket& udpHeaders);
 	void sendSrt();
 	const std::unique_ptr<const DefaultPacket> recvSrt();
 	const UdpPacket recvUdp();
@@ -43,7 +42,9 @@ private:
 public:
 	SrtSocket();
 	~SrtSocket();
-	void listenAndAccept(); // needs to block the current thread and start the thread function 
+	void listenAndAccept();
+	void connectToServer(sockaddr_in* addrs);
+	void srtBind(sockaddr_in* sockaddr);
 	
 };
 
