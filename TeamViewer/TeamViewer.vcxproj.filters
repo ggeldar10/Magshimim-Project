@@ -25,6 +25,9 @@
     <Filter Include="Source Files\communication">
       <UniqueIdentifier>{24fe6696-8558-4763-b957-dc02647a58f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\testing Socket">
+      <UniqueIdentifier>{214072a2-efd2-492d-be52-447d792c47d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -47,6 +50,9 @@
     </ClCompile>
     <ClCompile Include="packetManager.cpp">
       <Filter>Source Files\communication</Filter>
+    </ClCompile>
+    <ClCompile Include="testListenAndConnect.cpp">
+      <Filter>Source Files\testing Socket</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -73,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="packetManager.h">
       <Filter>Header Files\communication</Filter>
+    </ClInclude>
+    <ClInclude Include="windowsHeaders.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

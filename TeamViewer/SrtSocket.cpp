@@ -189,22 +189,22 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 	// start control thread
 }
 
-void SrtSocket::sendSrt(const DefaultPacket * packet) {
-	std::vector<uint8_t> buffer = packet->toBuffer();
-}
+//void SrtSocket::sendSrt(const DefaultPacket * packet) {
+//	std::vector<uint8_t> buffer = packet->toBuffer();
+//}
 
-const UdpPacket SrtSocket::recvUdp()
-{
-	// Assuming createUdpPacketFromVector is a static function in PacketParser
-	UdpPacket udpPacketRecv = PacketParser::createUdpPacketFromVector(bufferVector);
-
-	if (udpPacketRecv.getLength() != UDP_HEADERS_SIZE + HANDSHAKE_PACKET_SIZE)
-	{
-		throw std::runtime_error("Invalid UDP packet length");
-	}
-
-	return udpPacketRecv;
-}
+//const UdpPacket SrtSocket::recvUdp()
+//{
+//	// Assuming createUdpPacketFromVector is a static function in PacketParser
+//	UdpPacket udpPacketRecv = PacketParser::createUdpPacketFromVector(bufferVector);
+//
+//	if (udpPacketRecv.getLength() != UDP_HEADERS_SIZE + HANDSHAKE_PACKET_SIZE)
+//	{
+//		throw std::runtime_error("Invalid UDP packet length");
+//	}
+//
+//	return udpPacketRecv;
+//}
 
 /*
 waits for the packet with the srt protocol and with the right port and ip
@@ -301,9 +301,10 @@ output:
 */
 void SrtSocket::srtBind(sockaddr_in* addrs)
 {
-	if (bind(this->_srtSocket, (sockaddr*)&addrs, sizeof(addrs)) < 0)
+	if (bind(this->_srtSocket, reinterpret_cast<sockaddr*>(addrs), sizeof(sockaddr_in)) < 0)
 	{
 		std::cerr << "Error while trying to bind" << std::endl;
+		std::cerr << WSAGetLastError() << std::endl;
 		throw "Error while trying to bind";
 	}
 	sockaddr_in output;
