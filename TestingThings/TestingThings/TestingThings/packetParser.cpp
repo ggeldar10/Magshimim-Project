@@ -42,11 +42,12 @@ IpPacket PacketParser::createIpPacketFromVector(const std::vector<char>& ipPacke
     index += sizeof(uint32_t);
     dstAddrs = networkToHost<uint32_t>(ipPacketBuffer, index);
     index += sizeof(uint32_t);
-    std::vector<char> help(ipPacketBuffer.begin() + index, ipPacketBuffer.end());
+    std::string help(ipPacketBuffer.begin() + index, ipPacketBuffer.end());
     for (int i = 0; i < help.size() && i < MAX_IP_OPTIONS_SIZE; i++)
     {
         options[i] = help[i];
     }
+
     IpPacket packet = IpPacket(version, lengthOfHeaders, typeOfService, totalLength, identification, fragmentOffsetIncludingFlags, ttl, protocol, headerChecksum, srcAddrs, dstAddrs, options);
     return packet;
 }
@@ -240,6 +241,7 @@ std::vector<char> PacketParser::packetToBytes(const UdpPacket& udpHeaders, const
     {
         buffer.push_back(c);
     }
+
     if (data != nullptr)
     {
         for (int i = 0; i < data->size(); i++)
@@ -247,7 +249,6 @@ std::vector<char> PacketParser::packetToBytes(const UdpPacket& udpHeaders, const
             buffer.push_back(data->at(i));
         }
     }
-   
 
     return buffer;
 }

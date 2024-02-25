@@ -122,7 +122,7 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 	this->_commInfo._dstIP = addrs->sin_addr.s_addr;
 	sockaddr_in bindToAddr = { 0 };
 	bindToAddr.sin_addr.s_addr = INADDR_ANY;
-	bindToAddr.sin_port = 0;
+	bindToAddr.sin_port = 9000;
 	bindToAddr.sin_family = AF_INET;
 	this->srtBind(&bindToAddr);
 	HandshakeControlPacket handshakeHeaders = HandshakeControlPacket(0, 0, std::time(nullptr), false, 0, DEFUALT_MAX_TRANSMISSION, 0, DEFUALT_MTU_SIZE, INDUCTION_1);
@@ -208,10 +208,10 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 
 /*
 waits for the packet with the srt protocol and with the right port and ip
-input: isValid - the function that checks if the packet is valid it gets 
-a buffer and the size of it 
+input: isValid - the function that checks if the packet is valid it gets
+a buffer and the size of it
 and returns true if the packet is valid false if else
-buffer - the buffer to get the valid packet into 
+buffer - the buffer to get the valid packet into
 output: returns the valid packet inside the given buffer
 */
 void SrtSocket::waitForValidPacket(std::vector<char>* buffer, std::function<bool(char*, int)> isValid)
@@ -233,7 +233,7 @@ void SrtSocket::waitForValidPacket(std::vector<char>* buffer, std::function<bool
 		totalLength = (ipFirstRow[ipFirstHeaderRowLowerInArray] << FOUR_BITS) | ipFirstRow[ipFirstHeaderRowHigherInArray];
 		std::unique_ptr<char[]> allBuffer = std::make_unique<char[]>(totalLength);
 
-		if(recv(this->_srtSocket, allBuffer.get(), totalLength, 0) < 0)
+		if (recv(this->_srtSocket, allBuffer.get(), totalLength, 0) < 0)
 		{
 			std::cerr << "Error while doing recv. error number from wsagetlasterror: " << WSAGetLastError() << std::endl;
 			//throw excetpions
@@ -308,22 +308,27 @@ void SrtSocket::srtBind(sockaddr_in* addrs)
 		std::cerr << WSAGetLastError() << std::endl;
 		throw "Error while trying to bind";
 	}
-	//todo fix the bind problem
-	sockaddr_in* output = nullptr;
-	*output = { 0 };
-	if (addrs->sin_port == 0)
-	{
-		int sizeOfOutput = sizeof(sockaddr_in);
-		if (getsockname(this->_srtSocket, (sockaddr*)output, &sizeOfOutput) != 0)
+	sockaddr_in output;
+	socklen_t sizeOfOutput = sizeof(sockaddr_in);
+	//if (addrs->sin_port == 0)
+	//{
+		/*if (getsockname(this->_srtSocket, reinterpret_cast<sockaddr*>(&output), &sizeOfOutput) != 0)
 		{
 			std::cerr << "Error while trying to get the sock name";
 			throw "Error while trying to get the sock name";
-		}
+		}*/
+	struct sockaddr_in sin;
+	int addrlen = sizeof(sin);
+	if (getsockname(this->_srtSocket, (struct sockaddr*)&sin, &addrlen) == 0 &&
+		sin.sin_family == AF_INET &&
+		addrlen == sizeof(sin))
+	{
+		int local_port = ntohs(sin.sin_port);
 	}
-	this->_commInfo._srcPort = addrs->sin_port != 0 ? addrs->sin_port : output->sin_port;
-	this->_commInfo._srcIP = addrs->sin_port != 0 ? addrs->sin_addr.s_addr : output->sin_addr.s_addr;
 
-
+	//}
+	/*this->_commInfo._srcPort = addrs->sin_port != 0 ? addrs->sin_port : output.sin_port;
+	this->_commInfo._srcIP = addrs->sin_port != 0 ? addrs->sin_addr.s_addr : output.sin_addr.s_addr;*/
 }
 
 
