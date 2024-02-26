@@ -188,6 +188,7 @@ public:
 
     uint8_t getVersion() const;
     uint8_t getLengthOfHeaders() const;
+    uint8_t getLengthOfHeadersInBytes() const;
     uint8_t getTypeOfService() const;
     uint16_t getTotalLength() const;
     uint16_t getIdentification() const;

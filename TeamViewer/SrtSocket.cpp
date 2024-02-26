@@ -3,6 +3,7 @@
 #include <iostream>
 #include "packetParser.h"
 #include <vector>
+#include <random>
 
 SrtSocket::SrtSocket()
 {
@@ -45,7 +46,7 @@ void SrtSocket::listenAndAccept()
 			std::vector<char> bufferVec;
 			bufferVec.assign(buffer, buffer + totalLength);
 			ipHeaders = std::make_unique<IpPacket>(PacketParser::createIpPacketFromVector(bufferVec));
-			udpHeaders = std::make_unique<UdpPacket>(PacketParser::createUdpPacketFromVector({ bufferVec.begin() + ipHeaders->getLengthOfHeaders(), bufferVec.begin() + ipHeaders->getLengthOfHeaders() + UDP_HEADERS_SIZE }));
+			udpHeaders = std::make_unique<UdpPacket>(PacketParser::createUdpPacketFromVector({ bufferVec.begin() + ipHeaders->getLengthOfHeadersInBytes(), bufferVec.begin() + ipHeaders->getLengthOfHeadersInBytes() + UDP_HEADERS_SIZE }));
 			if (!isValidHeaders(*ipHeaders, *udpHeaders))
 			{
 				return false;
@@ -54,7 +55,7 @@ void SrtSocket::listenAndAccept()
 			{
 				return false;
 			}
-			srtHeaders = PacketParser::createHandshakeControlPacketFromVector({ bufferVec.begin() + ipHeaders->getLengthOfHeaders() + UDP_HEADERS_SIZE, bufferVec.end() }); // might have a problem
+			srtHeaders = PacketParser::createHandshakeControlPacketFromVector({ bufferVec.begin() + ipHeaders->getLengthOfHeadersInBytes() + UDP_HEADERS_SIZE, bufferVec.end() }); // might have a problem
 			if (srtHeaders->getPhase() != INDUCTION_1)
 			{
 				return false;
@@ -85,7 +86,7 @@ void SrtSocket::listenAndAccept()
 			std::vector<char> bufferVec;
 			bufferVec.assign(buffer, buffer + totalLength);
 			ipHeaders = std::make_unique<IpPacket>(PacketParser::createIpPacketFromVector(bufferVec));
-			udpHeaders = std::make_unique<UdpPacket>(PacketParser::createUdpPacketFromVector({ bufferVec.begin() + ipHeaders->getLengthOfHeaders(), bufferVec.begin() + ipHeaders->getLengthOfHeaders() + UDP_HEADERS_SIZE }));
+			udpHeaders = std::make_unique<UdpPacket>(PacketParser::createUdpPacketFromVector({ bufferVec.begin() + ipHeaders->getLengthOfHeadersInBytes(), bufferVec.begin() + ipHeaders->getLengthOfHeadersInBytes() + UDP_HEADERS_SIZE }));
 			if (!isValidHeaders(*ipHeaders, *udpHeaders))
 			{
 				return false;
@@ -94,7 +95,7 @@ void SrtSocket::listenAndAccept()
 			{
 				return false;
 			}
-			srtHeaders = PacketParser::createHandshakeControlPacketFromVector({ bufferVec.begin() + ipHeaders->getLengthOfHeaders() + UDP_HEADERS_SIZE, bufferVec.end() }); // might have a problem
+			srtHeaders = PacketParser::createHandshakeControlPacketFromVector({ bufferVec.begin() + ipHeaders->getLengthOfHeadersInBytes() + UDP_HEADERS_SIZE, bufferVec.end() }); // might have a problem
 			if (srtHeaders->getPhase() != SUMMARY_1)
 			{
 				return false;
@@ -138,7 +139,7 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 			std::vector<char> bufferVec;
 			bufferVec.assign(buffer, buffer + size);
 			ipHeadersRecv = std::make_unique<IpPacket>(PacketParser::createIpPacketFromVector(bufferVec));
-			udpHeadersRecv = std::make_unique<UdpPacket>(PacketParser::createUdpPacketFromVector({ bufferVec.begin() + ipHeadersRecv->getLengthOfHeaders(), bufferVec.begin() + ipHeadersRecv->getLengthOfHeaders() + UDP_HEADERS_SIZE }));
+			udpHeadersRecv = std::make_unique<UdpPacket>(PacketParser::createUdpPacketFromVector({ bufferVec.begin() + ipHeadersRecv->getLengthOfHeadersInBytes(), bufferVec.begin() + ipHeadersRecv->getLengthOfHeadersInBytes() + UDP_HEADERS_SIZE }));
 			if (!isValidHeaders(*ipHeadersRecv, *udpHeadersRecv))
 			{
 				return false;
@@ -147,7 +148,7 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 			{
 				return false;
 			}
-			srtHeadersRecv = PacketParser::createHandshakeControlPacketFromVector({ bufferVec.begin() + ipHeadersRecv->getLengthOfHeaders() + UDP_HEADERS_SIZE, bufferVec.end() }); // might have a problem
+			srtHeadersRecv = PacketParser::createHandshakeControlPacketFromVector({ bufferVec.begin() + ipHeadersRecv->getLengthOfHeadersInBytes() + UDP_HEADERS_SIZE, bufferVec.end() }); // might have a problem
 			if (srtHeadersRecv->getPhase() != INDUCTION_2)
 			{
 				return false;
@@ -170,7 +171,7 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 			std::vector<char> bufferVec;
 			bufferVec.assign(buffer, buffer + size);
 			ipHeadersRecv = std::make_unique<IpPacket>(PacketParser::createIpPacketFromVector(bufferVec));
-			udpHeadersRecv = std::make_unique<UdpPacket>(PacketParser::createUdpPacketFromVector({ bufferVec.begin() + ipHeadersRecv->getLengthOfHeaders(), bufferVec.begin() + ipHeadersRecv->getLengthOfHeaders() + UDP_HEADERS_SIZE }));
+			udpHeadersRecv = std::make_unique<UdpPacket>(PacketParser::createUdpPacketFromVector({ bufferVec.begin() + ipHeadersRecv->getLengthOfHeadersInBytes(), bufferVec.begin() + ipHeadersRecv->getLengthOfHeadersInBytes() + UDP_HEADERS_SIZE }));
 			if (!isValidHeaders(*ipHeadersRecv, *udpHeadersRecv))
 			{
 				return false;
@@ -179,7 +180,7 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 			{
 				return false;
 			}
-			srtHeadersRecv = PacketParser::createHandshakeControlPacketFromVector({ bufferVec.begin() + ipHeadersRecv->getLengthOfHeaders() + UDP_HEADERS_SIZE, bufferVec.end() }); // might have a problem
+			srtHeadersRecv = PacketParser::createHandshakeControlPacketFromVector({ bufferVec.begin() + ipHeadersRecv->getLengthOfHeadersInBytes() + UDP_HEADERS_SIZE, bufferVec.end() }); // might have a problem
 			if (srtHeadersRecv->getPhase() != INDUCTION_2)
 			{
 				return false;
@@ -308,22 +309,24 @@ void SrtSocket::srtBind(sockaddr_in* addrs)
 		std::cerr << WSAGetLastError() << std::endl;
 		throw "Error while trying to bind";
 	}
-	//todo fix the bind problem
-	sockaddr_in* output = nullptr;
-	*output = { 0 };
+	sockaddr_in output;
+	int addrlen = sizeof(sockaddr_in);
+	if (getsockname(this->_srtSocket, reinterpret_cast<sockaddr*>(&output), &addrlen) != 0)
+	{
+		std::cerr << "Error while trying to bind" << std::endl;
+		std::cerr << WSAGetLastError() << std::endl;
+		throw "Error while trying to bind";
+	}
+	this->_commInfo._srcIP = output.sin_addr.s_addr;
 	if (addrs->sin_port == 0)
 	{
-		int sizeOfOutput = sizeof(sockaddr_in);
-		if (getsockname(this->_srtSocket, (sockaddr*)output, &sizeOfOutput) != 0)
-		{
-			std::cerr << "Error while trying to get the sock name";
-			throw "Error while trying to get the sock name";
-		}
+		std::srand(std::time(nullptr));
+		this->_commInfo._srcPort = htons(MIN_PORT_NUM + std::rand() % (MAX_PORT_NUM - MIN_PORT_NUM));
 	}
-	this->_commInfo._srcPort = addrs->sin_port != 0 ? addrs->sin_port : output->sin_port;
-	this->_commInfo._srcIP = addrs->sin_port != 0 ? addrs->sin_addr.s_addr : output->sin_addr.s_addr;
-
-
+	else
+	{
+		this->_commInfo._srcPort = addrs->sin_port;
+	}
 }
 
 

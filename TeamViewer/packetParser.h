@@ -33,11 +33,10 @@ public:
     template<typename htnSize>
     static void hostToNetworkIntoVector(std::vector<char>* addVector, htnSize value)
     {
-        htnSize andFactor = 0xFF << ((sizeof(htnSize) - 1) * BYTE_IN_BITS);
-        for (int i = 0; i < sizeof(htnSize); i++)
+        while (value != 0)
         {
-            addVector->push_back(value & andFactor);
-            andFactor >>= BYTE_IN_BITS;
+            addVector->push_back(value & 0xFF);
+            value >>= BYTE_IN_BITS;
         }
     }
 
@@ -49,12 +48,15 @@ public:
             std::cerr << "Error: buffer size is not big enough" << std::endl;
             throw "Error: buffer size is not big enough";
         }
+
         nthSize networkToHostNum = 0;
-        for (int i = 0; i < sizeof(nthSize); i++)
+
+        for (int i = sizeof(nthSize) - 1; i >= 0; i--)
         {
-            networkToHostNum = networkToHostNum << BYTE_IN_BITS;
-            networkToHostNum = networkToHostNum | static_cast<nthSize>(buffer[index + i]);
+            networkToHostNum <<= BYTE_IN_BITS;
+            networkToHostNum |= buffer[index + i];
         }
+
         return networkToHostNum;
     }
 
