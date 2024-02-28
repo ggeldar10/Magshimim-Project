@@ -4,7 +4,8 @@
 #include "keyboard.h"
 #include <thread>
 
-int main() {
+int main() 
+{
     std::thread cursorThread(listenToCursor);
     std::thread keyboardThread(listenToKeyboard);
     

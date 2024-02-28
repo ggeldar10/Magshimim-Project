@@ -329,9 +329,6 @@ void SrtSocket::srtBind(sockaddr_in* addrs)
 	}
 }
 
-
-
-
 void SrtSocket::controlThreadFunction()
 {
 	DefaultControlPacket* packetPtr;
@@ -372,6 +369,59 @@ void SrtSocket::sendSrt() {
 		dest_addr.sin_port = htons(this->_commInfo._dstPort);
 		dest_addr.sin_addr.s_addr = htonl(this->_commInfo._dstIP);
 
-		sendto(this->_srtSocket, charArray, packetBuffer.size(), 0, (struct sockaddr*)&dest_addr, sizeof(sockaddr_in));
+		sendto(this->_srtSocket, charArray, packetBuffer.size(), 0, (struct sockaddr*)&dest_addr, sizeof(dest_addr));
+
+		delete[] charArray;
 	}
+}
+
+const std::unique_ptr<const DefaultPacket> SrtSocket::recvSrt()
+{
+	UdpPacket udpPacket = recvUdp();
+	const int length = udpPacket.getLength();
+	std::vector<char> buffer(length);
+
+	int bytesReceived = recv(this->_srtSocket, buffer.data(), length, 0);
+
+	if (bytesReceived < 0)
+	{
+		std::cerr << "Error while trying to get SRT packet" << std::endl;
+		throw std::runtime_error("Error while trying to get SRT packet");
+	}
+	else if (bytesReceived == 0)
+	{
+		throw std::runtime_error("Connection closed while trying to receive SRT packet");
+	}
+
+	std::unique_ptr<const DefaultPacket> packet = PacketParser::createPacketFromVectorGlobal(buffer);
+
+	return packet;
+}
+
+const UdpPacket SrtSocket::recvUdp()
+{
+	char buffer[UDP_HEADERS_SIZE] = { 0 };
+	std::vector<char> bufferVector(UDP_HEADERS_SIZE + IP_HEADERS_SIZE);
+
+	int bytesReceived = recv(this->_srtSocket, bufferVector.data(), UDP_HEADERS_SIZE + IP_HEADERS_SIZE, 0);
+
+	if (bytesReceived < 0)
+	{
+		std::cerr << "Error while trying to get UDP header" << std::endl;
+		throw std::runtime_error("Error while trying to get UDP header");
+	}
+	else if (bytesReceived == 0)
+	{
+		throw std::runtime_error("Connection closed while trying to receive UDP header");
+	}
+
+	// Assuming createUdpPacketFromVector is a static function in PacketParser
+	UdpPacket udpPacketRecv = PacketParser::createUdpPacketFromVector(bufferVector);
+
+	if (udpPacketRecv.getLength() != UDP_HEADERS_SIZE + HANDSHAKE_PACKET_SIZE)
+	{
+		throw std::runtime_error("Invalid UDP packet length");
+	}
+
+	return udpPacketRecv;
 }
