@@ -299,9 +299,16 @@ void UdpPacket::setChecksum(uint16_t checksum)
 std::vector<char> UdpPacket::toBuffer() const
 {
     std::vector<char> buffer;
-    PacketParser::hostToNetworkIntoVector<uint16_t>(&buffer, this->_srcPort);
-    PacketParser::hostToNetworkIntoVector<uint16_t>(&buffer, this->_dstPort);
+    buffer.push_back((this->_srcPort & 0xFF00) >> BYTE_IN_BITS);
+    buffer.push_back(this->_srcPort & 0xFF);
+    buffer.push_back((this->_dstPort & 0xFF00) >> BYTE_IN_BITS);
+    buffer.push_back(this->_dstPort & 0xFF);
     PacketParser::hostToNetworkIntoVector<uint16_t>(&buffer, this->_length);
     PacketParser::hostToNetworkIntoVector<uint16_t>(&buffer, this->_checksum);
     return buffer;
+}
+
+uint8_t IpPacket::getLengthOfHeadersInBytes() const
+{
+    return lengthOfHeaders * FOUR_BITS;
 }

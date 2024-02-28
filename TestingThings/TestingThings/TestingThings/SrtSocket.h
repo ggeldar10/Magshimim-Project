@@ -6,6 +6,8 @@
 #include <functional>
 #include <mutex>
 
+#define MAX_PORT_NUM 65535
+#define MIN_PORT_NUM 1000
 #define RECV_BUFFER_SIZE 1024
 
 class SrtSocket
