@@ -1,8 +1,9 @@
 #include "packetManager.h"
 
-PacketManager::PacketManager(bool* keepAliveSwitch)
+PacketManager::PacketManager(bool* keepAliveSwitch, std::mutex* switchesMtx)
 {
     this->_keepAliveSwitch = keepAliveSwitch;
+    this->_keepAliveMtx = switchesMtx;
 }
 
 void PacketManager::handlePacket(std::unique_ptr<DefaultPacket> packet)
@@ -113,5 +114,6 @@ void PacketManager::handleKeyboardDataPacket(KeyboardDataPacket* keyboardPacket)
 
 void PacketManager::handleKeepAliveControlPacket(DefaultControlPacket* keepAlivePacket)
 {
+    std::lock_guard<std::mutex> lock(*this->_keepAliveMtx);
     *this->_keepAliveSwitch = true;
 }
