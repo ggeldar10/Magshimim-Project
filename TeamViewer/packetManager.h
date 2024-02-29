@@ -6,15 +6,17 @@
 class PacketManager
 {
 public:
-    PacketManager(bool* keepAliveSwitch, std::mutex* switchesMtx);
+    PacketManager(bool* keepAliveSwitch, bool* shutdownSwitch, std::mutex* switchesMtx);
     void handlePacket(std::unique_ptr<DefaultPacket> packet);
 
 private:
     bool* _keepAliveSwitch;
-    std::mutex* _keepAliveMtx;
+    bool* _shutdownSwitch;
+    std::mutex* _switchesMtx;
     void handleDataPacket(DefaultDataPacket* dataPacket);
     void handleControlPacket(DefaultControlPacket* controlPacket);
     void handleCursorDataPacket(CursorDataPacket* cursorPacket);
     void handleKeyboardDataPacket(KeyboardDataPacket* keyboardPacket);
     void handleKeepAliveControlPacket(DefaultControlPacket* keepAlivePacket);
+    void handleShutdownControlPacket(DefaultControlPacket* shutdownPacket);
 };
