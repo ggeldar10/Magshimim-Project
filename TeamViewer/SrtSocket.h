@@ -23,20 +23,33 @@ private:
 		uint32_t _seqNum;
 		unsigned int _otherComputerMaxWindowSize;
 		unsigned int _otherComputerMTU;
-		/*sockaddr_in */
 
-	} _commInfo; // add connection information here
-	std::queue<std::string> _userRecvDataQueue; // for the recv to save the given information
+	} _commInfo;
+
+	std::queue<const std::unique_ptr<const DefaultPacket>> _recviedPacketsQueue;
+	std::mutex _recviedPacketsQueueMtx;
+
 	std::queue<std::vector<uint8_t>> _packetSendQueue;
 	std::mutex _packetSendQueueMtx;
-	std::thread _controlThread;
+
+	bool _shutdownSwitch;
+	bool _keepAliveSwitch;
+
+	std::thread _keepAliveMonitoringThread;
+	std::thread _cursorListenerThread;
+	std::thread _keyboardListenerThread;
+	std::thread _screenCaptureThread;
+	std::thread _sendPacketsThread;
+	std::thread _recivedPacketsThread;
 	
 	void waitForValidPacket(std::vector<char>* buffer, std::function<bool(char*, int)> checkFunction);
-	void controlThreadFunction();
-	bool isValidIpv4Checksum(const IpPacket& ipPacket); // add data
+	void keepAliveMonitoring();
+
+	bool isValidIpv4Checksum(const IpPacket& ipPacket);
 	bool isValidIpHeaders(const IpPacket& ipHeaders);
 	bool isValidUdpHeaders(const UdpPacket& udpHeaders);
 	bool isValidHeaders(const IpPacket& ipHeaders, const UdpPacket& udpHeaders);
+
 	void sendSrt();
 	const std::unique_ptr<const DefaultPacket> recvSrt();
 	const UdpPacket recvUdp();

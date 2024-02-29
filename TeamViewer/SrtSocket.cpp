@@ -20,11 +20,16 @@ SrtSocket::SrtSocket()
 		throw "Error while trying to open a socket";
 	}
 	this->_commInfo = { 0 };
-
+	this->_shutdownSwitch = false;
+	this->_keepAliveSwitch = true;
 }
 
 SrtSocket::~SrtSocket()
 {
+	this->_keepAliveSwitch = false;
+	this->_shutdownSwitch = true;
+	this->_packetSendQueue.empty();
+	this->_recviedPacketsQueue.empty();
 	closesocket(this->_srtSocket);
 	WSACleanup();
 }
@@ -190,23 +195,6 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 	// start control thread
 }
 
-//void SrtSocket::sendSrt(const DefaultPacket * packet) {
-//	std::vector<uint8_t> buffer = packet->toBuffer();
-//}
-
-//const UdpPacket SrtSocket::recvUdp()
-//{
-//	// Assuming createUdpPacketFromVector is a static function in PacketParser
-//	UdpPacket udpPacketRecv = PacketParser::createUdpPacketFromVector(bufferVector);
-//
-//	if (udpPacketRecv.getLength() != UDP_HEADERS_SIZE + HANDSHAKE_PACKET_SIZE)
-//	{
-//		throw std::runtime_error("Invalid UDP packet length");
-//	}
-//
-//	return udpPacketRecv;
-//}
-
 /*
 waits for the packet with the srt protocol and with the right port and ip
 input: isValid - the function that checks if the packet is valid it gets 
@@ -329,10 +317,10 @@ void SrtSocket::srtBind(sockaddr_in* addrs)
 	}
 }
 
-void SrtSocket::controlThreadFunction()
+void SrtSocket::keepAliveMonitoring()
 {
 	DefaultControlPacket* packetPtr;
-	while (true)
+	while (!this->_shutdownSwitch)
 	{
 		std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 		std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
@@ -340,8 +328,14 @@ void SrtSocket::controlThreadFunction()
 		std::unique_lock<std::mutex> lock(this->_packetSendQueueMtx);
 		this->_packetSendQueue.push(packetPtr->toBuffer());
 		lock.unlock();
-		Sleep(1000);
+		Sleep(2000);
 	}
+	std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+	std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
+	packetPtr = new DefaultControlPacket(-1, -1, currentTime, SHUTDOWN);
+	std::unique_lock<std::mutex> lock(this->_packetSendQueueMtx);
+	this->_packetSendQueue.push(packetPtr->toBuffer());
+	lock.unlock();
 }
 
 void SrtSocket::sendSrt() {

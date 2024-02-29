@@ -86,6 +86,9 @@
     <ClInclude Include="windowsHeaders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="windowsHeaders.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SrtSocket.cpp">
