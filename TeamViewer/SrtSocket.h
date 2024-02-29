@@ -34,6 +34,7 @@ private:
 
 	bool _shutdownSwitch;
 	bool _keepAliveSwitch;
+	std::mutex _switchesMtx;
 
 	std::thread _keepAliveMonitoringThread;
 	std::thread _cursorListenerThread;
@@ -44,6 +45,7 @@ private:
 	
 	void waitForValidPacket(std::vector<char>* buffer, std::function<bool(char*, int)> checkFunction);
 	void keepAliveMonitoring();
+	
 
 	bool isValidIpv4Checksum(const IpPacket& ipPacket);
 	bool isValidIpHeaders(const IpPacket& ipHeaders);
