@@ -323,6 +323,7 @@ void SrtSocket::keepAliveMonitoring()
 	std::chrono::system_clock::time_point now;
 	std::time_t currentTime;
 	std::unique_lock<std::mutex> sendLock(this->_packetSendQueueMtx);
+	this->_keepAliveTimerThread = std::thread(&SrtSocket::keepAliveTimer, this);
 
 	while (this->_keepAliveSwitch)
 	{
@@ -342,7 +343,23 @@ void SrtSocket::keepAliveMonitoring()
 	this->_packetSendQueue.push(packetPtr->toBuffer());
 	sendLock.unlock();
 	std::lock_guard<std::mutex> switchLock(this->_switchesMtx);
+	this->_keepAliveTimerThread.join();
 	this->_shutdownSwitch = true;
+}
+
+void SrtSocket::keepAliveTimer()
+{
+	std::unique_lock<std::mutex> switchLock(this->_switchesMtx);
+	switchLock.unlock();
+	std::chrono::seconds keepAliveTimeout(5);
+
+	while (this->_keepAliveSwitch)
+	{
+		switchLock.lock();
+		this->_keepAliveSwitch = false;
+		switchLock.unlock();
+		std::this_thread::sleep_for(keepAliveTimeout);
+	}
 }
 
 void SrtSocket::sendSrt() {

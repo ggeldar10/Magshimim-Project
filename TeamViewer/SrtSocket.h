@@ -26,7 +26,7 @@ private:
 
 	} _commInfo;
 
-	std::queue<const std::unique_ptr<const DefaultPacket>> _recviedPacketsQueue;
+	std::queue<std::unique_ptr<DefaultPacket>> _recviedPacketsQueue;
 	std::mutex _recviedPacketsQueueMtx;
 
 	std::queue<std::vector<uint8_t>> _packetSendQueue;
@@ -37,6 +37,7 @@ private:
 	std::mutex _switchesMtx;
 
 	std::thread _keepAliveMonitoringThread;
+	std::thread _keepAliveTimerThread;
 	std::thread _cursorListenerThread;
 	std::thread _keyboardListenerThread;
 	std::thread _screenCaptureThread;
@@ -45,7 +46,7 @@ private:
 	
 	void waitForValidPacket(std::vector<char>* buffer, std::function<bool(char*, int)> checkFunction);
 	void keepAliveMonitoring();
-	
+	void keepAliveTimer();
 
 	bool isValidIpv4Checksum(const IpPacket& ipPacket);
 	bool isValidIpHeaders(const IpPacket& ipHeaders);
