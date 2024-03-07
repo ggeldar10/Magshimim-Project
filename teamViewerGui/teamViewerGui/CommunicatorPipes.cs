@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
@@ -10,44 +11,48 @@ namespace teamViewerGui
 {
     internal class CommunicatorPipes : IDisposable
     {
-        private string nameOfPipe;
-        private string serverPipeName = "serverPipe";
-        private NamedPipeClientStream pipeClient;
+        private const string serverPipeName = "srtGuiPipe";
+        private NamedPipeServerStream pipeServer;
         private bool disposedValue;
 
-        public CommunicatorPipes(string nameOfPipe)
-        { 
-            this.nameOfPipe = nameOfPipe;
-        }
-        public void CreatePipe()
+        public CommunicatorPipes()
         {
-            this.pipeClient = new NamedPipeClientStream(serverPipeName, nameOfPipe, PipeDirection.InOut);
-            this.pipeClient.Connect();
+            this.pipeServer = new NamedPipeServerStream(serverPipeName, PipeDirection.InOut);
+            disposedValue = false;
         }
 
-        public void SendMessage(string message)
+        public void Listen()
         {
-            using (StreamWriter writer = new StreamWriter(pipeClient))
-            {
-                writer.WriteLine(message);
-            }
+            this.pipeServer.WaitForConnection();
+            // todo a check if the connection worked
         }
 
-        public string ReadMessage()
+        public void SendMessage(List<byte> data)
         {
-            string message = "";
-            using (StreamReader reader = new StreamReader(pipeClient))
-            {
-                message = reader.ReadToEnd();
-            }
-            return message;
+            //check exactly how does it send
+            int dataLength = data.Count();
+            byte[] buffer = new byte[dataLength + 4];
+            BitConverter.GetBytes(dataLength).CopyTo(buffer, 0);
+            data.CopyTo(buffer, 4);
+            pipeServer.Write(buffer, 0, data.Count + 4);
+        }
+
+        public byte[] ReadData()
+        {
+            //todo change from string to get also the bytes with null
+            byte[] lengthInBytes = new byte[4];
+            this.pipeServer.Read(lengthInBytes, 0, 4);
+            int length = BitConverter.ToInt32(lengthInBytes.Reverse().ToArray(), 0); // might have a problem
+            byte[] data = new byte[length];
+            this.pipeServer.Read(data, 0, length);
+            return data;
         }
 
 
 
         protected virtual void Dispose(bool disposing)
         {
-            if (pipeClient == null)
+            if (pipeServer == null)
             {
                 return;
             }
@@ -55,8 +60,8 @@ namespace teamViewerGui
             {
                 if (disposing)
                 {
-                    pipeClient.Dispose();
-                    pipeClient = null;
+                    pipeServer.Dispose();
+                    pipeServer = null;
                 }
                 disposedValue = true;
             }
