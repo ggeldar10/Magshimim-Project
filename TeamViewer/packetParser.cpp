@@ -60,7 +60,6 @@ std::unique_ptr<const DefaultPacket> PacketParser::createDefaultPacketFromVector
     index = 0;
 
     packetType = static_cast<DefaultPacketTypes>((defaultPacketBuffer[index] & 0xF0) >> FOUR_BITS);
-    index += sizeof(uint32_t);
     ackSequenceNumber = networkToHost<uint32_t>(defaultPacketBuffer, index);
     index += sizeof(uint32_t);
     packetSequenceNumber = networkToHost<uint32_t>(defaultPacketBuffer, index);
@@ -135,17 +134,17 @@ std::unique_ptr<const HandshakeControlPacket> PacketParser::createHandshakeContr
     HandshakePhases phase;
     int index = 0;
     std::unique_ptr<const DefaultControlPacket> defaultControlPacket = createDefaultControlPacketFromVector(handshakeControlPacketBuffer, index);
-    index += sizeof(bool);
+    //index += sizeof(DefaultControlPacket); // i dont know if it works like this 
     isEncrypted = networkToHost<unsigned int>(handshakeControlPacketBuffer, index);
-    index += sizeof(uint16_t);
+    index += sizeof(bool); // might do some problems if it is not 1 byte
     encryption_key = networkToHost<uint16_t>(handshakeControlPacketBuffer, index);
-    index += sizeof(uint32_t);
+    index += sizeof(uint16_t);
     windowSize = networkToHost<uint32_t>(handshakeControlPacketBuffer, index);
     index += sizeof(uint32_t);
     initialPacketSequenceNumber = networkToHost<uint32_t>(handshakeControlPacketBuffer, index);
     index += sizeof(uint32_t);
     maxTransmission = networkToHost<uint32_t>(handshakeControlPacketBuffer, index);
-    index += sizeof(HandshakePhases);
+    index += sizeof(uint32_t);
     phase = static_cast<HandshakePhases>((handshakeControlPacketBuffer[index] & 0xF0) >> FOUR_BITS);
     std::unique_ptr<const HandshakeControlPacket> packet = std::make_unique<HandshakeControlPacket>(defaultControlPacket->getAckSequenceNumber(), defaultControlPacket->getPacketSequenceNumber(), defaultControlPacket->getTimeStamp(), isEncrypted, encryption_key, windowSize, initialPacketSequenceNumber, maxTransmission, phase);
     return packet;
