@@ -20,9 +20,28 @@ namespace teamViewerGui
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static CommunicatorPipes manager;
         public MainWindow()
         {
             InitializeComponent();
+            manager = new CommunicatorPipes();
+            //testing send
+            manager.Listen();
+            List<byte> bytes = new List<byte>();
+            string message = "Hello";
+            foreach (var c in message)
+            {
+                bytes.Add((byte)c);
+            }
+            manager.SendMessage(bytes);
+            //testing recv
+
+            foreach(char c in manager.ReadData())
+            { 
+                Console.Write(c);
+            }
+            Console.WriteLine();
+
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

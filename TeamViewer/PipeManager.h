@@ -4,7 +4,7 @@
 
 typedef union {
 	int num;
-	char bytes[sizeof(int)]; // might have a problem if it does add a constant
+	char bytes[sizeof(int)];
 } ConvertIntToChar;
 
 class PipeManager
@@ -15,8 +15,8 @@ private:
 public:
 	PipeManager();
 	~PipeManager();
-	void sendToPipe(const std::vector<char>& data);
-	std::vector<char> readFromPipe(int numOfBytesToRead);
+	void sendToPipe(const std::vector<char>& data) const;
+	std::vector<char> readDataFromPipe() const;
 
 };
 
