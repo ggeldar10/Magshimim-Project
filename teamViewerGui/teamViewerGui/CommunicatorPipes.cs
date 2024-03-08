@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace teamViewerGui
 {
-    internal class CommunicatorPipes : IDisposable
+    public class CommunicatorPipes : IDisposable
     {
         private const string serverPipeName = "srtGuiPipe";
         private NamedPipeServerStream pipeServer;
@@ -17,7 +17,7 @@ namespace teamViewerGui
 
         public CommunicatorPipes()
         {
-            this.pipeServer = new NamedPipeServerStream(serverPipeName, PipeDirection.InOut);
+            this.pipeServer = new NamedPipeServerStream(serverPipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte);
             disposedValue = false;
         }
 
@@ -42,7 +42,7 @@ namespace teamViewerGui
             //todo change from string to get also the bytes with null
             byte[] lengthInBytes = new byte[4];
             this.pipeServer.Read(lengthInBytes, 0, 4);
-            int length = BitConverter.ToInt32(lengthInBytes.Reverse().ToArray(), 0); // might have a problem
+            int length = BitConverter.ToInt32(lengthInBytes.ToArray(), 0); // might have a problem
             byte[] data = new byte[length];
             this.pipeServer.Read(data, 0, length);
             return data;
