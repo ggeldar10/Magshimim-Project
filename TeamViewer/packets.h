@@ -124,7 +124,6 @@ public:
 
 class HandshakeControlPacket : public DefaultControlPacket {
 private:
-    bool isEncrypted;
     uint16_t encryption_key;
     uint32_t windowSize;
     uint32_t initialPacketSequenceNumber;
@@ -132,7 +131,7 @@ private:
     HandshakePhases phase;
 
 public:
-    HandshakeControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, bool hasEncryption, uint16_t encryption_key, uint32_t windowSize, uint32_t initialPacketSequenceNumber, uint32_t maxTransmissionUnit, HandshakePhases phase);
+    HandshakeControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, uint16_t encryption_key, uint32_t windowSize, uint32_t initialPacketSequenceNumber, uint32_t maxTransmissionUnit, HandshakePhases phase);
     bool hasEncryption() const;
     uint16_t getEncryptionKey() const;
     uint32_t getWindowSize() const;

@@ -100,14 +100,14 @@ std::vector<char> DefaultControlPacket::toBuffer() const {
     return buffer;
 }
 
-HandshakeControlPacket::HandshakeControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, bool hasEncryption, uint16_t encryption_key, uint32_t windowSize,
+HandshakeControlPacket::HandshakeControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, uint16_t encryption_key, uint32_t windowSize,
     uint32_t initialPacketSequenceNumber, uint32_t maxTransmissionUnit, HandshakePhases phase)
-    : DefaultControlPacket(ackNum, packetNum, time, HANDSHAKE), isEncrypted(hasEncryption), encryption_key(encryption_key),
+    : DefaultControlPacket(ackNum, packetNum, time, HANDSHAKE), encryption_key(encryption_key),
     windowSize(windowSize), initialPacketSequenceNumber(initialPacketSequenceNumber), maxTransmissionUnit(maxTransmissionUnit), phase(phase) {
 }
 
 bool HandshakeControlPacket::hasEncryption() const {
-    return isEncrypted;
+    return encryption_key == 0;
 }
 
 uint16_t HandshakeControlPacket::getEncryptionKey() const {
@@ -132,7 +132,6 @@ HandshakePhases HandshakeControlPacket::getPhase() const {
 
 std::vector<char> HandshakeControlPacket::toBuffer() const {
     std::vector<char> buffer = DefaultControlPacket::toBuffer();
-    buffer.push_back(static_cast<uint8_t>(isEncrypted));
     buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&encryption_key), reinterpret_cast<const uint8_t*>(&encryption_key) + sizeof(encryption_key));
     buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&windowSize), reinterpret_cast<const uint8_t*>(&windowSize) + sizeof(windowSize));
     buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&initialPacketSequenceNumber), reinterpret_cast<const uint8_t*>(&initialPacketSequenceNumber) + sizeof(initialPacketSequenceNumber));

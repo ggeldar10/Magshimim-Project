@@ -127,7 +127,6 @@ std::unique_ptr<const DefaultControlPacket> PacketParser::createDefaultControlPa
 
 std::unique_ptr<const HandshakeControlPacket> PacketParser::createHandshakeControlPacketFromVector(const std::vector<char>& handshakeControlPacketBuffer)
 {
-    bool isEncrypted;
     uint16_t encryption_key;
     uint32_t windowSize;
     uint32_t initialPacketSequenceNumber;
@@ -146,7 +145,7 @@ std::unique_ptr<const HandshakeControlPacket> PacketParser::createHandshakeContr
     index += sizeof(uint32_t);
     phase = static_cast<HandshakePhases>(networkToHost<uint32_t>(handshakeControlPacketBuffer, index));
     index += sizeof(uint32_t);
-    std::unique_ptr<const HandshakeControlPacket> packet = std::make_unique<HandshakeControlPacket>(defaultControlPacket->getAckSequenceNumber(), defaultControlPacket->getPacketSequenceNumber(), defaultControlPacket->getTimeStamp(), encryption_key != 0, encryption_key, windowSize, initialPacketSequenceNumber, maxTransmission, phase);
+    std::unique_ptr<const HandshakeControlPacket> packet = std::make_unique<HandshakeControlPacket>(defaultControlPacket->getAckSequenceNumber(), defaultControlPacket->getPacketSequenceNumber(), defaultControlPacket->getTimeStamp(), encryption_key, windowSize, initialPacketSequenceNumber, maxTransmission, phase);
     return packet;
 }
 
