@@ -23,7 +23,6 @@ IpPacket PacketParser::createIpPacketFromVector(const std::vector<char>& ipPacke
     // might be a problem of big and smalle endians so check when the srt is complete
     version = (ipPacketBuffer[index] & 0xF0) >> FOUR_BITS;
     lengthOfHeaders = ipPacketBuffer[index] & 0x0F;
-    index += sizeof(uint8_t);
     typeOfService = networkToHost<uint8_t>(ipPacketBuffer, index);
     index += sizeof(uint8_t);
     totalLength = networkToHost<uint16_t>(ipPacketBuffer, index);
@@ -42,12 +41,11 @@ IpPacket PacketParser::createIpPacketFromVector(const std::vector<char>& ipPacke
     index += sizeof(uint32_t);
     dstAddrs = networkToHost<uint32_t>(ipPacketBuffer, index);
     index += sizeof(uint32_t);
-    std::string help(ipPacketBuffer.begin() + index, ipPacketBuffer.end());
+    std::vector<char> help(ipPacketBuffer.begin() + index, ipPacketBuffer.end());
     for (int i = 0; i < help.size() && i < MAX_IP_OPTIONS_SIZE; i++)
     {
         options[i] = help[i];
     }
-
     IpPacket packet = IpPacket(version, lengthOfHeaders, typeOfService, totalLength, identification, fragmentOffsetIncludingFlags, ttl, protocol, headerChecksum, srcAddrs, dstAddrs, options);
     return packet;
 }
@@ -61,12 +59,12 @@ std::unique_ptr<const DefaultPacket> PacketParser::createDefaultPacketFromVector
     index = 0;
 
     packetType = static_cast<DefaultPacketTypes>((defaultPacketBuffer[index] & 0xF0) >> FOUR_BITS);
-    index += sizeof(uint32_t);
     ackSequenceNumber = networkToHost<uint32_t>(defaultPacketBuffer, index);
     index += sizeof(uint32_t);
     packetSequenceNumber = networkToHost<uint32_t>(defaultPacketBuffer, index);
     index += sizeof(uint32_t);
     timeStamp = networkToHost<uint32_t>(defaultPacketBuffer, index);
+    index += sizeof(uint32_t);
     std::unique_ptr<const DefaultPacket> packet = std::make_unique<DefaultPacket>(packetType, ackSequenceNumber, packetSequenceNumber, timeStamp);
     return packet;
 }
@@ -75,8 +73,8 @@ std::unique_ptr<const DefaultDataPacket> PacketParser::createDefaultDataPacketFr
 {
     DataPacketTypes dataPacketType;
     std::unique_ptr<const DefaultPacket> defaultPacket = createDefaultPacketFromVector(defaultDataPacketBuffer, index);
-    index += sizeof(DataPacketTypes);
     dataPacketType = static_cast<DataPacketTypes>((defaultDataPacketBuffer[index] & 0xF0) >> FOUR_BITS);
+    index += sizeof(DataPacketTypes);
     std::unique_ptr<const DefaultDataPacket> packet = std::make_unique<DefaultDataPacket>(defaultPacket->getAckSequenceNumber(), defaultPacket->getPacketSequenceNumber(), defaultPacket->getTimeStamp(), dataPacketType);
     return packet;
 }
@@ -89,15 +87,14 @@ std::unique_ptr<const CursorDataPacket> PacketParser::createCursorDataPacketFrom
     uint32_t y;
     int index = 0;
     std::unique_ptr<const DefaultDataPacket> defaultDataPacket = createDefaultDataPacketFromVector(cursorDataPacketBuffer, index);
-    index += sizeof(CursorActions);
     action = static_cast<CursorActions>((cursorDataPacketBuffer[index] & 0xF0) >> FOUR_BITS);
-    index += sizeof(uint32_t);
+    index += sizeof(CursorActions);
     x = networkToHost<uint32_t>(cursorDataPacketBuffer, index);
     index += sizeof(uint32_t);
     y = networkToHost<uint32_t>(cursorDataPacketBuffer, index);
     index += sizeof(uint32_t);
     scrollValue = networkToHost<uint32_t>(cursorDataPacketBuffer, index);
-
+    index += sizeof(uint32_t);
     std::unique_ptr<const CursorDataPacket> packet = std::make_unique<CursorDataPacket>(defaultDataPacket->getAckSequenceNumber(), defaultDataPacket->getPacketSequenceNumber(), defaultDataPacket->getTimeStamp(), action, scrollValue, x, y);
     return packet;
 }
@@ -108,10 +105,10 @@ std::unique_ptr<const KeyboardDataPacket> PacketParser::createKeyboardDataPacket
     unsigned int keyCode;
     int index = 0;
     std::unique_ptr<const DefaultDataPacket> defaultDataPacket = createDefaultDataPacketFromVector(keyboardDataPacketBuffer, index);
-    index += sizeof(KeyboardActions);
     action = static_cast<KeyboardActions>((keyboardDataPacketBuffer[index] & 0xF0) >> FOUR_BITS);
-    index += sizeof(unsigned int);
+    index += sizeof(KeyboardActions);
     keyCode = networkToHost<unsigned int>(keyboardDataPacketBuffer, index);
+    index += sizeof(unsigned int);
     std::unique_ptr<const KeyboardDataPacket> packet = std::make_unique<KeyboardDataPacket>(defaultDataPacket->getAckSequenceNumber(), defaultDataPacket->getPacketSequenceNumber(), defaultDataPacket->getTimeStamp(), action, keyCode);
     return packet;
 }
@@ -120,8 +117,8 @@ std::unique_ptr<const DefaultControlPacket> PacketParser::createDefaultControlPa
 {
     ControlPacketTypes controlPacketType;
     std::unique_ptr<const DefaultPacket> defaultPacket = createDefaultPacketFromVector(defaultControlPacketBuffer, index);
-    index += sizeof(DataPacketTypes);
     controlPacketType = static_cast<ControlPacketTypes>((defaultControlPacketBuffer[index] & 0xF0) >> FOUR_BITS);
+    index += sizeof(DataPacketTypes);
     std::unique_ptr<const DefaultControlPacket> packet = std::make_unique<DefaultControlPacket>(defaultPacket->getAckSequenceNumber(), defaultPacket->getPacketSequenceNumber(), defaultPacket->getTimeStamp(), controlPacketType);
     return packet;
 }
@@ -136,18 +133,18 @@ std::unique_ptr<const HandshakeControlPacket> PacketParser::createHandshakeContr
     HandshakePhases phase;
     int index = 0;
     std::unique_ptr<const DefaultControlPacket> defaultControlPacket = createDefaultControlPacketFromVector(handshakeControlPacketBuffer, index);
-    index += sizeof(bool);
     isEncrypted = networkToHost<unsigned int>(handshakeControlPacketBuffer, index);
-    index += sizeof(uint16_t);
+    index += sizeof(DataPacketTypes);
     encryption_key = networkToHost<uint16_t>(handshakeControlPacketBuffer, index);
-    index += sizeof(uint32_t);
+    index += sizeof(uint16_t);
     windowSize = networkToHost<uint32_t>(handshakeControlPacketBuffer, index);
     index += sizeof(uint32_t);
     initialPacketSequenceNumber = networkToHost<uint32_t>(handshakeControlPacketBuffer, index);
     index += sizeof(uint32_t);
     maxTransmission = networkToHost<uint32_t>(handshakeControlPacketBuffer, index);
-    index += sizeof(HandshakePhases);
+    index += sizeof(uint32_t);
     phase = static_cast<HandshakePhases>((handshakeControlPacketBuffer[index] & 0xF0) >> FOUR_BITS);
+    index += sizeof(HandshakePhases);
     std::unique_ptr<const HandshakeControlPacket> packet = std::make_unique<HandshakeControlPacket>(defaultControlPacket->getAckSequenceNumber(), defaultControlPacket->getPacketSequenceNumber(), defaultControlPacket->getTimeStamp(), isEncrypted, encryption_key, windowSize, initialPacketSequenceNumber, maxTransmission, phase);
     return packet;
 }
@@ -163,12 +160,12 @@ std::unique_ptr<const NAKControlPacket> PacketParser::createNAKControlPacketFrom
 
     std::unique_ptr<const DefaultControlPacket> defaultControlPacket = createDefaultControlPacketFromVector(nakControlPacketBuffer, index);
     controlPacketType = static_cast<ControlPacketTypes>((nakControlPacketBuffer[index] & 0xF0) >> FOUR_BITS);
-    index += sizeof(ControlPacketTypes);
     ackSequenceNumber = networkToHost<uint32_t>(nakControlPacketBuffer, index);
-    index += sizeof(uint32_t);
+    index += sizeof(ControlPacketTypes);
     packetSequenceNumber = networkToHost<uint32_t>(nakControlPacketBuffer, index);
     index += sizeof(uint32_t);
     timeStamp = networkToHost<uint32_t>(nakControlPacketBuffer, index);
+    index += sizeof(uint32_t);
 
     std::vector<unsigned int> lostSeqNums;
     while (index < nakControlPacketBuffer.size())
@@ -192,12 +189,12 @@ std::unique_ptr<const MessageDropRequestControlPacket> PacketParser::createMessa
 
     std::unique_ptr<const DefaultControlPacket> defaultControlPacket = createDefaultControlPacketFromVector(messageDropRequestControlPacketBuffer, index);
     controlPacketType = static_cast<ControlPacketTypes>((messageDropRequestControlPacketBuffer[index] & 0xF0) >> FOUR_BITS);
-    index += sizeof(ControlPacketTypes);
     ackSequenceNumber = networkToHost<uint32_t>(messageDropRequestControlPacketBuffer, index);
-    index += sizeof(uint32_t);
+    index += sizeof(ControlPacketTypes);
     packetSequenceNumber = networkToHost<uint32_t>(messageDropRequestControlPacketBuffer, index);
     index += sizeof(uint32_t);
     timeStamp = networkToHost<uint32_t>(messageDropRequestControlPacketBuffer, index);
+    index += sizeof(uint32_t);
 
     std::vector<unsigned int> lostSeqNums;
     while (index < messageDropRequestControlPacketBuffer.size())
@@ -241,7 +238,6 @@ std::vector<char> PacketParser::packetToBytes(const UdpPacket& udpHeaders, const
     {
         buffer.push_back(c);
     }
-
     if (data != nullptr)
     {
         for (int i = 0; i < data->size(); i++)
@@ -249,6 +245,7 @@ std::vector<char> PacketParser::packetToBytes(const UdpPacket& udpHeaders, const
             buffer.push_back(data->at(i));
         }
     }
+   
 
     return buffer;
 }

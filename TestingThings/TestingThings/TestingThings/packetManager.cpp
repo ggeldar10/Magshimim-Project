@@ -1,5 +1,12 @@
 #include "packetManager.h"
 
+PacketManager::PacketManager(bool* keepAliveSwitch, bool* shutDownSwitch, std::mutex* switchesMtx)
+{
+    this->_keepAliveSwitch = keepAliveSwitch;
+    this->_shutdownSwitch = shutDownSwitch;
+    this->_switchesMtx = switchesMtx;
+}
+
 void PacketManager::handlePacket(std::unique_ptr<DefaultPacket> packet)
 {
     switch (packet->getPacketType())
@@ -46,6 +53,7 @@ void PacketManager::handleControlPacket(DefaultControlPacket* controlPacket)
     case HANDSHAKE:
         break;
     case KEEPALIVE:
+        handleKeepAliveControlPacket(controlPacket);
         break;
     case ACK:
         break;
@@ -54,6 +62,7 @@ void PacketManager::handleControlPacket(DefaultControlPacket* controlPacket)
     case CongestionWarning:
         break;
     case SHUTDOWN:
+        handleShutdownControlPacket(controlPacket);
         break;
     case ACKACK:
         break;
@@ -103,4 +112,16 @@ void PacketManager::handleKeyboardDataPacket(KeyboardDataPacket* keyboardPacket)
     {
         std::cerr << exception.what() << std::endl;
     }
+}
+
+void PacketManager::handleKeepAliveControlPacket(DefaultControlPacket* keepAlivePacket)
+{
+    std::lock_guard<std::mutex> lock(*this->_switchesMtx);
+    *this->_keepAliveSwitch = true;
+}
+
+void PacketManager::handleShutdownControlPacket(DefaultControlPacket* shutdownPacket)
+{
+    std::lock_guard<std::mutex> lock(*this->_switchesMtx);
+    *this->_shutdownSwitch = true;
 }

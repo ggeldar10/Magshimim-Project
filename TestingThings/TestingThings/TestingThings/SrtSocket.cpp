@@ -3,6 +3,7 @@
 #include <iostream>
 #include "packetParser.h"
 #include <vector>
+#include <random>
 
 SrtSocket::SrtSocket()
 {
@@ -19,11 +20,16 @@ SrtSocket::SrtSocket()
 		throw "Error while trying to open a socket";
 	}
 	this->_commInfo = { 0 };
-
+	this->_shutdownSwitch = false;
+	this->_keepAliveSwitch = true;
 }
 
 SrtSocket::~SrtSocket()
 {
+	this->_keepAliveSwitch = false;
+	this->_shutdownSwitch = true;
+	this->_packetSendQueue.empty();
+	this->_recviedPacketsQueue.empty();
 	closesocket(this->_srtSocket);
 	WSACleanup();
 }
@@ -118,12 +124,11 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 	std::unique_ptr<const HandshakeControlPacket> srtHeadersRecv;
 
 
-	// add an if statement here
 	this->_commInfo._dstPort = addrs->sin_port;
 	this->_commInfo._dstIP = addrs->sin_addr.s_addr;
 	sockaddr_in bindToAddr = { 0 };
 	bindToAddr.sin_addr.s_addr = INADDR_ANY;
-	bindToAddr.sin_port = htons(9000);
+	bindToAddr.sin_port = 0;
 	bindToAddr.sin_family = AF_INET;
 	this->srtBind(&bindToAddr);
 	HandshakeControlPacket handshakeHeaders = HandshakeControlPacket(0, 0, std::time(nullptr), false, 0, DEFUALT_MAX_TRANSMISSION, 0, DEFUALT_MTU_SIZE, INDUCTION_1);
@@ -190,29 +195,12 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 	// start control thread
 }
 
-//void SrtSocket::sendSrt(const DefaultPacket * packet) {
-//	std::vector<uint8_t> buffer = packet->toBuffer();
-//}
-
-//const UdpPacket SrtSocket::recvUdp()
-//{
-//	// Assuming createUdpPacketFromVector is a static function in PacketParser
-//	UdpPacket udpPacketRecv = PacketParser::createUdpPacketFromVector(bufferVector);
-//
-//	if (udpPacketRecv.getLength() != UDP_HEADERS_SIZE + HANDSHAKE_PACKET_SIZE)
-//	{
-//		throw std::runtime_error("Invalid UDP packet length");
-//	}
-//
-//	return udpPacketRecv;
-//}
-
 /*
 waits for the packet with the srt protocol and with the right port and ip
-input: isValid - the function that checks if the packet is valid it gets
-a buffer and the size of it
+input: isValid - the function that checks if the packet is valid it gets 
+a buffer and the size of it 
 and returns true if the packet is valid false if else
-buffer - the buffer to get the valid packet into
+buffer - the buffer to get the valid packet into 
 output: returns the valid packet inside the given buffer
 */
 void SrtSocket::waitForValidPacket(std::vector<char>* buffer, std::function<bool(char*, int)> isValid)
@@ -234,7 +222,7 @@ void SrtSocket::waitForValidPacket(std::vector<char>* buffer, std::function<bool
 		totalLength = (ipFirstRow[ipFirstHeaderRowLowerInArray] << FOUR_BITS) | ipFirstRow[ipFirstHeaderRowHigherInArray];
 		std::unique_ptr<char[]> allBuffer = std::make_unique<char[]>(totalLength);
 
-		if (recv(this->_srtSocket, allBuffer.get(), totalLength, 0) < 0)
+		if(recv(this->_srtSocket, allBuffer.get(), totalLength, 0) < 0)
 		{
 			std::cerr << "Error while doing recv. error number from wsagetlasterror: " << WSAGetLastError() << std::endl;
 			//throw excetpions
@@ -321,7 +309,7 @@ void SrtSocket::srtBind(sockaddr_in* addrs)
 	if (addrs->sin_port == 0)
 	{
 		std::srand(std::time(nullptr));
-		this->_commInfo._srcPort = (MIN_PORT_NUM + std::rand() % (MAX_PORT_NUM - MIN_PORT_NUM));
+		this->_commInfo._srcPort = htons(MIN_PORT_NUM + std::rand() % (MAX_PORT_NUM - MIN_PORT_NUM));
 	}
 	else
 	{
@@ -329,21 +317,49 @@ void SrtSocket::srtBind(sockaddr_in* addrs)
 	}
 }
 
-
-
-
-void SrtSocket::controlThreadFunction()
+void SrtSocket::keepAliveMonitoring()
 {
 	DefaultControlPacket* packetPtr;
-	while (true)
+	std::chrono::system_clock::time_point now;
+	std::time_t currentTime;
+	std::unique_lock<std::mutex> sendLock(this->_packetSendQueueMtx);
+	this->_keepAliveTimerThread = std::thread(&SrtSocket::keepAliveTimer, this);
+
+	while (this->_keepAliveSwitch && !this->_shutdownSwitch)
 	{
-		std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-		std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
+		now = std::chrono::system_clock::now();
+		currentTime = std::chrono::system_clock::to_time_t(now);
 		packetPtr = new DefaultControlPacket(-1, -1, currentTime, KEEPALIVE);
-		std::unique_lock<std::mutex> lock(this->_packetSendQueueMtx);
+		sendLock.lock();
 		this->_packetSendQueue.push(packetPtr->toBuffer());
-		lock.unlock();
-		Sleep(1000);
+		sendLock.unlock();
+		Sleep(2000);
+	}
+
+	now = std::chrono::system_clock::now();
+	currentTime = std::chrono::system_clock::to_time_t(now);
+	packetPtr = new DefaultControlPacket(-1, -1, currentTime, SHUTDOWN);
+	sendLock.lock();
+	this->_packetSendQueue.push(packetPtr->toBuffer());
+	sendLock.unlock();
+	std::lock_guard<std::mutex> switchLock(this->_switchesMtx);
+	this->_keepAliveSwitch = false;
+	this->_keepAliveTimerThread.join();
+	this->_shutdownSwitch = true;
+}
+
+void SrtSocket::keepAliveTimer()
+{
+	std::unique_lock<std::mutex> switchLock(this->_switchesMtx);
+	switchLock.unlock();
+	std::chrono::seconds keepAliveTimeout(5);
+
+	while (this->_keepAliveSwitch)
+	{
+		switchLock.lock();
+		this->_keepAliveSwitch = false;
+		switchLock.unlock();
+		std::this_thread::sleep_for(keepAliveTimeout);
 	}
 }
 
@@ -372,6 +388,59 @@ void SrtSocket::sendSrt() {
 		dest_addr.sin_port = htons(this->_commInfo._dstPort);
 		dest_addr.sin_addr.s_addr = htonl(this->_commInfo._dstIP);
 
-		sendto(this->_srtSocket, charArray, packetBuffer.size(), 0, (struct sockaddr*)&dest_addr, sizeof(sockaddr_in));
+		sendto(this->_srtSocket, charArray, packetBuffer.size(), 0, (struct sockaddr*)&dest_addr, sizeof(dest_addr));
+
+		delete[] charArray;
 	}
+}
+
+const std::unique_ptr<const DefaultPacket> SrtSocket::recvSrt()
+{
+	UdpPacket udpPacket = recvUdp();
+	const int length = udpPacket.getLength();
+	std::vector<char> buffer(length);
+
+	int bytesReceived = recv(this->_srtSocket, buffer.data(), length, 0);
+
+	if (bytesReceived < 0)
+	{
+		std::cerr << "Error while trying to get SRT packet" << std::endl;
+		throw std::runtime_error("Error while trying to get SRT packet");
+	}
+	else if (bytesReceived == 0)
+	{
+		throw std::runtime_error("Connection closed while trying to receive SRT packet");
+	}
+
+	std::unique_ptr<const DefaultPacket> packet = PacketParser::createPacketFromVectorGlobal(buffer);
+
+	return packet;
+}
+
+const UdpPacket SrtSocket::recvUdp()
+{
+	char buffer[UDP_HEADERS_SIZE] = { 0 };
+	std::vector<char> bufferVector(UDP_HEADERS_SIZE + IP_HEADERS_SIZE);
+
+	int bytesReceived = recv(this->_srtSocket, bufferVector.data(), UDP_HEADERS_SIZE + IP_HEADERS_SIZE, 0);
+
+	if (bytesReceived < 0)
+	{
+		std::cerr << "Error while trying to get UDP header" << std::endl;
+		throw std::runtime_error("Error while trying to get UDP header");
+	}
+	else if (bytesReceived == 0)
+	{
+		throw std::runtime_error("Connection closed while trying to receive UDP header");
+	}
+
+	// Assuming createUdpPacketFromVector is a static function in PacketParser
+	UdpPacket udpPacketRecv = PacketParser::createUdpPacketFromVector(bufferVector);
+
+	if (udpPacketRecv.getLength() != UDP_HEADERS_SIZE + HANDSHAKE_PACKET_SIZE)
+	{
+		throw std::runtime_error("Invalid UDP packet length");
+	}
+
+	return udpPacketRecv;
 }

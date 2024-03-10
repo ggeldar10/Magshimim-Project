@@ -33,10 +33,16 @@ public:
     template<typename htnSize>
     static void hostToNetworkIntoVector(std::vector<char>* addVector, htnSize value)
     {
-        for (int i = 0; i < sizeof(htnSize); i++)
+        int count = 0;
+        while (value != 0)
         {
             addVector->push_back(value & 0xFF);
             value >>= BYTE_IN_BITS;
+            count++;
+        }
+        for (count; count < sizeof(htnSize); count++)
+        {
+            addVector->push_back(0);
         }
     }
 

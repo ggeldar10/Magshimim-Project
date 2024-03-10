@@ -18,6 +18,24 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="cursor.cpp" />
+    <ClCompile Include="keyboard.cpp" />
+    <ClCompile Include="packetManager.cpp" />
+    <ClCompile Include="packetParser.cpp" />
+    <ClCompile Include="packets.cpp" />
+    <ClCompile Include="SrtSocket.cpp" />
+    <ClCompile Include="testConnect.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cursor.h" />
+    <ClInclude Include="keyboard.h" />
+    <ClInclude Include="packetManager.h" />
+    <ClInclude Include="packetParser.h" />
+    <ClInclude Include="packets.h" />
+    <ClInclude Include="SrtSocket.h" />
+    <ClInclude Include="windowsHeaders.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -126,24 +144,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="cursor.cpp" />
-    <ClCompile Include="keyboard.cpp" />
-    <ClCompile Include="packetManager.cpp" />
-    <ClCompile Include="packetParser.cpp" />
-    <ClCompile Include="packets.cpp" />
-    <ClCompile Include="SrtSocket.cpp" />
-    <ClCompile Include="testConnect.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="cursor.h" />
-    <ClInclude Include="keyboard.h" />
-    <ClInclude Include="packetManager.h" />
-    <ClInclude Include="packetParser.h" />
-    <ClInclude Include="packets.h" />
-    <ClInclude Include="SrtSocket.h" />
-    <ClInclude Include="windowsHeaders.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

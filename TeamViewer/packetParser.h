@@ -17,7 +17,7 @@
 #define UDP_PROTOCOL_CODE 17
 #define DEFUALT_MTU_SIZE 1024
 #define DEFUALT_MAX_TRANSMISSION 10
-#define HANDSHAKE_PACKET_SIZE 19
+#define HANDSHAKE_PACKET_SIZE 38
 #define IP_FIRST_HEADER_ROW 4
 
 class PacketParser
@@ -33,10 +33,16 @@ public:
     template<typename htnSize>
     static void hostToNetworkIntoVector(std::vector<char>* addVector, htnSize value)
     {
+        int count = 0;
         while (value != 0)
         {
             addVector->push_back(value & 0xFF);
             value >>= BYTE_IN_BITS;
+            count++;
+        }
+        for (count; count < sizeof(htnSize); count++)
+        {
+            addVector->push_back(0);
         }
     }
 

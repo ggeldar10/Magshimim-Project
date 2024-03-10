@@ -195,6 +195,11 @@ uint8_t IpPacket::getLengthOfHeaders() const {
     return lengthOfHeaders;
 }
 
+uint8_t IpPacket::getLengthOfHeadersInBytes() const
+{
+    return lengthOfHeaders * FOUR_BITS;
+}
+
 uint8_t IpPacket::getTypeOfService() const {
     return typeOfService;
 }
@@ -306,9 +311,4 @@ std::vector<char> UdpPacket::toBuffer() const
     PacketParser::hostToNetworkIntoVector<uint16_t>(&buffer, this->_length);
     PacketParser::hostToNetworkIntoVector<uint16_t>(&buffer, this->_checksum);
     return buffer;
-}
-
-uint8_t IpPacket::getLengthOfHeadersInBytes() const
-{
-    return lengthOfHeaders * FOUR_BITS;
 }
