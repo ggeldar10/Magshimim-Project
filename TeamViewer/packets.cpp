@@ -20,8 +20,8 @@ time_t DefaultPacket::getTimeStamp() const {
     return timeStamp;
 }
 
-std::vector<uint8_t> DefaultPacket::toBuffer() const {
-    std::vector<uint8_t> buffer;
+std::vector<char> DefaultPacket::toBuffer() const {
+    std::vector<char> buffer;
     buffer.push_back(static_cast<uint8_t>(packetType));
     buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&ackSequenceNumber), reinterpret_cast<const uint8_t*>(&ackSequenceNumber) + sizeof(ackSequenceNumber));
     buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&packetSequenceNumber), reinterpret_cast<const uint8_t*>(&packetSequenceNumber) + sizeof(packetSequenceNumber));
@@ -36,8 +36,8 @@ DataPacketTypes DefaultDataPacket::getDataType() const {
     return dataPacketType;
 }
 
-std::vector<uint8_t> DefaultDataPacket::toBuffer() const {
-    std::vector<uint8_t> buffer = DefaultPacket::toBuffer();
+std::vector<char> DefaultDataPacket::toBuffer() const {
+    std::vector<char> buffer = DefaultPacket::toBuffer();
     buffer.push_back(static_cast<uint8_t>(dataPacketType));
     return buffer;
 }
@@ -60,8 +60,8 @@ int CursorDataPacket::getScrollValue() const {
     return scrollValue;
 }
 
-std::vector<uint8_t> CursorDataPacket::toBuffer() const {
-    std::vector<uint8_t> buffer = DefaultDataPacket::toBuffer();
+std::vector<char> CursorDataPacket::toBuffer() const {
+    std::vector<char> buffer = DefaultDataPacket::toBuffer();
     buffer.push_back(static_cast<uint8_t>(action));
     buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&scrollValue), reinterpret_cast<const uint8_t*>(&scrollValue) + sizeof(scrollValue));
     buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&location), reinterpret_cast<const uint8_t*>(&location) + sizeof(location));
@@ -80,8 +80,8 @@ unsigned int KeyboardDataPacket::getKeyCode() const {
     return keyCode;
 }
 
-std::vector<uint8_t> KeyboardDataPacket::toBuffer() const {
-    std::vector<uint8_t> buffer = DefaultDataPacket::toBuffer();
+std::vector<char> KeyboardDataPacket::toBuffer() const {
+    std::vector<char> buffer = DefaultDataPacket::toBuffer();
     buffer.push_back(static_cast<uint8_t>(action));
     buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&keyCode), reinterpret_cast<const uint8_t*>(&keyCode) + sizeof(keyCode));
     return buffer;
@@ -94,8 +94,8 @@ ControlPacketTypes DefaultControlPacket::getControlType() const {
     return controlPacketType;
 }
 
-std::vector<uint8_t> DefaultControlPacket::toBuffer() const {
-    std::vector<uint8_t> buffer = DefaultPacket::toBuffer();
+std::vector<char> DefaultControlPacket::toBuffer() const {
+    std::vector<char> buffer = DefaultPacket::toBuffer();
     buffer.push_back(static_cast<uint8_t>(controlPacketType));
     return buffer;
 }
@@ -130,8 +130,8 @@ HandshakePhases HandshakeControlPacket::getPhase() const {
     return phase;
 }
 
-std::vector<uint8_t> HandshakeControlPacket::toBuffer() const {
-    std::vector<uint8_t> buffer = DefaultControlPacket::toBuffer();
+std::vector<char> HandshakeControlPacket::toBuffer() const {
+    std::vector<char> buffer = DefaultControlPacket::toBuffer();
     buffer.push_back(static_cast<uint8_t>(isEncrypted));
     buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&encryption_key), reinterpret_cast<const uint8_t*>(&encryption_key) + sizeof(encryption_key));
     buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&windowSize), reinterpret_cast<const uint8_t*>(&windowSize) + sizeof(windowSize));
@@ -149,8 +149,8 @@ const std::vector<unsigned int>& NAKControlPacket::getLostSequenceNumbers() cons
     return lostSequenceNumbers;
 }
 
-std::vector<uint8_t> NAKControlPacket::toBuffer() const {
-    std::vector<uint8_t> buffer = DefaultControlPacket::toBuffer();
+std::vector<char> NAKControlPacket::toBuffer() const {
+    std::vector<char> buffer = DefaultControlPacket::toBuffer();
     buffer.insert(buffer.end(), lostSequenceNumbers.begin(), lostSequenceNumbers.end());
     return buffer;
 }
@@ -163,8 +163,8 @@ const std::vector<unsigned int>& MessageDropRequestControlPacket::getLostSequenc
     return lostSequenceNumbers;
 }
 
-std::vector<uint8_t> MessageDropRequestControlPacket::toBuffer() const {
-    std::vector<uint8_t> buffer = DefaultControlPacket::toBuffer();
+std::vector<char> MessageDropRequestControlPacket::toBuffer() const {
+    std::vector<char> buffer = DefaultControlPacket::toBuffer();
     buffer.insert(buffer.end(), lostSequenceNumbers.begin(), lostSequenceNumbers.end());
     return buffer;
 }
@@ -241,8 +241,8 @@ const unsigned char* IpPacket::getOptions() const {
     return options;
 }
 
-std::vector<uint8_t> IpPacket::toBuffer() const {
-    std::vector<uint8_t> buffer;
+std::vector<char> IpPacket::toBuffer() const {
+    std::vector<char> buffer;
     buffer.push_back(static_cast<uint8_t>(version));
     buffer.push_back(static_cast<uint8_t>(lengthOfHeaders));
     buffer.push_back(static_cast<uint8_t>(typeOfService));

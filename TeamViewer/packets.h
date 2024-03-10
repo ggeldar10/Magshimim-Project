@@ -69,7 +69,7 @@ public:
     uint32_t getPacketSequenceNumber() const;
     time_t getTimeStamp() const;
 
-    virtual std::vector<uint8_t> toBuffer() const;
+    virtual std::vector<char> toBuffer() const;
 };
 
 class DefaultDataPacket : public DefaultPacket {
@@ -80,7 +80,7 @@ public:
     DefaultDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, DataPacketTypes dataPacketType);
     DataPacketTypes getDataType() const;
 
-    std::vector<uint8_t> toBuffer() const override;
+    std::vector<char> toBuffer() const override;
 };
 
 class CursorDataPacket : public DefaultDataPacket {
@@ -95,7 +95,7 @@ public:
     POINT getLocation() const;
     int getScrollValue() const;
 
-    std::vector<uint8_t> toBuffer() const override;
+    std::vector<char> toBuffer() const override;
 };
 
 class KeyboardDataPacket : public DefaultDataPacket {
@@ -108,7 +108,7 @@ public:
     KeyboardActions getAction() const;
     unsigned int getKeyCode() const;
 
-    std::vector<uint8_t> toBuffer() const override;
+    std::vector<char> toBuffer() const override;
 };
 
 class DefaultControlPacket : public DefaultPacket {
@@ -119,7 +119,7 @@ public:
     DefaultControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, ControlPacketTypes controlPacketType);
     ControlPacketTypes getControlType() const;
 
-    std::vector<uint8_t> toBuffer() const override;
+    std::vector<char> toBuffer() const override;
 };
 
 class HandshakeControlPacket : public DefaultControlPacket {
@@ -140,7 +140,7 @@ public:
     uint32_t getMaxTransmissionUnit() const;
     HandshakePhases getPhase() const;
 
-    std::vector<uint8_t> toBuffer() const override;
+    std::vector<char> toBuffer() const override;
 };
 
 class NAKControlPacket : public DefaultControlPacket {
@@ -151,7 +151,7 @@ public:
     NAKControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, const std::vector<unsigned int>& lostSeqNums);
     const std::vector<unsigned int>& getLostSequenceNumbers() const;
 
-    std::vector<uint8_t> toBuffer() const override;
+    std::vector<char> toBuffer() const override;
 };
 
 class MessageDropRequestControlPacket : public DefaultControlPacket {
@@ -162,7 +162,7 @@ public:
     MessageDropRequestControlPacket(uint32_t ackNum, uint32_t packetNum, time_t time, const std::vector<unsigned int>& lostSeqNums);
     const std::vector<unsigned int>& getLostSequenceNumbers() const;
 
-    std::vector<uint8_t> toBuffer() const override;
+    std::vector<char> toBuffer() const override;
 };
 
 class IpPacket {
@@ -200,5 +200,5 @@ public:
     uint32_t getDstAddrs() const;
     const unsigned char* getOptions() const;
 
-    std::vector<uint8_t> toBuffer() const;
+    std::vector<char> toBuffer() const;
 };

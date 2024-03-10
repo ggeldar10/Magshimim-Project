@@ -367,7 +367,7 @@ void SrtSocket::sendSrt() {
 	std::lock_guard<std::mutex> lock(this->_packetSendQueueMtx);
 
 	if (this->_packetSendQueue.size() != 0) {
-		std::vector<uint8_t> dataBuffer = this->_packetSendQueue.front();
+		std::vector<char> dataBuffer = this->_packetSendQueue.front();
 		this->_packetSendQueue.pop();
 
 		UdpPacket udpPacket(this->_commInfo._srcPort, this->_commInfo._dstPort, dataBuffer.size(), 0);
