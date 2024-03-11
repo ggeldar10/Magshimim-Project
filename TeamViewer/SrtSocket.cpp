@@ -319,13 +319,20 @@ void SrtSocket::srtBind(sockaddr_in* addrs)
 
 void SrtSocket::keepAliveMonitoring()
 {
+	bool runLoop = true;
+
 	DefaultControlPacket* packetPtr;
 	std::chrono::system_clock::time_point now;
 	std::time_t currentTime;
+
+	std::unique_lock<std::mutex> switchLock(this->_switchesMtx);
+	switchLock.unlock();
 	std::unique_lock<std::mutex> sendLock(this->_packetSendQueueMtx);
+	sendLock.unlock();
+
 	this->_keepAliveTimerThread = std::thread(&SrtSocket::keepAliveTimer, this);
 
-	while (this->_keepAliveSwitch && !this->_shutdownSwitch)
+	while (runLoop)
 	{
 		now = std::chrono::system_clock::now();
 		currentTime = std::chrono::system_clock::to_time_t(now);
@@ -333,6 +340,9 @@ void SrtSocket::keepAliveMonitoring()
 		sendLock.lock();
 		this->_packetSendQueue.push(packetPtr->toBuffer());
 		sendLock.unlock();
+		switchLock.lock();
+		runLoop = this->_keepAliveSwitch && !this->_shutdownSwitch;
+		switchLock.unlock();
 		Sleep(2000);
 	}
 
@@ -350,16 +360,21 @@ void SrtSocket::keepAliveMonitoring()
 
 void SrtSocket::keepAliveTimer()
 {
+	bool runLoop = true;
+
 	std::unique_lock<std::mutex> switchLock(this->_switchesMtx);
 	switchLock.unlock();
 	std::chrono::seconds keepAliveTimeout(5);
 
-	while (this->_keepAliveSwitch)
+	while (runLoop)
 	{
 		switchLock.lock();
 		this->_keepAliveSwitch = false;
 		switchLock.unlock();
 		std::this_thread::sleep_for(keepAliveTimeout);
+		switchLock.lock();
+		runLoop = this->_keepAliveSwitch;
+		switchLock.unlock();
 	}
 }
 

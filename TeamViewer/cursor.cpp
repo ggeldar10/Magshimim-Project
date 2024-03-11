@@ -58,14 +58,33 @@ void makeCursorButtonAction(const CursorActions action, const int scrollValue)
     }
 }
 
-void listenToCursor()
+void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<std::vector<char>>& packetSendQueue, std::mutex* packetSendQueueMtx)
 {
     bool runLoop = true;
-    while (runLoop) 
+
+    CursorDataPacket* packetPtr;
+    std::chrono::system_clock::time_point now;
+    std::time_t currentTime;
+
+    std::unique_lock<std::mutex> switchLock(*switchesMtx);
+    switchLock.unlock();
+    std::unique_lock<std::mutex> sendLock(*packetSendQueueMtx);
+    sendLock.unlock();
+
+    CursorActions previousAction = CursorPosition;
+
+    while (runLoop)
     {
         try {
             POINT point = getCursorPosition();
             std::cout << "Cursor position - x: " << point.x << ", y: " << point.y << std::endl;
+
+            now = std::chrono::system_clock::now();
+            currentTime = std::chrono::system_clock::to_time_t(now);
+            packetPtr = new CursorDataPacket(-1, -1, currentTime, CursorPosition, 0, point.x, point.y);
+            sendLock.lock();
+            packetSendQueue.push(packetPtr->toBuffer());
+            sendLock.unlock();
         }
         catch (GetCursorPositionException& e)
         {
@@ -78,16 +97,85 @@ void listenToCursor()
             // Check the state of the left mouse button
             if (GetAsyncKeyState(VK_LBUTTON) & IS_PRESSED) {
                 std::cout << "Left mouse button pressed." << std::endl;
+
+                now = std::chrono::system_clock::now();
+                currentTime = std::chrono::system_clock::to_time_t(now);
+                if (previousAction != LeftButtonDown)
+                {
+                    packetPtr = new CursorDataPacket(-1, -1, currentTime, LeftButtonDown, 0, 0, 0);
+                    sendLock.lock();
+                    packetSendQueue.push(packetPtr->toBuffer());
+                    sendLock.unlock();
+                    previousAction = LeftButtonDown;
+                }
+               
+            }
+            else if (previousAction == LeftButtonDown)
+            {
+                // Left mouse button released
+                now = std::chrono::system_clock::now();
+                currentTime = std::chrono::system_clock::to_time_t(now);
+                packetPtr = new CursorDataPacket(-1, -1, currentTime, LeftButtonUp, 0, 0, 0);
+                sendLock.lock();
+                packetSendQueue.push(packetPtr->toBuffer());
+                sendLock.unlock();
+                previousAction = LeftButtonUp;
             }
 
             // Check the state of the right mouse button
             if (GetAsyncKeyState(VK_RBUTTON) & IS_PRESSED) {
-                std::cout << "Right mouse button pressed." << std::endl;
+                std::cout << "Left mouse button pressed." << std::endl;
+
+                now = std::chrono::system_clock::now();
+                currentTime = std::chrono::system_clock::to_time_t(now);
+                if (previousAction != RightButtonDown)
+                {
+                    packetPtr = new CursorDataPacket(-1, -1, currentTime, RightButtonDown, 0, 0, 0);
+                    sendLock.lock();
+                    packetSendQueue.push(packetPtr->toBuffer());
+                    sendLock.unlock();
+                    previousAction = RightButtonDown;
+                }
+
+            }
+            else if (previousAction == RightButtonDown)
+            {
+                // Right mouse button released
+                now = std::chrono::system_clock::now();
+                currentTime = std::chrono::system_clock::to_time_t(now);
+                packetPtr = new CursorDataPacket(-1, -1, currentTime, RightButtonUp, 0, 0, 0);
+                sendLock.lock();
+                packetSendQueue.push(packetPtr->toBuffer());
+                sendLock.unlock();
+                previousAction = RightButtonUp;
             }
 
             // Check the state of the middle mouse button
             if (GetAsyncKeyState(VK_MBUTTON) & IS_PRESSED) {
-                std::cout << "Middle mouse button pressed." << std::endl;
+                std::cout << "Left mouse button pressed." << std::endl;
+
+                now = std::chrono::system_clock::now();
+                currentTime = std::chrono::system_clock::to_time_t(now);
+                if (previousAction != MiddleButtonDown)
+                {
+                    packetPtr = new CursorDataPacket(-1, -1, currentTime, MiddleButtonDown, 0, 0, 0);
+                    sendLock.lock();
+                    packetSendQueue.push(packetPtr->toBuffer());
+                    sendLock.unlock();
+                    previousAction = MiddleButtonDown;
+                }
+
+            }
+            else if (previousAction == MiddleButtonDown)
+            {
+                // Right mouse button released
+                now = std::chrono::system_clock::now();
+                currentTime = std::chrono::system_clock::to_time_t(now);
+                packetPtr = new CursorDataPacket(-1, -1, currentTime, MiddleButtonUp, 0, 0, 0);
+                sendLock.lock();
+                packetSendQueue.push(packetPtr->toBuffer());
+                sendLock.unlock();
+                previousAction = MiddleButtonUp;
             }
         }
         catch (const std::exception& e)
@@ -96,6 +184,9 @@ void listenToCursor()
             runLoop = false;
         }
         // Sleep for a short duration to avoid high CPU usage
-        Sleep(100);
+        Sleep(200);
+        switchLock.lock();
+        runLoop = !*shutdownSwitch;
+        switchLock.unlock();
     }
 }

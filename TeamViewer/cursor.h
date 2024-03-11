@@ -1,13 +1,14 @@
 #pragma once
 #include "packets.h"
+#include "mutex"
 #include <exception>
-
+#include <queue>
 #define IS_PRESSED 0x8000
 
 POINT getCursorPosition();
 void setCursorPosition(const POINT& point);
 void makeCursorButtonAction(const CursorActions action, const int scrollValue);
-void listenToCursor();
+void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<std::vector<char>>& packetSendQueue, std::mutex* packetSendQueueMtx);
 
 
 class GetCursorPositionException : public std::exception
