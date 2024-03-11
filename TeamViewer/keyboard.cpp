@@ -23,26 +23,52 @@ void makeKeyboardAction(KeyboardActions action, int keyCode)
        
     }
 }
-bool shiftPressed = false;
 
-void listenToKeyboard()
+void listenToKeyboard(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<std::vector<char>>& packetSendQueue, std::mutex* packetSendQueueMtx)
 {
-    SetHook();  // Set the low-level keyboard hook
-    MSG msg;
-    while (GetMessage(&msg, nullptr, 0, 0)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+    bool runLoop = true;
+
+    HookParameters hookParams;
+    hookParams.packetSendQueue = &packetSendQueue;
+    hookParams.packetSendQueueMtx = packetSendQueueMtx;
+
+    std::unique_lock<std::mutex> switchLock(*switchesMtx);
+    switchLock.unlock();
+
+    try {
+        SetHook(hookParams);
     }
-    Unhook();  // Unhook when the message loop exits
+    catch (const std::runtime_error& e) {
+        std::cerr << "Error setting hook: " << e.what() << std::endl;
+    }
+    MSG msg;
+
+    while (runLoop) 
+    {
+        // PeekMessage checks the message queue and returns immediately
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        Sleep(100);
+        switchLock.lock();
+        runLoop = !*shutdownSwitch;
+        switchLock.unlock();
+    }
+    Unhook();
 }
 
 HHOOK hHook = nullptr;
 
-void SetHook()
+void SetHook(HookParameters& hookParams)
 {
-    // Set the low-level keyboard hook
-    hHook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardProc, GetModuleHandle(nullptr), 0);
+    // Set the low-level keyboard hook with parameters
+    hHook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardProc, GetModuleHandle(nullptr), reinterpret_cast<DWORD_PTR>(&hookParams));
+    if (hHook == nullptr) {
+        throw std::runtime_error("Failed to set keyboard hook.");
+    }
 }
+
 
 void Unhook()
 {
@@ -55,6 +81,13 @@ void Unhook()
 
 LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
+    HookParameters* hookParams = reinterpret_cast<HookParameters*>(lParam);
+
+    std::unique_lock<std::mutex> sendLock(*hookParams->packetSendQueueMtx);
+
+    std::chrono::system_clock::time_point now;
+    std::time_t currentTime;
+
     if (nCode >= 0)
     {
         // Extract the key code from the event
@@ -66,27 +99,36 @@ LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
         bool keyReleased = (wParam == WM_KEYUP || wParam == WM_SYSKEYUP);
 
         // Check if Shift key is pressed or released
-        if (keyCode == VK_SHIFT)
+        /*if (keyCode == VK_SHIFT)
         {
             shiftPressed = keyPressed;
-        }
+        }*/
 
         // Print the key information
-        if (keyPressed || keyReleased)
+        if (keyPressed)
         {
-            std::cout << (keyPressed ? "Key pressed: " : "Key released: ") << keyCode;
+            std::cout << "Key pressed: " << keyCode << std::endl;
 
             // Check if Shift key is pressed
-            if (shiftPressed) {
+            /*if (shiftPressed) {
                 std::cout << " Shift key is pressed.";
-            }
-
-            std::cout << std::endl;
-
-            // You can use shiftPressed and keyCode in your logic as needed
+            }*/
+            now = std::chrono::system_clock::now();
+            currentTime = std::chrono::system_clock::to_time_t(now);
+            std::unique_ptr<KeyboardDataPacket> packetPtr = std::make_unique<KeyboardDataPacket>(-1, -1, currentTime, KeyUp, keyCode);
+            hookParams->packetSendQueue->push(packetPtr->toBuffer());
+        }
+        else if (keyReleased)
+        {
+            std::cout << "Key released: " << keyCode << std::endl;
+            now = std::chrono::system_clock::now();
+            currentTime = std::chrono::system_clock::to_time_t(now);
+            std::unique_ptr<KeyboardDataPacket> packetPtr = std::make_unique<KeyboardDataPacket>(-1, -1, currentTime, KeyDown, keyCode);
+            hookParams->packetSendQueue->push(packetPtr->toBuffer());
         }
     }
 
     // Call the next hook in the chain
     return CallNextHookEx(hHook, nCode, wParam, lParam);
 }
+

@@ -62,7 +62,6 @@ void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<st
 {
     bool runLoop = true;
 
-    CursorDataPacket* packetPtr;
     std::chrono::system_clock::time_point now;
     std::time_t currentTime;
 
@@ -81,7 +80,7 @@ void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<st
 
             now = std::chrono::system_clock::now();
             currentTime = std::chrono::system_clock::to_time_t(now);
-            packetPtr = new CursorDataPacket(-1, -1, currentTime, CursorPosition, 0, point.x, point.y);
+            std::unique_ptr<CursorDataPacket> packetPtr = std::make_unique<CursorDataPacket>(-1, -1, currentTime, CursorPosition, 0, point.x, point.y);
             sendLock.lock();
             packetSendQueue.push(packetPtr->toBuffer());
             sendLock.unlock();
@@ -102,7 +101,7 @@ void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<st
                 currentTime = std::chrono::system_clock::to_time_t(now);
                 if (previousAction != LeftButtonDown)
                 {
-                    packetPtr = new CursorDataPacket(-1, -1, currentTime, LeftButtonDown, 0, 0, 0);
+                    std::unique_ptr<CursorDataPacket> packetPtr = std::make_unique<CursorDataPacket>(-1, -1, currentTime, LeftButtonDown, 0, 0, 0);
                     sendLock.lock();
                     packetSendQueue.push(packetPtr->toBuffer());
                     sendLock.unlock();
@@ -115,7 +114,7 @@ void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<st
                 // Left mouse button released
                 now = std::chrono::system_clock::now();
                 currentTime = std::chrono::system_clock::to_time_t(now);
-                packetPtr = new CursorDataPacket(-1, -1, currentTime, LeftButtonUp, 0, 0, 0);
+                std::unique_ptr<CursorDataPacket> packetPtr = std::make_unique<CursorDataPacket>(-1, -1, currentTime, LeftButtonUp, 0, 0, 0);
                 sendLock.lock();
                 packetSendQueue.push(packetPtr->toBuffer());
                 sendLock.unlock();
@@ -130,7 +129,7 @@ void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<st
                 currentTime = std::chrono::system_clock::to_time_t(now);
                 if (previousAction != RightButtonDown)
                 {
-                    packetPtr = new CursorDataPacket(-1, -1, currentTime, RightButtonDown, 0, 0, 0);
+                    std::unique_ptr<CursorDataPacket> packetPtr = std::make_unique<CursorDataPacket>(-1, -1, currentTime, RightButtonDown, 0, 0, 0);
                     sendLock.lock();
                     packetSendQueue.push(packetPtr->toBuffer());
                     sendLock.unlock();
@@ -143,7 +142,7 @@ void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<st
                 // Right mouse button released
                 now = std::chrono::system_clock::now();
                 currentTime = std::chrono::system_clock::to_time_t(now);
-                packetPtr = new CursorDataPacket(-1, -1, currentTime, RightButtonUp, 0, 0, 0);
+                std::unique_ptr<CursorDataPacket> packetPtr = std::make_unique<CursorDataPacket>(-1, -1, currentTime, RightButtonUp, 0, 0, 0);
                 sendLock.lock();
                 packetSendQueue.push(packetPtr->toBuffer());
                 sendLock.unlock();
@@ -158,7 +157,7 @@ void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<st
                 currentTime = std::chrono::system_clock::to_time_t(now);
                 if (previousAction != MiddleButtonDown)
                 {
-                    packetPtr = new CursorDataPacket(-1, -1, currentTime, MiddleButtonDown, 0, 0, 0);
+                    std::unique_ptr<CursorDataPacket> packetPtr = std::make_unique<CursorDataPacket>(-1, -1, currentTime, MiddleButtonDown, 0, 0, 0);
                     sendLock.lock();
                     packetSendQueue.push(packetPtr->toBuffer());
                     sendLock.unlock();
@@ -171,7 +170,7 @@ void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<st
                 // Right mouse button released
                 now = std::chrono::system_clock::now();
                 currentTime = std::chrono::system_clock::to_time_t(now);
-                packetPtr = new CursorDataPacket(-1, -1, currentTime, MiddleButtonUp, 0, 0, 0);
+                std::unique_ptr<CursorDataPacket> packetPtr = std::make_unique<CursorDataPacket>(-1, -1, currentTime, MiddleButtonUp, 0, 0, 0);
                 sendLock.lock();
                 packetSendQueue.push(packetPtr->toBuffer());
                 sendLock.unlock();

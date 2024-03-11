@@ -321,7 +321,6 @@ void SrtSocket::keepAliveMonitoring()
 {
 	bool runLoop = true;
 
-	DefaultControlPacket* packetPtr;
 	std::chrono::system_clock::time_point now;
 	std::time_t currentTime;
 
@@ -336,7 +335,7 @@ void SrtSocket::keepAliveMonitoring()
 	{
 		now = std::chrono::system_clock::now();
 		currentTime = std::chrono::system_clock::to_time_t(now);
-		packetPtr = new DefaultControlPacket(-1, -1, currentTime, KEEPALIVE);
+		std::unique_ptr<DefaultControlPacket> packetPtr = std::make_unique<DefaultControlPacket>(-1, -1, currentTime, KEEPALIVE);
 		sendLock.lock();
 		this->_packetSendQueue.push(packetPtr->toBuffer());
 		sendLock.unlock();
@@ -348,14 +347,15 @@ void SrtSocket::keepAliveMonitoring()
 
 	now = std::chrono::system_clock::now();
 	currentTime = std::chrono::system_clock::to_time_t(now);
-	packetPtr = new DefaultControlPacket(-1, -1, currentTime, SHUTDOWN);
+	std::unique_ptr<DefaultControlPacket> packetPtr = std::make_unique<DefaultControlPacket>(-1, -1, currentTime, SHUTDOWN);
 	sendLock.lock();
 	this->_packetSendQueue.push(packetPtr->toBuffer());
 	sendLock.unlock();
-	std::lock_guard<std::mutex> switchLock(this->_switchesMtx);
+	switchLock.lock();
 	this->_keepAliveSwitch = false;
 	this->_keepAliveTimerThread.join();
 	this->_shutdownSwitch = true;
+	switchLock.unlock();
 }
 
 void SrtSocket::keepAliveTimer()
