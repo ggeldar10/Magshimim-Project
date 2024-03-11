@@ -78,7 +78,7 @@ void SrtSocket::listenAndAccept()
 	toAddr.sin_addr.s_addr = this->_commInfo._dstIP;
 	toAddr.sin_family = AF_INET;
 
-	HandshakeControlPacket handshakeSend = HandshakeControlPacket(2, 0, time(nullptr), false, 0, DEFUALT_MAX_TRANSMISSION, 0, DEFUALT_MTU_SIZE, INDUCTION_2);
+	HandshakeControlPacket handshakeSend = HandshakeControlPacket(2, 0, time(nullptr), 0, DEFUALT_MAX_TRANSMISSION, 0, DEFUALT_MTU_SIZE, INDUCTION_2);
 	UdpPacket udpPacketSend = UdpPacket(this->_commInfo._srcPort, this->_commInfo._dstPort, UDP_HEADERS_SIZE + HANDSHAKE_PACKET_SIZE, 0);
 	std::vector<char> sendBufferVector = PacketParser::packetToBytes(udpPacketSend, handshakeSend, nullptr);
 	if (sendto(this->_srtSocket, sendBufferVector.data(), sendBufferVector.size(), 0, reinterpret_cast<sockaddr*>(&toAddr), sizeof(sockaddr_in)) < 0)
@@ -110,7 +110,7 @@ void SrtSocket::listenAndAccept()
 
 	// other logic here
 
-	handshakeSend = HandshakeControlPacket(4, 0, time(nullptr), false, 0, DEFUALT_MAX_TRANSMISSION, 0/*Change later*/, DEFUALT_MTU_SIZE, SUMMARY_2);
+	handshakeSend = HandshakeControlPacket(4, 0, time(nullptr), 0, DEFUALT_MAX_TRANSMISSION, 0/*Change later*/, DEFUALT_MTU_SIZE, SUMMARY_2);
 	udpPacketSend = UdpPacket(this->_commInfo._srcPort, this->_commInfo._dstPort, UDP_HEADERS_SIZE + HANDSHAKE_PACKET_SIZE, 0);
 	sendBufferVector = PacketParser::packetToBytes(udpPacketSend, handshakeSend, nullptr);
 	sendto(this->_srtSocket, sendBufferVector.data(), sendBufferVector.size(), 0, reinterpret_cast<sockaddr*>(&toAddr), sizeof(sockaddr_in));
@@ -131,7 +131,7 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 	bindToAddr.sin_port = 0;
 	bindToAddr.sin_family = AF_INET;
 	this->srtBind(&bindToAddr);
-	HandshakeControlPacket handshakeHeaders = HandshakeControlPacket(0, 0, std::time(nullptr), false, 0, DEFUALT_MAX_TRANSMISSION, 0, DEFUALT_MTU_SIZE, INDUCTION_1);
+	HandshakeControlPacket handshakeHeaders = HandshakeControlPacket(0, 0, std::time(nullptr), 0, DEFUALT_MAX_TRANSMISSION, 0, DEFUALT_MTU_SIZE, INDUCTION_1);
 	UdpPacket udpHeaders = UdpPacket(this->_commInfo._srcPort, this->_commInfo._dstPort, HANDSHAKE_PACKET_SIZE + UDP_HEADERS_SIZE, 0);
 	std::vector<char> sendBuffer = PacketParser::packetToBytes(udpHeaders, handshakeHeaders, nullptr);
 	if (sendto(this->_srtSocket, sendBuffer.data(), sendBuffer.size(), 0, reinterpret_cast<sockaddr*>(addrs), sizeof(sockaddr_in)) < 0)
@@ -164,7 +164,7 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 	this->_commInfo._otherComputerMaxWindowSize = handshakeHeaders.getWindowSize();
 
 
-	handshakeHeaders = HandshakeControlPacket(4, 0, time(nullptr), false, 0, DEFUALT_MTU_SIZE, 5, DEFUALT_MAX_TRANSMISSION, SUMMARY_1);
+	handshakeHeaders = HandshakeControlPacket(4, 0, time(nullptr), 0, DEFUALT_MTU_SIZE, 5, DEFUALT_MAX_TRANSMISSION, SUMMARY_1);
 	sendBuffer = PacketParser::packetToBytes(udpHeaders, handshakeHeaders, nullptr);
 	if (sendto(this->_srtSocket, sendBuffer.data(), sendBuffer.size(), 0, reinterpret_cast<sockaddr*>(addrs), sizeof(sockaddr_in)) < 0)
 	{
@@ -367,7 +367,7 @@ void SrtSocket::sendSrt() {
 	std::lock_guard<std::mutex> lock(this->_packetSendQueueMtx);
 
 	if (this->_packetSendQueue.size() != 0) {
-		std::vector<uint8_t> dataBuffer = this->_packetSendQueue.front();
+		std::vector<char> dataBuffer = this->_packetSendQueue.front();
 		this->_packetSendQueue.pop();
 
 		UdpPacket udpPacket(this->_commInfo._srcPort, this->_commInfo._dstPort, dataBuffer.size(), 0);

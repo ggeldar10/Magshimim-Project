@@ -29,7 +29,7 @@ private:
 	std::queue<std::unique_ptr<DefaultPacket>> _recviedPacketsQueue;
 	std::mutex _recviedPacketsQueueMtx;
 
-	std::queue<std::vector<uint8_t>> _packetSendQueue;
+	std::queue<std::vector<char>> _packetSendQueue;
 	std::mutex _packetSendQueueMtx;
 
 	bool _shutdownSwitch;
