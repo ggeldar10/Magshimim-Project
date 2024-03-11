@@ -22,10 +22,10 @@ time_t DefaultPacket::getTimeStamp() const {
 
 std::vector<char> DefaultPacket::toBuffer() const {
     std::vector<char> buffer;
-    buffer.push_back(static_cast<uint8_t>(packetType));
-    buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&ackSequenceNumber), reinterpret_cast<const uint8_t*>(&ackSequenceNumber) + sizeof(ackSequenceNumber));
-    buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&packetSequenceNumber), reinterpret_cast<const uint8_t*>(&packetSequenceNumber) + sizeof(packetSequenceNumber));
-    buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&timeStamp), reinterpret_cast<const uint8_t*>(&timeStamp) + sizeof(timeStamp));
+    PacketParser::hostToNetworkIntoVector<uint32_t>(&buffer, packetType);
+    PacketParser::hostToNetworkIntoVector<uint32_t>(&buffer, ackSequenceNumber);
+    PacketParser::hostToNetworkIntoVector<uint32_t>(&buffer, packetSequenceNumber);
+    PacketParser::hostToNetworkIntoVector<uint32_t>(&buffer, timeStamp);
     return buffer;
 }
 
@@ -96,7 +96,7 @@ ControlPacketTypes DefaultControlPacket::getControlType() const {
 
 std::vector<char> DefaultControlPacket::toBuffer() const {
     std::vector<char> buffer = DefaultPacket::toBuffer();
-    buffer.push_back(static_cast<uint8_t>(controlPacketType));
+    PacketParser::hostToNetworkIntoVector<uint32_t>(&buffer, controlPacketType);
     return buffer;
 }
 
@@ -132,11 +132,11 @@ HandshakePhases HandshakeControlPacket::getPhase() const {
 
 std::vector<char> HandshakeControlPacket::toBuffer() const {
     std::vector<char> buffer = DefaultControlPacket::toBuffer();
-    buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&encryption_key), reinterpret_cast<const uint8_t*>(&encryption_key) + sizeof(encryption_key));
-    buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&windowSize), reinterpret_cast<const uint8_t*>(&windowSize) + sizeof(windowSize));
-    buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&initialPacketSequenceNumber), reinterpret_cast<const uint8_t*>(&initialPacketSequenceNumber) + sizeof(initialPacketSequenceNumber));
-    buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&maxTransmissionUnit), reinterpret_cast<const uint8_t*>(&maxTransmissionUnit) + sizeof(maxTransmissionUnit));
-    buffer.push_back(static_cast<uint8_t>(phase));
+    PacketParser::hostToNetworkIntoVector<uint16_t>(&buffer, encryption_key);
+    PacketParser::hostToNetworkIntoVector<uint32_t>(&buffer, windowSize);
+    PacketParser::hostToNetworkIntoVector<uint32_t>(&buffer, initialPacketSequenceNumber);
+    PacketParser::hostToNetworkIntoVector<uint32_t>(&buffer, maxTransmissionUnit);
+    PacketParser::hostToNetworkIntoVector<uint32_t>(&buffer, phase);
     return buffer;
 }
 

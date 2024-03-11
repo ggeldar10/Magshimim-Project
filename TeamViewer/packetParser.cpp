@@ -119,8 +119,8 @@ std::unique_ptr<const DefaultControlPacket> PacketParser::createDefaultControlPa
 {
     ControlPacketTypes controlPacketType;
     std::unique_ptr<const DefaultPacket> defaultPacket = createDefaultPacketFromVector(defaultControlPacketBuffer, index);
-    controlPacketType = static_cast<ControlPacketTypes>(networkToHost<uint16_t>(defaultControlPacketBuffer, index));
-    index += sizeof(uint16_t);
+    controlPacketType = static_cast<ControlPacketTypes>(networkToHost<uint32_t>(defaultControlPacketBuffer, index));
+    index += sizeof(uint32_t);
     std::unique_ptr<const DefaultControlPacket> packet = std::make_unique<DefaultControlPacket>(defaultPacket->getAckSequenceNumber(), defaultPacket->getPacketSequenceNumber(), defaultPacket->getTimeStamp(), controlPacketType);
     return packet;
 }
