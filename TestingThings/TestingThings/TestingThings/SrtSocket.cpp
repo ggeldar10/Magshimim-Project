@@ -74,14 +74,15 @@ void SrtSocket::listenAndAccept()
 	this->_commInfo._otherComputerMaxWindowSize = srtHeaders->getWindowSize();
 
 	sockaddr_in toAddr = { 0 };
-	toAddr.sin_port = this->_commInfo._dstPort;
-	toAddr.sin_addr.s_addr = this->_commInfo._dstIP;
+	toAddr.sin_port = htons(this->_commInfo._dstPort);
+	toAddr.sin_addr.s_addr = htonl(this->_commInfo._dstIP);
 	toAddr.sin_family = AF_INET;
 
-	HandshakeControlPacket handshakeSend = HandshakeControlPacket(2, 0, time(nullptr), 0, DEFUALT_MAX_TRANSMISSION, 0, DEFUALT_MTU_SIZE, INDUCTION_2);
+	HandshakeControlPacket handshakeSend = HandshakeControlPacket(2, 0, std::time(nullptr), 0, DEFUALT_MAX_TRANSMISSION, 0, DEFUALT_MTU_SIZE, INDUCTION_2);
 	UdpPacket udpPacketSend = UdpPacket(this->_commInfo._srcPort, this->_commInfo._dstPort, UDP_HEADERS_SIZE + HANDSHAKE_PACKET_SIZE, 0);
 	std::vector<char> sendBufferVector = PacketParser::packetToBytes(udpPacketSend, handshakeSend, nullptr);
-	if (sendto(this->_srtSocket, sendBufferVector.data(), sendBufferVector.size(), 0, reinterpret_cast<sockaddr*>(&toAddr), sizeof(sockaddr_in)) < 0)
+	int res = sendto(this->_srtSocket, sendBufferVector.data(), sendBufferVector.size(), 0, reinterpret_cast<sockaddr*>(&toAddr), sizeof(sockaddr_in));
+	if (res < 0)
 	{
 		std::cerr << "Error while doing sendto in listenAndAccept" << std::endl;
 		throw /*todo throw the right error*/;
@@ -113,7 +114,11 @@ void SrtSocket::listenAndAccept()
 	handshakeSend = HandshakeControlPacket(4, 0, time(nullptr), 0, DEFUALT_MAX_TRANSMISSION, 0/*Change later*/, DEFUALT_MTU_SIZE, SUMMARY_2);
 	udpPacketSend = UdpPacket(this->_commInfo._srcPort, this->_commInfo._dstPort, UDP_HEADERS_SIZE + HANDSHAKE_PACKET_SIZE, 0);
 	sendBufferVector = PacketParser::packetToBytes(udpPacketSend, handshakeSend, nullptr);
-	sendto(this->_srtSocket, sendBufferVector.data(), sendBufferVector.size(), 0, reinterpret_cast<sockaddr*>(&toAddr), sizeof(sockaddr_in));
+	if (sendto(this->_srtSocket, sendBufferVector.data(), sendBufferVector.size(), 0, reinterpret_cast<sockaddr*>(&toAddr), sizeof(sockaddr_in)) < 0)
+	{
+		std::cerr << "Error while doing sendto in listenAndAccept" << std::endl;
+		throw /*todo throw the right error*/;
+	}
 
 }
 
@@ -124,7 +129,7 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 	std::unique_ptr<const HandshakeControlPacket> srtHeadersRecv;
 
 
-	this->_commInfo._dstPort = addrs->sin_port;
+	this->_commInfo._dstPort = htons(addrs->sin_port);
 	this->_commInfo._dstIP = addrs->sin_addr.s_addr;
 	sockaddr_in bindToAddr = { 0 };
 	bindToAddr.sin_addr.s_addr = INADDR_ANY;
@@ -160,8 +165,8 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 			}
 			return true;
 		});
-	this->_commInfo._otherComputerMTU = handshakeHeaders.getMaxTransmissionUnit();
-	this->_commInfo._otherComputerMaxWindowSize = handshakeHeaders.getWindowSize();
+	this->_commInfo._otherComputerMTU = srtHeadersRecv->getMaxTransmissionUnit();
+	this->_commInfo._otherComputerMaxWindowSize = srtHeadersRecv->getWindowSize();
 
 
 	handshakeHeaders = HandshakeControlPacket(4, 0, time(nullptr), 0, DEFUALT_MTU_SIZE, 5, DEFUALT_MAX_TRANSMISSION, SUMMARY_1);
@@ -186,7 +191,7 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 				return false;
 			}
 			srtHeadersRecv = PacketParser::createHandshakeControlPacketFromVector({ bufferVec.begin() + ipHeadersRecv->getLengthOfHeadersInBytes() + UDP_HEADERS_SIZE, bufferVec.end() }); // might have a problem
-			if (srtHeadersRecv->getPhase() != INDUCTION_2)
+			if (srtHeadersRecv->getPhase() != SUMMARY_2)
 			{
 				return false;
 			}
@@ -313,7 +318,7 @@ void SrtSocket::srtBind(sockaddr_in* addrs)
 	}
 	else
 	{
-		this->_commInfo._srcPort = addrs->sin_port;
+		this->_commInfo._srcPort = htons(addrs->sin_port);
 	}
 }
 

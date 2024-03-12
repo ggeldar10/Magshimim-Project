@@ -33,16 +33,15 @@ public:
     template<typename htnSize>
     static void hostToNetworkIntoVector(std::vector<char>* addVector, htnSize value)
     {
-        int count = 0;
-        while (value != 0)
+        union {
+            htnSize val;
+            char bytes[sizeof(htnSize)];
+        } valUnion;
+        memset(valUnion.bytes, 0, sizeof(htnSize));
+        valUnion.val = value;
+        for (int i = sizeof(htnSize) - 1; i >= 0; i--)
         {
-            addVector->push_back(value & 0xFF);
-            value >>= BYTE_IN_BITS;
-            count++;
-        }
-        for (count; count < sizeof(htnSize); count++)
-        {
-            addVector->push_back(0);
+            addVector->push_back(valUnion.bytes[i]);
         }
     }
 
@@ -54,16 +53,16 @@ public:
             std::cerr << "Error: buffer size is not big enough" << std::endl;
             throw "Error: buffer size is not big enough";
         }
-
-        nthSize networkToHostNum = 0;
-
-        for (int i = sizeof(nthSize) - 1; i >= 0; i--)
+        union {
+            nthSize val;
+            char bytes[sizeof(nthSize)];
+        } valUnion;
+        memset(valUnion.bytes, 0, sizeof(nthSize));
+        for (int i = sizeof(nthSize) - 1, j = 0; i >= 0 ; i--, j++)
         {
-            networkToHostNum <<= BYTE_IN_BITS;
-            networkToHostNum |= buffer[index + i];
+            valUnion.bytes[j] = buffer[i + index];
         }
-
-        return networkToHostNum;
+        return valUnion.val;
     }
 
     static std::vector<char> packetToBytes(const UdpPacket& udpHeaders, const DefaultPacket& strHeaders, const std::vector<char>* data);

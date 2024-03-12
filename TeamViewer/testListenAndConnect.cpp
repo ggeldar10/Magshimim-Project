@@ -16,5 +16,6 @@ int main()
 	serverSocket.srtBind(&serverInfo);
 	serverSocket.listenAndAccept();
 
+	std::cout << "found user" << std::endl;
 
 }
