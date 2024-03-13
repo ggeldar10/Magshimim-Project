@@ -51,9 +51,6 @@
     <ClCompile Include="testListenAndConnect.cpp">
       <Filter>Source Files\testing Socket</Filter>
     </ClCompile>
-    <ClCompile Include="Source.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cursor.h">
@@ -79,6 +76,9 @@
     </ClInclude>
     <ClInclude Include="packetManager.h">
       <Filter>Header Files\communication</Filter>
+    </ClInclude>
+    <ClInclude Include="windowsHeaders.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="windowsHeaders.h">
       <Filter>Header Files</Filter>
