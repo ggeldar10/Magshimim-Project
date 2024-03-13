@@ -14,9 +14,8 @@ SrtSocket::SrtSocket()
 	this->_srtSocket = socket(AF_INET, SOCK_RAW, IP_SRT_PROTOCOL_NUMBER);
 	if (this->_srtSocket == INVALID_SOCKET)
 	{
-		int error = WSAGetLastError();
-		std::cerr << "Error creating socket: " << error << std::endl;
-		throw "Error creating socket";
+		std::cerr << "Error while trying to open a socket" << std::endl;
+		throw "Error while trying to open a socket";
 	}
 	this->_commInfo = { 0 };
 	this->_shutdownSwitch = false;
@@ -84,7 +83,8 @@ void SrtSocket::listenAndAccept()
 	int res = sendto(this->_srtSocket, sendBufferVector.data(), sendBufferVector.size(), 0, reinterpret_cast<sockaddr*>(&toAddr), sizeof(sockaddr_in));
 	if (res < 0)
 	{
-		std::cerr << "Error while doing sendto in listenAndAccept" << std::endl;
+		int error = WSAGetLastError();
+		std::cerr << "Error while doing sendto in listenAndAccept: " << error << std::endl;
 		throw /*todo throw the right error*/;
 	}
 	waitForValidPacket(nullptr, [&](char* buffer, int totalLength) -> bool
@@ -116,13 +116,14 @@ void SrtSocket::listenAndAccept()
 	sendBufferVector = PacketParser::packetToBytes(udpPacketSend, handshakeSend, nullptr);
 	if (sendto(this->_srtSocket, sendBufferVector.data(), sendBufferVector.size(), 0, reinterpret_cast<sockaddr*>(&toAddr), sizeof(sockaddr_in)) < 0)
 	{
-		std::cerr << "Error while doing sendto in listenAndAccept" << std::endl;
+		int error = WSAGetLastError();
+		std::cerr << "Error while doing sendto in listenAndAccept: " << error << std::endl;
 		throw /*todo throw the right error*/;
 	}
 
 }
 
-void SrtSocket::connectToServer(sockaddr_in* addrs)
+void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidPacket
 {
 	std::unique_ptr<IpPacket> ipHeadersRecv;
 	std::unique_ptr<UdpPacket> udpHeadersRecv;

@@ -16,7 +16,7 @@ int main()
     {
     case CONTROLED:
     {
-        SrtSocket serverSocket; // Create SrtSocket object for server
+        SrtSocket serverSocket;
         sockaddr_in serverInfo = { 0 };
         serverInfo.sin_addr.s_addr = inet_addr("127.0.0.1");
         serverInfo.sin_family = AF_INET;
@@ -28,11 +28,12 @@ int main()
     }
     case CONTROLLER:
     {
-        SrtSocket client; // Create SrtSocket object for client
+        SrtSocket client;
         sockaddr_in serverInfo = { 0 };
-        serverInfo.sin_addr.s_addr = INADDR_ANY;
+        serverInfo.sin_addr.s_addr = inet_addr("127.0.0.1");
         serverInfo.sin_family = AF_INET;
         serverInfo.sin_port = htons(serverPort);
+
         client.connectToServer(&serverInfo);
         std::cout << "connected" << std::endl;
         break;
