@@ -14,7 +14,7 @@ int main()
 
     switch (option)
     {
-    case CONTROLLER:
+    case CONTROLED:
     {
         SrtSocket serverSocket; // Create SrtSocket object for server
         sockaddr_in serverInfo = { 0 };
@@ -26,7 +26,7 @@ int main()
         std::cout << "found user" << std::endl;
         break;
     }
-    case CONTROLED:
+    case CONTROLLER:
     {
         SrtSocket client; // Create SrtSocket object for client
         sockaddr_in serverInfo = { 0 };

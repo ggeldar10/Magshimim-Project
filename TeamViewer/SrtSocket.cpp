@@ -6,22 +6,18 @@ SrtSocket::SrtSocket()
 	: _packetManager(&_keepAliveSwitch, &_shutdownSwitch, &_switchesMtx)
 {
 	WSADATA wsaData;
-	int result = WSAStartup(MAKEWORD(2, 2), &wsaData); // Store the result
-	if (result != 0)
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
 	{
-		std::cerr << "Error while trying to initialize startup: " << result << std::endl; // Print error code
-		throw std::runtime_error("Error while trying to initialize startup");
+		std::cerr << "Error while trying to intialize startup" << std::endl;
+		throw "Error while trying to intialize startup";
 	}
-
-	this->_srtSocket = socket(AF_INET, SOCK_RAW, IPPROTO_RAW); // Use IPPROTO_RAW for raw sockets
+	this->_srtSocket = socket(AF_INET, SOCK_RAW, IP_SRT_PROTOCOL_NUMBER);
 	if (this->_srtSocket == INVALID_SOCKET)
 	{
-		std::cerr << "Error while trying to open a socket: " << WSAGetLastError() << std::endl; // Print error code
-		WSACleanup();
-		throw std::runtime_error("Error while trying to open a socket");
+		int error = WSAGetLastError();
+		std::cerr << "Error creating socket: " << error << std::endl;
+		throw "Error creating socket";
 	}
-
-	// Initialize other member variables
 	this->_commInfo = { 0 };
 	this->_shutdownSwitch = false;
 	this->_keepAliveSwitch = true;
