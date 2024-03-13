@@ -1,7 +1,5 @@
 #include <iostream>
 #include "windowsHeaders.h"
-#include "cursor.h"
-#include "keyboard.h"
 #include <thread>
 
 int main() 
@@ -11,6 +9,7 @@ int main()
     
     cursorThread.join();
     keyboardThread.join();*/
+
     system("pause");
     return 0;
 }

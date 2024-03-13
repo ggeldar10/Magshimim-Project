@@ -1,35 +1,39 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "SrtSocket.h"
-#include <iostream>
-#include "packetParser.h"
-#include <vector>
-#include <random>
+
 
 SrtSocket::SrtSocket()
+	: _packetManager(&_keepAliveSwitch, &_shutdownSwitch, &_switchesMtx)
 {
 	WSADATA wsaData;
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+	int result = WSAStartup(MAKEWORD(2, 2), &wsaData); // Store the result
+	if (result != 0)
 	{
-		std::cerr << "Error while trying to intialize startup" << std::endl;
-		throw "Error while trying to intialize startup";
+		std::cerr << "Error while trying to initialize startup: " << result << std::endl; // Print error code
+		throw std::runtime_error("Error while trying to initialize startup");
 	}
-	this->_srtSocket = socket(AF_INET, SOCK_RAW, IP_SRT_PROTOCOL_NUMBER);
+
+	this->_srtSocket = socket(AF_INET, SOCK_RAW, IPPROTO_RAW); // Use IPPROTO_RAW for raw sockets
 	if (this->_srtSocket == INVALID_SOCKET)
 	{
-		std::cerr << "Error while trying to open a socket" << std::endl;
-		throw "Error while trying to open a socket";
+		std::cerr << "Error while trying to open a socket: " << WSAGetLastError() << std::endl; // Print error code
+		WSACleanup();
+		throw std::runtime_error("Error while trying to open a socket");
 	}
+
+	// Initialize other member variables
 	this->_commInfo = { 0 };
 	this->_shutdownSwitch = false;
 	this->_keepAliveSwitch = true;
 }
+
 
 SrtSocket::~SrtSocket()
 {
 	this->_keepAliveSwitch = false;
 	this->_shutdownSwitch = true;
 	this->_packetSendQueue.empty();
-	this->_recviedPacketsQueue.empty();
+	//this->_recviedPacketsQueue.empty();
 	closesocket(this->_srtSocket);
 	WSACleanup();
 }
@@ -287,6 +291,42 @@ bool SrtSocket::isValidHeaders(const IpPacket& ipHeaders, const UdpPacket& udpHe
 	return isValidIpHeaders(ipHeaders) && isValidUdpHeaders(udpHeaders);
 }
 
+void SrtSocket::sendMonitoring()
+{
+	bool runLoop = true;
+
+	std::unique_lock<std::mutex> switchLock(this->_switchesMtx);
+	switchLock.unlock();
+
+	while (runLoop)
+	{
+		sendSrt();
+		Sleep(200);
+		switchLock.lock();
+		runLoop = !this->_shutdownSwitch;
+		switchLock.unlock();
+	}
+	
+}
+
+void SrtSocket::recvMonitoring()
+{
+	bool runLoop = true;
+	std::unique_lock<std::mutex> switchLock(this->_switchesMtx);
+	switchLock.unlock();
+
+
+	while (runLoop)
+	{
+		std::unique_ptr<const DefaultPacket> packet = recvSrt();
+		this->_packetManager.handlePacket(std::move(packet));
+		Sleep(100);
+		switchLock.lock();
+		runLoop = !this->_shutdownSwitch;
+		switchLock.unlock();
+	}
+}
+
 
 /*
 binds the socket to a specific port and ip on the computer
@@ -386,7 +426,8 @@ void SrtSocket::keepAliveTimer()
 void SrtSocket::sendSrt() {
 	std::lock_guard<std::mutex> lock(this->_packetSendQueueMtx);
 
-	if (this->_packetSendQueue.size() != 0) {
+	if (this->_packetSendQueue.size() != 0) 
+	{
 		std::vector<char> dataBuffer = this->_packetSendQueue.front();
 		this->_packetSendQueue.pop();
 
@@ -414,7 +455,7 @@ void SrtSocket::sendSrt() {
 	}
 }
 
-const std::unique_ptr<const DefaultPacket> SrtSocket::recvSrt()
+std::unique_ptr<const DefaultPacket> SrtSocket::recvSrt()
 {
 	UdpPacket udpPacket = recvUdp();
 	const int length = udpPacket.getLength();
@@ -432,9 +473,7 @@ const std::unique_ptr<const DefaultPacket> SrtSocket::recvSrt()
 		throw std::runtime_error("Connection closed while trying to receive SRT packet");
 	}
 
-	std::unique_ptr<const DefaultPacket> packet = PacketParser::createPacketFromVectorGlobal(buffer);
-
-	return packet;
+	return std::move(PacketParser::createPacketFromVectorGlobal(buffer));
 }
 
 const UdpPacket SrtSocket::recvUdp()

@@ -7,76 +7,116 @@ PacketManager::PacketManager(bool* keepAliveSwitch, bool* shutDownSwitch, std::m
     this->_switchesMtx = switchesMtx;
 }
 
-void PacketManager::handlePacket(std::unique_ptr<DefaultPacket> packet)
+void PacketManager::handlePacket(std::unique_ptr<const DefaultPacket> packet)
 {
     switch (packet->getPacketType())
     {
     case DataPacket:
-        handleDataPacket(dynamic_cast<DefaultDataPacket*>(packet.get()));
+    {
+        auto dataPacket = dynamic_cast<const DefaultDataPacket*>(packet.get());
+        handleDataPacket(std::unique_ptr<const DefaultDataPacket>(dataPacket));
         break;
+    }
     case ControlPacket:
-        handleControlPacket(dynamic_cast<DefaultControlPacket*>(packet.get()));
+    {
+        auto controlPacket = dynamic_cast<const DefaultControlPacket*>(packet.get());
+        handleControlPacket(std::unique_ptr<const DefaultControlPacket>(controlPacket));
         break;
+    }
     default:
+    {
         throw PacketParserException("Error: Invalid packet type");
         break;
     }
+    }
 }
 
-void PacketManager::handleDataPacket(DefaultDataPacket* dataPacket)
+void PacketManager::handleDataPacket(std::unique_ptr<const DefaultDataPacket> dataPacket)
 {
     switch (dataPacket->getDataType())
     {
     case Cursor:
-        handleCursorDataPacket(dynamic_cast<CursorDataPacket*>(dataPacket));
+    {
+        auto cursorPacket = dynamic_cast<const CursorDataPacket*>(dataPacket.get());
+        handleCursorDataPacket(std::unique_ptr<const CursorDataPacket>(cursorPacket));
         break;
+    }
     case Keyboard:
-        handleKeyboardDataPacket(dynamic_cast<KeyboardDataPacket*>(dataPacket));
+    {
+        auto keyboardPacket = dynamic_cast<const KeyboardDataPacket*>(dataPacket.get());
+        handleKeyboardDataPacket(std::unique_ptr<const KeyboardDataPacket>(keyboardPacket));
         break;
+    }
     case Screen:
+    {
         // To Do
         break;
+    }
     case Chat:
+    {
         // To Do
         break;
+    }
     default:
+    {
         throw PacketParserException("Error: Invalid data type");
         break;
     }
+    }
 }
 
-void PacketManager::handleControlPacket(DefaultControlPacket* controlPacket)
+void PacketManager::handleControlPacket(std::unique_ptr<const DefaultControlPacket> controlPacket)
 {
     
     switch (controlPacket->getControlType())
     {
     case HANDSHAKE:
+    {
         break;
+    }
     case KEEPALIVE:
-        handleKeepAliveControlPacket(controlPacket);
+    {
+        handleKeepAliveControlPacket(std::move(controlPacket));
         break;
+    }
     case ACK:
+    {
         break;
+    }
     case NAK:
+    {
         break;
+    }
     case CongestionWarning:
+    {
         break;
+    }
     case SHUTDOWN:
-        handleShutdownControlPacket(controlPacket);
+    {
+        handleShutdownControlPacket(std::move(controlPacket));
         break;
+    }
     case ACKACK:
+    {
         break;
+    }
     case DROPREQ:
+    {
         break;
+    }
     case PEERERROR:
+    {
         break;
+    }
     default:
+    {
         throw PacketParserException("Error: Invalid control type");
         break;
     }
+    }
 }
 
-void PacketManager::handleCursorDataPacket(CursorDataPacket* cursorPacket)
+void PacketManager::handleCursorDataPacket(std::unique_ptr<const CursorDataPacket> cursorPacket)
 {
     if (cursorPacket->getAction() == CursorPosition)
     {
@@ -102,7 +142,7 @@ void PacketManager::handleCursorDataPacket(CursorDataPacket* cursorPacket)
     }
 }
 
-void PacketManager::handleKeyboardDataPacket(KeyboardDataPacket* keyboardPacket)
+void PacketManager::handleKeyboardDataPacket(std::unique_ptr<const KeyboardDataPacket> keyboardPacket)
 {
     try
     {
@@ -114,13 +154,13 @@ void PacketManager::handleKeyboardDataPacket(KeyboardDataPacket* keyboardPacket)
     }
 }
 
-void PacketManager::handleKeepAliveControlPacket(DefaultControlPacket* keepAlivePacket)
+void PacketManager::handleKeepAliveControlPacket(std::unique_ptr<const DefaultControlPacket> keepAlivePacket)
 {
     std::lock_guard<std::mutex> lock(*this->_switchesMtx);
     *this->_keepAliveSwitch = true;
 }
 
-void PacketManager::handleShutdownControlPacket(DefaultControlPacket* shutdownPacket)
+void PacketManager::handleShutdownControlPacket(std::unique_ptr<const DefaultControlPacket> shutdownPacket)
 {
     std::lock_guard<std::mutex> lock(*this->_switchesMtx);
     *this->_shutdownSwitch = true;

@@ -1,10 +1,17 @@
 #pragma once
 #include "packetParser.h"
+#include "packetManager.h"
+#include <iostream>
+#include <vector>
+#include <random>
 #include <queue>
 #include <thread>
 #include <string>
 #include <functional>
 #include <mutex>
+
+
+
 
 #define RECV_BUFFER_SIZE 1024
 #define MAX_PORT_NUM 65535
@@ -26,8 +33,10 @@ private:
 
 	} _commInfo;
 
-	std::queue<std::unique_ptr<DefaultPacket>> _recviedPacketsQueue;
-	std::mutex _recviedPacketsQueueMtx;
+	PacketManager _packetManager;
+
+	/*std::queue<std::unique_ptr<DefaultPacket>> _recviedPacketsQueue;
+	std::mutex _recviedPacketsQueueMtx;*/
 
 	std::queue<std::vector<char>> _packetSendQueue;
 	std::mutex _packetSendQueueMtx;
@@ -38,9 +47,11 @@ private:
 
 	std::thread _keepAliveMonitoringThread;
 	std::thread _keepAliveTimerThread;
+
 	std::thread _cursorListenerThread;
 	std::thread _keyboardListenerThread;
 	std::thread _screenCaptureThread;
+
 	std::thread _sendPacketsThread;
 	std::thread _recivedPacketsThread;
 	
@@ -53,8 +64,10 @@ private:
 	bool isValidUdpHeaders(const UdpPacket& udpHeaders);
 	bool isValidHeaders(const IpPacket& ipHeaders, const UdpPacket& udpHeaders);
 
+	void sendMonitoring();
+	void recvMonitoring();
 	void sendSrt();
-	const std::unique_ptr<const DefaultPacket> recvSrt();
+	std::unique_ptr<const DefaultPacket> recvSrt();
 	const UdpPacket recvUdp();
 
 public:
