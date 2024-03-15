@@ -14,6 +14,11 @@
 #define MAX_PORT_NUM 65535
 #define MIN_PORT_NUM 1000
 
+enum Modes
+{
+	Controller = 1, Controled
+};
+
 class SrtSocket
 {
 private:
@@ -47,15 +52,16 @@ private:
 
 	std::thread _cursorListenerThread;
 	std::thread _keyboardListenerThread;
-	std::thread _screenCaptureThread;
+	std::thread _screenListenerThread;
 
 	std::thread _sendPacketsThread;
 	std::thread _recivedPacketsThread;
 	
-	void waitForValidPacket(std::vector<char>* buffer, std::function<bool(char*, int)> checkFunction);
 	void keepAliveMonitoring();
 	void keepAliveTimer();
+	void initializeThreads(Modes mode);
 
+	void waitForValidPacket(std::vector<char>* buffer, std::function<bool(char*, int)> checkFunction);
 	bool isValidIpv4Checksum(const IpPacket& ipPacket);
 	bool isValidIpHeaders(const IpPacket& ipHeaders);
 	bool isValidUdpHeaders(const UdpPacket& udpHeaders);

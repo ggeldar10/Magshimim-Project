@@ -120,7 +120,7 @@ void SrtSocket::listenAndAccept()
 		std::cerr << "Error while doing sendto in listenAndAccept: " << error << std::endl;
 		throw /*todo throw the right error*/;
 	}
-
+	initializeThreads(Controled);
 }
 
 void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidPacket
@@ -198,7 +198,7 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 			}
 			return true;
 		});
-	// start control thread
+	initializeThreads(Controller);
 }
 
 /*
@@ -489,8 +489,6 @@ const UdpPacket SrtSocket::recvUdp()
 	{
 		throw std::runtime_error("Connection closed while trying to receive UDP header");
 	}
-
-	// Assuming createUdpPacketFromVector is a static function in PacketParser
 	UdpPacket udpPacketRecv = PacketParser::createUdpPacketFromVector(bufferVector);
 
 	if (udpPacketRecv.getLength() != UDP_HEADERS_SIZE + HANDSHAKE_PACKET_SIZE)
@@ -499,4 +497,24 @@ const UdpPacket SrtSocket::recvUdp()
 	}
 
 	return udpPacketRecv;
+}
+
+void SrtSocket::initializeThreads(Modes mode)
+{
+	
+	this->_recivedPacketsThread = std::thread(&SrtSocket::recvMonitoring, this);
+	this->_sendPacketsThread = std::thread(&SrtSocket::sendMonitoring, this);
+	this->_keepAliveMonitoringThread = std::thread(&SrtSocket::keepAliveMonitoring, this);
+	if (mode == Controller)
+	{
+		this->_cursorListenerThread = std::thread([&]() {
+			listenToCursor(&_shutdownSwitch, &_switchesMtx, _packetSendQueue, &_packetSendQueueMtx);
+			});
+		this->_keyboardListenerThread = std::thread([&]() {
+			listenToKeyboard(&_shutdownSwitch, &_switchesMtx, _packetSendQueue, &_packetSendQueueMtx);
+			});
+		/*this->_screenListenerThread = std::thread([&]() {
+			listenToScreen(&_shutdownSwitch, &_switchesMtx, _packetSendQueue, &_packetSendQueueMtx);
+			});*/
+	}
 }

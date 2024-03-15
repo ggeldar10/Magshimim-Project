@@ -1,20 +1,20 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <iostream>
-#include "SrtSocket.h" // Include SrtSocket.h before using SrtSocket class
-#define CONTROLLER 1
-#define CONTROLED 2
+#include "SrtSocket.h" 
 
 int main()
 {
     const int serverPort = 12356;
     int option = 0;
+    Modes mode;
 
     std::cout << "Choose connection type:\n1 - Controller\n2 - Controled" << std::endl;
     std::cin >> option;
+    mode = (Modes)option;
 
-    switch (option)
+    switch (mode)
     {
-    case CONTROLED:
+    case Controled:
     {
         SrtSocket serverSocket;
         sockaddr_in serverInfo = { 0 };
@@ -26,7 +26,7 @@ int main()
         std::cout << "found user" << std::endl;
         break;
     }
-    case CONTROLLER:
+    case Controller:
     {
         SrtSocket client;
         sockaddr_in serverInfo = { 0 };
