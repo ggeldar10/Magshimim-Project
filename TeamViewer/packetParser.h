@@ -68,15 +68,20 @@ public:
     static std::vector<char> packetToBytes(const UdpPacket& udpHeaders, const DefaultPacket& strHeaders, const std::vector<char>* data);
 
     static IpPacket createIpPacketFromVector(const std::vector<char>& ipPacketBuffer);
+    static UdpPacket createUdpPacketFromVector(const std::vector<char>& udpPacketBuffer);
+
     static std::unique_ptr<const DefaultPacket> createDefaultPacketFromVector(const std::vector<char>& defaultPacketBuffer, int& index);
+
     static std::unique_ptr<const DefaultDataPacket> createDefaultDataPacketFromVector(const std::vector<char>& defaultDataPacketBuffer, int& index);
     static std::unique_ptr<const CursorDataPacket> createCursorDataPacketFromVector(const std::vector<char>& cursorDataPacketBuffer);
     static std::unique_ptr<const KeyboardDataPacket> createKeyboardDataPacketFromVector(const std::vector<char>& keyboardDataPacketBuffer);
+    static std::unique_ptr<const ScreenDataPacket> createScreenDataPacketFromVector(const std::vector<char>& screenDataPacketBuffer);
+
     static std::unique_ptr<const DefaultControlPacket> createDefaultControlPacketFromVector(const std::vector<char>& defaultControlPacketBuffer, int& index);
     static std::unique_ptr<const HandshakeControlPacket> createHandshakeControlPacketFromVector(const std::vector<char>& handshakeControlPacketBuffer);
     static std::unique_ptr<const NAKControlPacket> createNAKControlPacketFromVector(const std::vector<char>& nakControlPacketBuffer);
     static std::unique_ptr<const MessageDropRequestControlPacket> createMessageDropRequestControlPacketFromVector(const std::vector<char>& messageDropRequestControlPacketBuffer);
-    static UdpPacket createUdpPacketFromVector(const std::vector<char>& udpPacketBuffer);
+    
     static std::unique_ptr<const DefaultPacket> createPacketFromVectorGlobal(const std::vector<char>& globalPacketBuffer);
 };
 

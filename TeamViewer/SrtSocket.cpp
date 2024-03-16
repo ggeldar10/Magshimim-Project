@@ -482,7 +482,7 @@ const UdpPacket SrtSocket::recvUdp()
 
 	if (bytesReceived < 0)
 	{
-		std::cerr << "Error while trying to get UDP header" << std::endl;
+		std::cerr << "Error while trying to get UDP header: " << WSAGetLastError() << std::endl;
 		throw std::runtime_error("Error while trying to get UDP header");
 	}
 	else if (bytesReceived == 0)

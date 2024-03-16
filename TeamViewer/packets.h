@@ -104,9 +104,22 @@ private:
     unsigned int keyCode;
 
 public:
-    KeyboardDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, KeyboardActions action, int keyCode);
+    KeyboardDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, KeyboardActions action, unsigned int keyCode);
     KeyboardActions getAction() const;
     unsigned int getKeyCode() const;
+
+    std::vector<char> toBuffer() const override;
+};
+
+class ScreenDataPacket : public DefaultDataPacket {
+private:
+    unsigned int _resoulutionHight;
+    unsigned int _resoulutionWidth;
+
+public:
+    ScreenDataPacket(unsigned int resoulutionHight, unsigned int resoulutionWidth);
+    unsigned int getResolotionHight() const;
+    unsigned int getResolotionWidth() const;
 
     std::vector<char> toBuffer() const override;
 };

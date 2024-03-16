@@ -131,7 +131,6 @@
     <ClInclude Include="keyboard.h" />
     <ClInclude Include="packetManager.h" />
     <ClInclude Include="packetParser.h" />
-    <ClInclude Include="windowsHeaders.h" />
     <ClInclude Include="packets.h" />
     <ClInclude Include="SrtSocket.h" />
     <ClInclude Include="windowsHeaders.h" />
