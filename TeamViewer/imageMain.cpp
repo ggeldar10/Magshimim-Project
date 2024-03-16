@@ -1,73 +1,24 @@
-#include <windows.h>
-#include <gdiplus.h>
+#include "ImageCapture.h"
 #include <iostream>
-
-#pragma comment(lib,"gdiplus.lib")
-
-using namespace Gdiplus;
-
-int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
-{
-	UINT  num = 0;          // number of image encoders
-	UINT  size = 0;         // size of the image encoder array in bytes
-
-	ImageCodecInfo* pImageCodecInfo = NULL;
-
-	GetImageEncodersSize(&num, &size);
-	if (size == 0)
-		return -1;  // Failure
-
-	pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
-	if (pImageCodecInfo == NULL)
-		return -1;  // Failure
-
-	GetImageEncoders(num, size, pImageCodecInfo);
-
-	for (UINT j = 0; j < num; ++j)
-	{
-		if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0)
-		{
-			*pClsid = pImageCodecInfo[j].Clsid;
-			free(pImageCodecInfo);
-			return j;  // Success
-		}
-	}
-
-	free(pImageCodecInfo);
-	return -1;  // Failure
-}
+#include <fstream>
 
 int main()
 {
-	SetProcessDPIAware();
-	HDC hdcScreen = GetDC(NULL);
-	HDC hdcMemDC = CreateCompatibleDC(hdcScreen);
-	HBITMAP hbmScreen = NULL;
+	ImageCapture capturer = ImageCapture(NULL);
+	std::unique_ptr<Bitmap> bitmap = capturer.captureScreen();
+	CLSID clsid;
+	if (ImageCapture::getEncoderClsid(L"image/jpeg", &clsid) < 0)
+	{
+		return 1;
+	}
+	bitmap->Save(L"C:\\Users\\test0\\team-viewer-project\\TeamViewer\\captureImage.jpg", &clsid, NULL);
+	std::ifstream stream = std::ifstream("C:\\Users\\test0\\team-viewer-project\\TeamViewer\\captureImage.jpg");
+	stream.seekg(0, std::ios::end);
+	int length = stream.tellg();
+	stream.seekg(0, std::ios::beg);
+	char* buffer = new char[length];
+	stream.read(buffer, length);
 
-	GdiplusStartupInput gdip;
-	ULONG_PTR gdipToken;
-	GdiplusStartup(&gdipToken, &gdip, NULL);
-
-	int width = GetSystemMetrics(SM_CXSCREEN);
-	int height = GetSystemMetrics(SM_CYSCREEN);
-
-	hbmScreen = CreateCompatibleBitmap(hdcScreen, width, height);
-	SelectObject(hdcMemDC, hbmScreen);
-
-	BitBlt(hdcMemDC, 0, 0, width, height, hdcScreen, 0, 0, SRCCOPY);
-
-	CLSID encoderID;
-
-	GetEncoderClsid(L"image/jpeg", &encoderID);//image/jpeg
-
-	Bitmap* bmp = new Bitmap(hbmScreen, (HPALETTE)0);
-	bmp->Save(L"C:\\Users\\test0\\team-viewer-project\\TeamViewer\\captureImage.jpg", &encoderID, NULL);
-
-	GdiplusShutdown(gdipToken);
-
-	DeleteObject(hbmScreen);
-	DeleteObject(hdcMemDC);
-	ReleaseDC(NULL, hdcScreen);
-
+	delete[] buffer;
 	return 0;
 }
