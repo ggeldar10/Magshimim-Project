@@ -127,11 +127,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="PipeManager.h" />
+    <ClCompile Include="ImageCapture.cpp" />
+    <ClCompile Include="imageMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="PipeManager.cpp" />
-    <ClCompile Include="Source.cpp" />
+    <ClInclude Include="ImageCapture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
