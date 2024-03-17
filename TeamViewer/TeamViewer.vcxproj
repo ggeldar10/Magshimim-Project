@@ -129,9 +129,12 @@
   <ItemGroup>
     <ClCompile Include="ImageCapture.cpp" />
     <ClCompile Include="imageMain.cpp" />
+    <ClCompile Include="PipeManager.cpp" />
+    <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageCapture.h" />
+    <ClInclude Include="PipeManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

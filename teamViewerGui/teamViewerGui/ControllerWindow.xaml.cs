@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +23,26 @@ namespace teamViewerGui
         public ControllerWindow()
         {
             InitializeComponent();
+            setImageFromPipeData();
         }
+
+        public void displayImage(byte[] imageBytes)
+        {
+            using (MemoryStream ms = new MemoryStream(imageBytes))
+            {
+                var decoder = BitmapDecoder.Create(ms,
+            BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+                screenDisplay.Source = decoder.Frames[0];
+            }
+        }
+
+        public void setImageFromPipeData()
+        {
+            // maybe add mutex if i decide to do it in a thread
+            displayImage(PipeManagerSingletone.getInstance().ReadData());
+            
+        }
+
+
     }
 }

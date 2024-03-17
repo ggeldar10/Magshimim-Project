@@ -15,8 +15,8 @@
             <Button Content="connect"/>
 
         </StackPanel>
-        <Image  Source="C:\Users\test0\OneDrive\תמונות\צילומי מסך\sunset.png"/>
-        
+        <Image  Source="C:\Users\test0\OneDrive\תמונות\צילומי מסך\sunset.png" Name="screenDisplay"/>
+       
 
     </DockPanel>
 </Window>
