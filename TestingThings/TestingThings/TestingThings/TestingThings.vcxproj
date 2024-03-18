@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -18,11 +18,29 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="cursor.cpp" />
+    <ClCompile Include="keyboard.cpp" />
+    <ClCompile Include="packetManager.cpp" />
+    <ClCompile Include="packetParser.cpp" />
+    <ClCompile Include="packets.cpp" />
+    <ClCompile Include="SrtSocket.cpp" />
+    <ClCompile Include="testConnect.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cursor.h" />
+    <ClInclude Include="keyboard.h" />
+    <ClInclude Include="packetManager.h" />
+    <ClInclude Include="packetParser.h" />
+    <ClInclude Include="packets.h" />
+    <ClInclude Include="SrtSocket.h" />
+    <ClInclude Include="windowsHeaders.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{e66289ce-9039-4a7e-a10f-243140d229fe}</ProjectGuid>
-    <RootNamespace>TeamViewer</RootNamespace>
+    <ProjectGuid>{d7cb37b2-ef8b-40a1-98c7-4221923830e1}</ProjectGuid>
+    <RootNamespace>TestingThings</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -126,29 +144,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="cursor.h" />
-    <ClInclude Include="keyboard.h" />
-    <ClInclude Include="packetManager.h" />
-    <ClInclude Include="packetParser.h" />
-    <ClInclude Include="packets.h" />
-    <ClInclude Include="SrtSocket.h" />
-    <ClInclude Include="windowsHeaders.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="cursor.cpp" />
-    <ClCompile Include="keyboard.cpp" />
-    <ClCompile Include="packetManager.cpp" />
-    <ClCompile Include="packetParser.cpp" />
-    <ClCompile Include="packets.cpp" />
-    <ClCompile Include="SrtSocket.cpp" />
-    <ClCompile Include="main.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
