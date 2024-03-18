@@ -63,7 +63,6 @@ namespace teamViewerGui
             {
                 // maybe add mutex if i decide to do it in a thread
                 displayImage(PipeManagerSingletone.getInstance().ReadData());
-                Thread.Sleep(100);
             }
         }
 

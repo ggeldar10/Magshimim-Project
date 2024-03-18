@@ -30,6 +30,13 @@ std::unique_ptr<Bitmap> ImageCapture::captureScreen()
 		std::cerr << "Error while trying to capture a screenshot" << std::endl;
 		throw;
 	}
+	CURSORINFO cursor = { 0 };
+	cursor.cbSize = sizeof(CURSORINFO);
+	GetCursorInfo(&cursor);
+	if (cursor.flags == CURSOR_SHOWING)
+	{
+		DrawIconEx(this->_screenshotMem, cursor.ptScreenPos.x, cursor.ptScreenPos.y, cursor.hCursor, 0, 0, 0, NULL, DI_NORMAL);
+	}
 	return std::unique_ptr<Bitmap>(new Bitmap(this->_hbitmap, (HPALETTE)0));
 }
 

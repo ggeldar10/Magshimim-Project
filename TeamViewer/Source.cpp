@@ -12,6 +12,7 @@ int main()
 
 		ImageCapture capturer(NULL);
 		CLSID clsid;
+		
 		ImageCapture::getEncoderClsid(L"image/jpeg", &clsid);
 		capturer.captureScreen()->Save(L"C:\\Users\\test0\\team-viewer-project\\TeamViewer\\captureImage.jpg", &clsid, NULL);
 		#pragma endregion
@@ -32,8 +33,6 @@ int main()
 		manager.sendToPipe(bufferVec);
 
 		#pragma endregion
-
-		Sleep(100);
 	}
 return 0;
 }
