@@ -1,9 +1,11 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <iostream>
 #include "SrtSocket.h" 
+#include "PipeManager.h"
 
 int main()
 {
+    //PipeManager pipeManager;
     const int serverPort = 12356;
     int option = 0;
     Modes mode;
