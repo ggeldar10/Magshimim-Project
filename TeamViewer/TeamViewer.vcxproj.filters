@@ -25,6 +25,15 @@
     <Filter Include="Source Files\Communication">
       <UniqueIdentifier>{24fe6696-8558-4763-b957-dc02647a58f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Executables">
+      <UniqueIdentifier>{f8a56555-0d66-443c-b869-42a3ae6737db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Communication\Internal Communication">
+      <UniqueIdentifier>{c4115943-a4a9-47e0-9748-b191139764f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Communication\Internal Communication">
+      <UniqueIdentifier>{7e246d89-0c2a-4be8-9ef9-31115ff7057e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cursor.cpp">
@@ -45,8 +54,20 @@
     <ClCompile Include="packetManager.cpp">
       <Filter>Source Files\Communication</Filter>
     </ClCompile>
+    <ClCompile Include="ImageCapture.cpp">
+      <Filter>Source Files\Devices</Filter>
+    </ClCompile>
+    <ClCompile Include="Source.cpp">
+      <Filter>Source Files\Executables</Filter>
+    </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Executables</Filter>
+    </ClCompile>
+    <ClCompile Include="imageMain.cpp">
+      <Filter>Source Files\Executables</Filter>
+    </ClCompile>
+    <ClCompile Include="PipeManager.cpp">
+      <Filter>Source Files\Communication\Internal Communication</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -110,6 +131,12 @@
     <ClInclude Include="windowsHeaders.h">
       <Filter>Header Files\Communication</Filter>
     </ClInclude>
+    <ClInclude Include="ImageCapture.h">
+      <Filter>Header Files\Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="PipeManager.h">
+      <Filter>Header Files\Communication\Internal Communication</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SrtSocket.cpp">
@@ -124,28 +151,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="packets.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="imageMain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ImageCapture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PipeManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="ImageCapture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PipeManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

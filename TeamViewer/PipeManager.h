@@ -5,7 +5,7 @@
 typedef union {
 	int num;
 	char bytes[sizeof(int)];
-} ConvertIntToChar;
+} IntCharUnion;
 
 class PipeManager
 {

@@ -5,14 +5,14 @@
 
 int main()
 {
-    //PipeManager pipeManager;
     const int serverPort = 12356;
-    int option = 0;
-    Modes mode;
+    PipeManager pipeManager;
+    IntCharUnion convertor = {0};
+    std::vector<char> buffer = pipeManager.readDataFromPipe();
 
-    std::cout << "Choose connection type:\n1 - Controller\n2 - Controled" << std::endl;
-    std::cin >> option;
-    mode = (Modes)option;
+    // The gui will send the code for 1 byte
+    convertor.bytes[0] = buffer[0];
+    Modes mode = static_cast<Modes>(convertor.num);
 
     switch (mode)
     {

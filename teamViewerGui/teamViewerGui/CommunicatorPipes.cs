@@ -24,7 +24,6 @@ namespace teamViewerGui
         public void Listen()
         {
             this.pipeServer.WaitForConnection();
-            // todo a check if the connection worked
         }
 
         public void SendMessage(List<byte> data)

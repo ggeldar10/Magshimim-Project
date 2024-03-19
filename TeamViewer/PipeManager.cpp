@@ -26,7 +26,7 @@ output: none
 */
 void PipeManager::sendToPipe(const std::vector<char>& data) const
 {
-	ConvertIntToChar convertor;
+	IntCharUnion convertor;
 	convertor.num = data.size();
 	std::vector<char> dataWithLength;
 	dataWithLength.insert(dataWithLength.begin(), convertor.bytes, convertor.bytes + sizeof(int));
@@ -40,7 +40,7 @@ void PipeManager::sendToPipe(const std::vector<char>& data) const
 
 std::vector<char> PipeManager::readDataFromPipe() const
 {
-	ConvertIntToChar convertor;
+	IntCharUnion convertor;
 	if (!ReadFile(this->_pipe, convertor.bytes, sizeof(int), NULL, NULL))
 	{
 		std::cerr << "Error while reading" << std::endl;

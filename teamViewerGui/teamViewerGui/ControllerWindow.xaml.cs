@@ -26,6 +26,8 @@ namespace teamViewerGui
         public ControllerWindow()
         {
             InitializeComponent();
+            WindowState = WindowState.Maximized;
+            ResizeMode = ResizeMode.NoResize;
             this.backgroundThread = new Thread(setImageFromPipeData);
             this.backgroundThread.Start();
         }

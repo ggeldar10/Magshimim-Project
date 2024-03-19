@@ -15,6 +15,11 @@ using System.Windows.Shapes;
 
 namespace teamViewerGui
 {
+    enum MODES
+    { 
+        CONTROLLER, CONTROLLED
+    };
+    
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -24,26 +29,16 @@ namespace teamViewerGui
         public MainWindow()
         {
             InitializeComponent();
-            PipeManagerSingletone.getInstance().Listen();
+            //manager = new CommunicatorPipes();
             //manager.Listen();
-            //List<byte> bytes = new List<byte>();
-            //string message = "Hello";
-            //foreach (var c in message)
-            //{
-            //    bytes.Add((byte)c);
-            //}
-            //manager.SendMessage(bytes);
-            ////testing recv
-
-            //foreach(char c in manager.ReadData())
-            //{ 
-            //    Console.Write(c);
-            //}
-            //Console.WriteLine();
+            PipeManagerSingletone.getInstance().Listen();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            List<byte> bytes = new List<byte>();
+            bytes.Add((byte)MODES.CONTROLLER);
+            PipeManagerSingletone.getInstance().SendMessage(bytes);
             ControllerWindow window = new ControllerWindow();
             window.Show();
         }

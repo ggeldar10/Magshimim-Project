@@ -128,19 +128,35 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="cursor.h" />
+    <ClInclude Include="ImageCapture.h" />
     <ClInclude Include="keyboard.h" />
     <ClInclude Include="packetManager.h" />
     <ClInclude Include="packetParser.h" />
     <ClInclude Include="packets.h" />
+    <ClInclude Include="PipeManager.h" />
     <ClInclude Include="SrtSocket.h" />
     <ClInclude Include="windowsHeaders.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cursor.cpp" />
+    <ClCompile Include="ImageCapture.cpp" />
+    <ClCompile Include="imageMain.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="keyboard.cpp" />
     <ClCompile Include="packetManager.cpp" />
     <ClCompile Include="packetParser.cpp" />
     <ClCompile Include="packets.cpp" />
+    <ClCompile Include="PipeManager.cpp" />
+    <ClCompile Include="Source.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="SrtSocket.cpp" />
     <ClCompile Include="main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
