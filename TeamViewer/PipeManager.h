@@ -2,6 +2,11 @@
 #include <windows.h>
 #include <vector>
 
+enum PIPE_CODES
+{
+	CLOSE_PIPE, STOP_SENDING_PICTURES, START_SENDING, CONTROLLER, CONTROLLED
+};
+
 typedef union {
 	int num;
 	char bytes[sizeof(int)];
@@ -17,6 +22,7 @@ public:
 	~PipeManager();
 	void sendToPipe(const std::vector<char>& data) const;
 	std::vector<char> readDataFromPipe() const;
+	bool isDataAvail();
 
 };
 

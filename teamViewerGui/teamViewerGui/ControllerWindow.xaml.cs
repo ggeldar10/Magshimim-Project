@@ -26,7 +26,12 @@ namespace teamViewerGui
         public ControllerWindow()
         {
             InitializeComponent();
+            this.ResizeMode = ResizeMode.NoResize;
+            this.WindowState = WindowState.Maximized;
+            List<byte> bytes = new List<byte> { (byte)PIPE_CODES.START_SENDING };
+            PipeManagerSingletone.getInstance().SendMessage(bytes);
             this.backgroundThread = new Thread(setImageFromPipeData);
+            this.backgroundThread.IsBackground = true;
             this.backgroundThread.Start();
         }
 
@@ -47,7 +52,6 @@ namespace teamViewerGui
                 {
                     
                 }
-
                 this.disposed = true;
             }
         }
@@ -61,9 +65,14 @@ namespace teamViewerGui
         {
             while (!this.disposed)
             {
-                // maybe add mutex if i decide to do it in a thread
                 displayImage(PipeManagerSingletone.getInstance().ReadData());
             }
+            if (PipeManagerSingletone.getInstance().isDataAvailable())
+            {
+                PipeManagerSingletone.getInstance().ReadData();
+            }
+            List<byte> bytes = new List<byte> { (byte)PIPE_CODES.STOP_SENDING_PICTURES };
+            PipeManagerSingletone.getInstance().SendMessage(bytes);
         }
 
         private void UpdateImage(BitmapFrame frame)
@@ -76,6 +85,11 @@ namespace teamViewerGui
             {
                 Application.Current.Dispatcher.Invoke(() => screenDisplay.Source = frame);
             }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            this.Dispose();
         }
     }
 }

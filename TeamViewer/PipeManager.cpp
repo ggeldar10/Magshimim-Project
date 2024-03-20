@@ -7,7 +7,7 @@ PipeManager::PipeManager()
 	this->_pipe = CreateFileA(this->serverName, GENERIC_WRITE | GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
 	if (this->_pipe == INVALID_HANDLE_VALUE)
 	{
-		std::cerr << "Error while creating pipe" << std::endl;
+		std::cerr << "Error while creating pipe " << GetLastError() << std::endl;
 		throw "Error while creating pipe";
 	}
 
@@ -53,5 +53,17 @@ std::vector<char> PipeManager::readDataFromPipe() const
 		throw "Error while reading";
 	}
 	return buffer;
+}
+
+bool PipeManager::isDataAvail()
+{
+	DWORD bytesAvailable = 0;
+	if (!PeekNamedPipe(this->_pipe, NULL, NULL, NULL, &bytesAvailable, NULL))
+	{
+		std::cerr << "Error while peeking " << std::endl;
+		throw "Error while peeking";
+	}
+	
+	return bytesAvailable;
 }
 

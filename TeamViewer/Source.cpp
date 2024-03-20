@@ -6,7 +6,12 @@
 int main()
 {
 	PipeManager manager;
-	while (true)
+	std::vector<char> buffer = manager.readDataFromPipe();
+	if (static_cast<PIPE_CODES>(buffer[0]) != PIPE_CODES::START_SENDING)
+	{
+		return 1;
+	}
+	while (!manager.isDataAvail())
 	{
 		#pragma region CaptureScreenShot
 
@@ -30,9 +35,16 @@ int main()
 
 		#pragma region SendData
 
-		manager.sendToPipe(bufferVec);
-
+		if (!manager.isDataAvail())
+		{
+			manager.sendToPipe(bufferVec);
+		}
 		#pragma endregion
+	}
+	buffer = manager.readDataFromPipe();
+	if (!static_cast<PIPE_CODES>(buffer[0]) == STOP_SENDING_PICTURES)
+	{
+		return 1;
 	}
 return 0;
 }
