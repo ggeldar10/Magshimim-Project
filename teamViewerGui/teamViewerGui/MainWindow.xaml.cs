@@ -29,8 +29,6 @@ namespace teamViewerGui
         public MainWindow()
         {
             InitializeComponent();
-            //manager = new CommunicatorPipes();
-            //manager.Listen();
             PipeManagerSingletone.getInstance().Listen();
         }
 

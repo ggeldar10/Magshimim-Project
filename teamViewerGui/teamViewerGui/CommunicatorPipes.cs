@@ -4,11 +4,16 @@ using System.ComponentModel;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace teamViewerGui
 {
+    public enum PIPE_CODES
+    { 
+        CLOSE_PIPE, STOP_SENDING_PICTURES, START_SENDING, CONTROLLER, CONTROLLED
+    }
     public class CommunicatorPipes : IDisposable
     {
         private const string serverPipeName = "srtGuiPipe";
@@ -56,9 +61,9 @@ namespace teamViewerGui
             if (!disposedValue)
             {
                 if (disposing)
-                {
-                    pipeServer.Dispose();
-                    pipeServer = null;
+                { 
+                    pipeServer.Close();
+                    
                 }
                 disposedValue = true;
             }
@@ -77,5 +82,23 @@ namespace teamViewerGui
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool PeekNamedPipe(SafeHandle handle,
+    byte[] buffer, uint nBufferSize, ref uint bytesRead,
+    ref uint bytesAvail, ref uint BytesLeftThisMessage);
+
+        public bool isDataAvailable()
+        { 
+            uint bytesRead = 0;
+            uint bytesAvail = 0;
+            uint bytesLeft = 0;
+            if (!PeekNamedPipe(this.pipeServer.SafePipeHandle, null, 0, ref bytesRead, ref bytesAvail, ref bytesLeft))
+            {
+                return false;
+            }
+            return bytesAvail > 0;
+        }
+
     }
 }
