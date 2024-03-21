@@ -111,19 +111,6 @@ public:
     std::vector<char> toBuffer() const override;
 };
 
-class ScreenDataPacket : public DefaultDataPacket {
-private:
-    unsigned int _resoulutionHight;
-    unsigned int _resoulutionWidth;
-
-public:
-    ScreenDataPacket(unsigned int resoulutionHight, unsigned int resoulutionWidth);
-    unsigned int getResolotionHight() const;
-    unsigned int getResolotionWidth() const;
-
-    std::vector<char> toBuffer() const override;
-};
-
 class DefaultControlPacket : public DefaultPacket {
 protected:
     ControlPacketTypes controlPacketType;

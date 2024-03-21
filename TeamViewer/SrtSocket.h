@@ -16,7 +16,7 @@
 
 enum Modes
 {
-	Controller = 1, Controled
+	Controller, Controled
 };
 
 class SrtSocket
