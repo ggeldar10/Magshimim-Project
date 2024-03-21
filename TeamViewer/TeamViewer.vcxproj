@@ -127,8 +127,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Controlled.h" />
+    <ClInclude Include="Controller.h" />
     <ClInclude Include="cursor.h" />
     <ClInclude Include="ImageCapture.h" />
+    <ClInclude Include="IUser.h" />
     <ClInclude Include="keyboard.h" />
     <ClInclude Include="packetManager.h" />
     <ClInclude Include="packetParser.h" />
@@ -138,6 +141,8 @@
     <ClInclude Include="windowsHeaders.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Controlled.cpp" />
+    <ClCompile Include="Controller.cpp" />
     <ClCompile Include="cursor.cpp" />
     <ClCompile Include="ImageCapture.cpp" />
     <ClCompile Include="imageMain.cpp">
@@ -146,6 +151,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="IUser.cpp" />
     <ClCompile Include="keyboard.cpp" />
     <ClCompile Include="packetManager.cpp" />
     <ClCompile Include="packetParser.cpp" />

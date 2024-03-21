@@ -35,8 +35,8 @@ namespace teamViewerGui
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             List<byte> bytes = new List<byte>();
-            bytes.Add((byte)MODES.CONTROLLER);
-            PipeManagerSingletone.getInstance().SendMessage(bytes);
+            //bytes.Add((byte)MODES.CONTROLLER);
+            //PipeManagerSingletone.getInstance().SendMessage(bytes);
             ControllerWindow window = new ControllerWindow();
             window.Show();
         }

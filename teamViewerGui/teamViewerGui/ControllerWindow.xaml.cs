@@ -19,10 +19,13 @@ namespace teamViewerGui
     /// <summary>
     /// Interaction logic for ControllerWindow.xaml
     /// </summary>
+    /// 
     public partial class ControllerWindow : Window, IDisposable
     {
         private bool disposed = false;
-        private Thread backgroundThread; 
+        private Thread backgroundThread;
+        private double imageWidth = 0;
+        private double imageHeight = 0;
         public ControllerWindow()
         {
             InitializeComponent();
@@ -90,6 +93,12 @@ namespace teamViewerGui
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             this.Dispose();
+        }
+
+        private void screenDisplay_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            this.imageHeight = screenDisplay.ActualHeight;
+            this.imageWidth = screenDisplay.ActualWidth;
         }
     }
 }

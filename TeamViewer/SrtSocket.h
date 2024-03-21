@@ -14,9 +14,9 @@
 #define MAX_PORT_NUM 65535
 #define MIN_PORT_NUM 1000
 
-enum Modes
+enum MODES
 {
-	Controller, Controled
+	CONTROLLER, CONTROLLED
 };
 
 class SrtSocket
@@ -59,7 +59,7 @@ private:
 	
 	void keepAliveMonitoring();
 	void keepAliveTimer();
-	void initializeThreads(Modes mode);
+	void initializeThreads(MODES mode);
 
 	void waitForValidPacket(std::vector<char>* buffer, std::function<bool(char*, int)> checkFunction);
 	bool isValidIpv4Checksum(const IpPacket& ipPacket);

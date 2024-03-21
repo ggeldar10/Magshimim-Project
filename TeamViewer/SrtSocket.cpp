@@ -120,7 +120,7 @@ void SrtSocket::listenAndAccept()
 		std::cerr << "Error while doing sendto in listenAndAccept: " << error << std::endl;
 		throw /*todo throw the right error*/;
 	}
-	initializeThreads(Controled);
+	initializeThreads(CONTROLLED);
 }
 
 void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidPacket
@@ -198,7 +198,7 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 			}
 			return true;
 		});
-	initializeThreads(Controller);
+	initializeThreads(CONTROLLER);
 }
 
 /*
@@ -499,13 +499,13 @@ const UdpPacket SrtSocket::recvUdp()
 	return udpPacketRecv;
 }
 
-void SrtSocket::initializeThreads(Modes mode)
+void SrtSocket::initializeThreads(MODES mode)
 {
 	
 	this->_recivedPacketsThread = std::thread(&SrtSocket::recvMonitoring, this);
 	this->_sendPacketsThread = std::thread(&SrtSocket::sendMonitoring, this);
 	this->_keepAliveMonitoringThread = std::thread(&SrtSocket::keepAliveMonitoring, this);
-	if (mode == Controller)
+	if (mode == CONTROLLER)
 	{
 		this->_cursorListenerThread = std::thread([&]() {
 			listenToCursor(&_shutdownSwitch, &_switchesMtx, _packetSendQueue, &_packetSendQueueMtx);
