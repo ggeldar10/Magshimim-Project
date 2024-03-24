@@ -198,7 +198,7 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 			}
 			return true;
 		});
-	initializeThreads(CONTROLLER);
+	//initializeThreads(CONTROLLER);
 }
 
 /*
@@ -507,14 +507,7 @@ void SrtSocket::initializeThreads(MODES mode)
 	this->_keepAliveMonitoringThread = std::thread(&SrtSocket::keepAliveMonitoring, this);
 	if (mode == CONTROLLER)
 	{
-		this->_cursorListenerThread = std::thread([&]() {
-			listenToCursor(&_shutdownSwitch, &_switchesMtx, _packetSendQueue, &_packetSendQueueMtx);
-			});
-		this->_keyboardListenerThread = std::thread([&]() {
-			listenToKeyboard(&_shutdownSwitch, &_switchesMtx, _packetSendQueue, &_packetSendQueueMtx);
-			});
-		/*this->_screenListenerThread = std::thread([&]() {
-			listenToScreen(&_shutdownSwitch, &_switchesMtx, _packetSendQueue, &_packetSendQueueMtx);
-			});*/
+		this->_cursorListenerThread = std::thread(&listenToCursor, std::ref(_shutdownSwitch), std::ref(_packetSendQueue), std::ref(_packetSendQueueMtx));
+		this->_keyboardListenerThread = std::thread(&listenToKeyboard, std::ref(_shutdownSwitch), std::ref(_packetSendQueue), std::ref(_packetSendQueueMtx));
 	}
 }
