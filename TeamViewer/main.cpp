@@ -29,12 +29,13 @@ int main()
 
         SrtSocket serverSocket;
         sockaddr_in serverInfo = { 0 };
-        serverInfo.sin_addr.s_addr = INADDR_ANY;
+        serverInfo.sin_addr.s_addr = INADDR_ANY /*inet_addr("10.0.0.18")*/;
         serverInfo.sin_family = AF_INET;
         serverInfo.sin_port = htons(serverPort);
         serverSocket.srtBind(&serverInfo);
         serverSocket.listenAndAccept();
         std::cout << "found user" << std::endl;
+        while(true){}
         break;
     }
     case MODES::CONTROLLER:
@@ -42,7 +43,7 @@ int main()
         //todo get the data from the user
         SrtSocket socket;
         sockaddr_in serverInfo = { 0 };
-        serverInfo.sin_addr.s_addr = inet_addr("10.0.0.18");
+        serverInfo.sin_addr.s_addr = inet_addr("10.0.0.27");
         serverInfo.sin_family = AF_INET;
         serverInfo.sin_port = htons(serverPort);
         socket.connectToServer(&serverInfo);
