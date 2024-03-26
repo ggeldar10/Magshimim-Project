@@ -71,7 +71,6 @@ private:
 	void recvMonitoring();
 	void sendSrt();
 	std::unique_ptr<const DefaultPacket> recvSrt();
-	const UdpPacket recvUdp();
 
 public:
 	SrtSocket();

@@ -19,9 +19,14 @@ int main()
     convertor.bytes[0] = buffer[0];
     MODES mode = static_cast<MODES>(convertor.num);
 
+    //// The gui will send the code for 1 byte
+    //convertor.bytes[0] = buffer[0];
+    //MODES mode = static_cast<MODES>(convertor.num);
+    
+    MODES mode = MODES::CONTROLLED;
     switch (mode)
     {
-    case CONTROLLED:
+    case MODES::CONTROLLED:
     {
         //user = std::make_unique<Controlled>(&pipeManager);
 
@@ -33,19 +38,25 @@ int main()
         serverSocket.srtBind(&serverInfo);
         serverSocket.listenAndAccept();
         std::cout << "found user" << std::endl;
+        while(true){}
         break;
     }
-    case CONTROLLER:
+    case MODES::CONTROLLER:
     {
-
-        Controller controller(&pipeManager);
-        //controller.connectToServer();
-        //controller.intilizeCursorAndKeyboard();
-        controller.startImageStream();
+        //todo get the data from the user
+        SrtSocket socket;
+        sockaddr_in serverInfo = { 0 };
+        serverInfo.sin_addr.s_addr = inet_addr("10.0.0.27");
+        serverInfo.sin_family = AF_INET;
+        serverInfo.sin_port = htons(serverPort);
+        socket.connectToServer(&serverInfo);
+       /* this->_socket.connectToServer(&serverInfo);*/
+        std::cout << "connected" << std::endl;
       
         break;
     }
     default:
+    {}
         std::cout << "Invalid option" << std::endl;
         break;
     };

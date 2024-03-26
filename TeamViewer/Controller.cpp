@@ -18,13 +18,13 @@ Controller::Controller(PipeManager* pipeManager) : IUser(pipeManager, MODES::CON
 */
 void Controller::connectToServer(uint16_t portNum, const std::string& serverIp)
 {
-    sockaddr_in serverInfo = { 0 };
-    serverInfo.sin_addr.s_addr = inet_addr(serverIp.c_str());
-    serverInfo.sin_family = AF_INET;
-    serverInfo.sin_port = htons(portNum);
+    //sockaddr_in serverInfo = { 0 };
+    //serverInfo.sin_addr.s_addr = inet_addr(serverIp.c_str());
+    //serverInfo.sin_family = AF_INET;
+    //serverInfo.sin_port = htons(portNum);
 
-    this->_socket.connectToServer(&serverInfo);
-    std::cout << "connected" << std::endl;
+    //this->_socket.connectToServer(&serverInfo);
+    //std::cout << "connected" << std::endl;
 }
 
 void Controller::startImageStream()
