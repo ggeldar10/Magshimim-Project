@@ -12,7 +12,12 @@ namespace teamViewerGui
 {
     public enum PIPE_CODES
     { 
-        CLOSE_PIPE, STOP_SENDING_PICTURES, START_SENDING, CONTROLLER, CONTROLLED
+        CLOSE_PIPE, STOP_SENDING_PICTURES, START_SENDING
+    }
+
+    public enum MODES
+    { 
+        CONTROLLER, CONTROLLED
     }
     public class CommunicatorPipes : IDisposable
     {

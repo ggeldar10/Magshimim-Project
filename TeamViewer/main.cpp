@@ -19,40 +19,40 @@ int main()
     convertor.bytes[0] = buffer[0];
     MODES mode = static_cast<MODES>(convertor.num);
 
-    //// The gui will send the code for 1 byte
-    //convertor.bytes[0] = buffer[0];
-    //MODES mode = static_cast<MODES>(convertor.num);
+    // The gui will send the code for 1 byte
+    convertor.bytes[0] = buffer[0];
+    MODES mode = static_cast<MODES>(convertor.num);
     
-    MODES mode = MODES::CONTROLLED;
     switch (mode)
     {
     case MODES::CONTROLLED:
     {
-        //user = std::make_unique<Controlled>(&pipeManager);
-
-        SrtSocket serverSocket;
-        sockaddr_in serverInfo = { 0 };
-        serverInfo.sin_addr.s_addr = INADDR_ANY; 
-        serverInfo.sin_family = AF_INET;
-        serverInfo.sin_port = htons(serverPort);
-        serverSocket.srtBind(&serverInfo);
-        serverSocket.listenAndAccept();
-        std::cout << "found user" << std::endl;
-        while(true){}
+        try
+        {
+            //user = std::make_unique<Controlled>(&pipeManager);
+            Controlled controlled(&pipeManager);
+            controlled.createServer(serverPort); // creates also the threads 
+            controlled.startSendingImages();
+        }
+        catch (const std::exception& error)
+        {
+            std::cerr << error.what() << std::endl;
+        }
         break;
     }
     case MODES::CONTROLLER:
     {
-        //todo get the data from the user
-        SrtSocket socket;
-        sockaddr_in serverInfo = { 0 };
-        serverInfo.sin_addr.s_addr = inet_addr("10.0.0.27");
-        serverInfo.sin_family = AF_INET;
-        serverInfo.sin_port = htons(serverPort);
-        socket.connectToServer(&serverInfo);
-       /* this->_socket.connectToServer(&serverInfo);*/
-        std::cout << "connected" << std::endl;
-      
+        try
+        {
+            std::vector<char> ipBuffer = pipeManager.readDataFromPipe();
+            Controller controller(&pipeManager);
+            controller.connectToServer(serverPort, std::string(ipBuffer.begin(), ipBuffer.end()));
+            controller.startImageStream();
+        }
+        catch (const std::exception& error)
+        {
+            std::cerr << error.what() << std::endl;
+        }
         break;
     }
     default:

@@ -2,10 +2,10 @@
 #include <windows.h>
 #include <vector>
 
-//enum PIPE_CODES
-//{
-//	CLOSE_PIPE, STOP_SENDING_PICTURES, START_SENDING, CONTROLLER, CONTROLLED
-//};
+enum PIPE_CODES
+{
+	CLOSE_PIPE, STOP_SENDING_PICTURES, START_SENDING
+};
 
 typedef union {
 	int num;
