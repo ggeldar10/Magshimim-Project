@@ -10,7 +10,7 @@ public:
 	~Controller() override = default;
 	void connectToServer(uint16_t portNum, const std::string& serverIp);
 	void startImageStream();
-	void intilizeCursorAndKeyboard();
+	void intilizeCursorAndKeyboard(); // i dont know if we need it if you do it is here
 	
 };
 

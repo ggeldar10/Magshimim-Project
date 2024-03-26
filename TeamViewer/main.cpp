@@ -11,10 +11,13 @@
 int main()
 {
     const int serverPort = 12356;
-    //PipeManager pipeManager;
-    //IntCharUnion convertor = {0};
-    //std::vector<char> buffer = pipeManager.readDataFromPipe();
-    //std::unique_ptr<IUser> user;
+    PipeManager pipeManager;
+    IntCharUnion convertor = {0};
+    std::vector<char> buffer = pipeManager.readDataFromPipe();
+
+    // The gui will send the code for 1 byte
+    convertor.bytes[0] = buffer[0];
+    MODES mode = static_cast<MODES>(convertor.num);
 
     //// The gui will send the code for 1 byte
     //convertor.bytes[0] = buffer[0];
@@ -29,7 +32,7 @@ int main()
 
         SrtSocket serverSocket;
         sockaddr_in serverInfo = { 0 };
-        serverInfo.sin_addr.s_addr = INADDR_ANY /*inet_addr("10.0.0.18")*/;
+        serverInfo.sin_addr.s_addr = INADDR_ANY; 
         serverInfo.sin_family = AF_INET;
         serverInfo.sin_port = htons(serverPort);
         serverSocket.srtBind(&serverInfo);
