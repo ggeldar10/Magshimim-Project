@@ -121,7 +121,10 @@ std::unique_ptr<const KeyboardDataPacket> PacketParser::createKeyboardDataPacket
 
 std::unique_ptr<const ImageScreenDataPacket> PacketParser::createScreenDataPacketFromVector(const std::vector<char>& screenDataPacketBuffer)
 {
-    return std::unique_ptr<const ImageScreenDataPacket>();
+    int index = 0;
+    std::unique_ptr<const DefaultDataPacket> defaultDataPacket = createDefaultDataPacketFromVector(screenDataPacketBuffer, index);
+    std::vector<char> imageBytes(screenDataPacketBuffer.begin() + index, screenDataPacketBuffer.end());
+    return std::move(std::make_unique<ImageScreenDataPacket>(defaultDataPacket->getAckSequenceNumber(), defaultDataPacket->getPacketSequenceNumber(), defaultDataPacket->getTimeStamp(), imageBytes));
 }
 
 

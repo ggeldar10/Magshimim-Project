@@ -473,9 +473,8 @@ void SrtSocket::sendImageStream()
 		now = std::chrono::system_clock::now();
 		currentTime = std::chrono::system_clock::to_time_t(now);
 		std::unique_ptr<ImageScreenDataPacket> packetPtr = std::make_unique<ImageScreenDataPacket>(-1, -1, currentTime, CursorPosition, 0, bufferVec);
-
 		sendLock.lock();
-		this->_packetSendQueue.push(bufferVec);
+		this->_packetSendQueue.push(packetPtr->toBuffer());
 		sendLock.unlock();
 
 		switchLock.lock();
