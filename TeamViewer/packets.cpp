@@ -317,14 +317,15 @@ ImageScreenDataPacket::ImageScreenDataPacket(uint32_t ackNum, uint32_t packetNum
 {
 }
 
-std::vector<char> ImageScreenDataPacket::getImageBytes()
+std::vector<char> ImageScreenDataPacket::getImageBytes() const
 {
-    return std::vector<char>();
+    return this->_imageBytes;
 }
 
 std::vector<char> ImageScreenDataPacket::toBuffer() const
 {
     std::vector<char> buffer = DefaultDataPacket::toBuffer();
-    
+    buffer.insert(buffer.end(), this->_imageBytes.begin(), this->_imageBytes.end());
+    return buffer;
     
 }

@@ -119,6 +119,13 @@ std::unique_ptr<const KeyboardDataPacket> PacketParser::createKeyboardDataPacket
     return std::move(std::make_unique<KeyboardDataPacket>(defaultDataPacket->getAckSequenceNumber(), defaultDataPacket->getPacketSequenceNumber(), defaultDataPacket->getTimeStamp(), action, keyCode));
 }
 
+std::unique_ptr<const ImageScreenDataPacket> PacketParser::createScreenDataPacketFromVector(const std::vector<char>& screenDataPacketBuffer)
+{
+    return std::unique_ptr<const ImageScreenDataPacket>();
+}
+
+
+
 std::unique_ptr<const DefaultControlPacket> PacketParser::createDefaultControlPacketFromVector(const std::vector<char>& defaultControlPacketBuffer, int& index)
 {
     ControlPacketTypes controlPacketType;
@@ -238,7 +245,7 @@ std::vector<char> PacketParser::packetToBytes(const UdpPacket& udpHeaders, const
 }
 
 std::unique_ptr<const DefaultPacket> PacketParser::createPacketFromVectorGlobal(const std::vector<char>& globalPacketBuffer)
-{8
+{
     int index = 0;
     std::unique_ptr<const DefaultPacket> packet = createDefaultPacketFromVector(globalPacketBuffer, index);
     std::unique_ptr<const DefaultDataPacket> dataPacket;

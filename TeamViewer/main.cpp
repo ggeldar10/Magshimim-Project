@@ -32,7 +32,6 @@ int main()
             //user = std::make_unique<Controlled>(&pipeManager);
             Controlled controlled(&pipeManager);
             controlled.createServer(serverPort); // creates also the threads 
-            controlled.startSendingImages();
         }
         catch (const std::exception& error)
         {

@@ -34,7 +34,6 @@ private:
 		unsigned int _otherComputerMTU;
 
 	} _commInfo;
-	PipeManager* _pipeManager;
 	PacketManager _packetManager;
 
 	/*std::queue<std::unique_ptr<DefaultPacket>> _recviedPacketsQueue;
@@ -74,7 +73,7 @@ private:
 	std::unique_ptr<const DefaultPacket> recvSrt();
 
 public:
-	SrtSocket();
+	SrtSocket(PipeManager* pipeManager);
 	~SrtSocket();
 	void listenAndAccept();
 	void connectToServer(sockaddr_in* addrs);

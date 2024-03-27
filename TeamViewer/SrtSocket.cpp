@@ -459,6 +459,8 @@ void SrtSocket::sendImageStream()
 	std::unique_lock<std::mutex> sendLock(this->_packetSendQueueMtx);
 	sendLock.unlock();
 	bool runLoop = true;
+	std::chrono::system_clock::time_point now;
+	std::time_t currentTime;
 	while (runLoop)
 	{
 		capturer.captureScreen()->Save(L"..\\captureImage.jpg", &clsid, NULL);
@@ -468,8 +470,10 @@ void SrtSocket::sendImageStream()
 		stream.seekg(0, std::ios::beg);
 		std::vector<char> bufferVec(length);
 		stream.read(bufferVec.data(), length);
-		
-		//todo add here the packet 
+		now = std::chrono::system_clock::now();
+		currentTime = std::chrono::system_clock::to_time_t(now);
+		std::unique_ptr<ImageScreenDataPacket> packetPtr = std::make_unique<ImageScreenDataPacket>(-1, -1, currentTime, CursorPosition, 0, bufferVec);
+
 		sendLock.lock();
 		this->_packetSendQueue.push(bufferVec);
 		sendLock.unlock();
