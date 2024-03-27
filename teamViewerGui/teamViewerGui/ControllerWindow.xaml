@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Controller" Height="450" Width="800"  WindowState="Maximized" ResizeMode="NoResize" Closing="Window_Closing" WindowStyle="None"> 
     <DockPanel LastChildFill="False">
-        <StackPanel DockPanel.Dock="Left" Width="200" Background="LightGray">
+        <StackPanel DockPanel.Dock="Left" Width="200px" Background="LightGray">
             <Button Content="chat"/>
             <Rectangle Height="5"/>
             <Button Content="disconnect"/>
