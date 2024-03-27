@@ -22,6 +22,9 @@ public:
 	ImageCapture(HWND hWindow);
 	~ImageCapture();
 	std::unique_ptr<Bitmap> captureScreen();
+	uint32_t getScreenWidth() const;
+	uint32_t getScreenHeight() const;
+	
 
 	// A function from msdn to get the clsid
 	// format can be:

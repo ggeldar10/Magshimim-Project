@@ -207,10 +207,14 @@ public:
 class ImageScreenDataPacket : public DefaultDataPacket {
 private:
     std::vector<char> _imageBytes;
+    uint32_t _width;
+    uint32_t _height;
 
 public:
-    ImageScreenDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, const std::vector<char>& imageBytes);
+    ImageScreenDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, uint32_t width, uint32_t height, const std::vector<char>& imageBytes);
     std::vector<char> getImageBytes() const;
-
+    unsigned int getWidth() const;
+    unsigned int getHeight() const;
+    
     std::vector<char> toBuffer() const override;
 };

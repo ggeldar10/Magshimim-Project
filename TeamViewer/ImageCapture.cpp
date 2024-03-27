@@ -40,6 +40,16 @@ std::unique_ptr<Bitmap> ImageCapture::captureScreen()
 	return std::unique_ptr<Bitmap>(new Bitmap(this->_hbitmap, (HPALETTE)0));
 }
 
+uint32_t ImageCapture::getScreenWidth() const
+{
+	return _width;
+}
+
+uint32_t ImageCapture::getScreenHeight() const 
+{
+	return _height;
+}
+
 int ImageCapture::getEncoderClsid(const WCHAR* format, CLSID* pClsid)
 {
 	UINT  num = 0;          // number of image encoders
