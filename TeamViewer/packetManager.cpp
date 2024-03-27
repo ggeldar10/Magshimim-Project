@@ -1,6 +1,6 @@
 #include "packetManager.h"
 
-PacketManager::PacketManager(bool* keepAliveSwitch, bool* shutDownSwitch, std::mutex* switchesMtx)
+PacketManager::PacketManager(bool* keepAliveSwitch, bool* shutDownSwitch, std::mutex* switchesMtx, PipeManager* pipeManager) :  _pipeManager(pipeManager)
 {
     this->_keepAliveSwitch = keepAliveSwitch;
     this->_shutdownSwitch = shutDownSwitch;
@@ -152,6 +152,11 @@ void PacketManager::handleKeyboardDataPacket(std::unique_ptr<const KeyboardDataP
     {
         std::cerr << exception.what() << std::endl;
     }
+}
+
+void PacketManager::handleScreenDataPacket(std::unique_ptr<const ImageScreenDataPacket> screenPacket)
+{
+    _pipeManager->sendToPipe(screenPacket->getImageBytes());
 }
 
 void PacketManager::handleKeepAliveControlPacket(std::unique_ptr<const DefaultControlPacket> keepAlivePacket)

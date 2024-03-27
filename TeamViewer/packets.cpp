@@ -313,7 +313,7 @@ std::vector<char> UdpPacket::toBuffer() const
     return buffer;
 }
 
-ImageScreenDataPacket::ImageScreenDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, const std::vector<char>& imageBytes) : DefaultDataPacket(ackNum, packetNum, time), imageBytes(imageBytes)
+ImageScreenDataPacket::ImageScreenDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, const std::vector<char>& imageBytes) : DefaultDataPacket(ackNum, packetNum, time, Screen), _imageBytes(imageBytes)
 {
 }
 

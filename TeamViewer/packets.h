@@ -210,7 +210,7 @@ private:
 
 public:
     ImageScreenDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, const std::vector<char>& imageBytes);
-    std::vector<char> getImageBytes();
+    std::vector<char> getImageBytes() const;
 
     std::vector<char> toBuffer() const override;
 };

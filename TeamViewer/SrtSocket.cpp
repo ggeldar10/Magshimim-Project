@@ -4,8 +4,8 @@
 #include <fstream>
 
 
-SrtSocket::SrtSocket()
-	: _packetManager(&_keepAliveSwitch, &_shutdownSwitch, &_switchesMtx)
+SrtSocket::SrtSocket(PipeManager* pipeManager)
+	: _packetManager(&_keepAliveSwitch, &_shutdownSwitch, &_switchesMtx, pipeManager)
 {
 	int recv_buffer_size = 8192;  // Specify your desired buffer size
 	WSADATA wsaData;
@@ -454,7 +454,12 @@ void SrtSocket::sendImageStream()
 	ImageCapture capturer(NULL);
 	CLSID clsid;
 	ImageCapture::getEncoderClsid(L"image/jpeg", &clsid);
-	while (!_shutdownSwitch)
+	std::unique_lock<std::mutex> switchLock(this->_switchesMtx);
+	switchLock.unlock();
+	std::unique_lock<std::mutex> sendLock(this->_packetSendQueueMtx);
+	sendLock.unlock();
+	bool runLoop = true;
+	while (runLoop)
 	{
 		capturer.captureScreen()->Save(L"..\\captureImage.jpg", &clsid, NULL);
 
@@ -471,10 +476,15 @@ void SrtSocket::sendImageStream()
 
 #pragma region SendData
 		
-		{
-			std::lock_guard<std::mutex> lock(this->_packetSendQueueMtx);
-			this->_packetSendQueue.push(bufferVec);
-		}
+		//todo add here the packet 
+		sendLock.lock();
+		this->_packetSendQueue.push(bufferVec);
+		sendLock.unlock();
+
+		switchLock.lock();
+		runLoop = !_shutdownSwitch;
+		switchLock.unlock();
+		Sleep(100);
 #pragma endregion
 	}
 
@@ -516,5 +526,10 @@ void SrtSocket::initializeThreads(MODES mode)
 		this->_cursorListenerThread.detach();
 		this->_keyboardListenerThread = std::thread(listenToKeyboard, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx);
 		this->_keyboardListenerThread.detach();
+	}
+	else
+	{
+		this->_screenListenerThread = std::thread(sta);
+		this->_screenListenerThread.detach();
 	}
 }

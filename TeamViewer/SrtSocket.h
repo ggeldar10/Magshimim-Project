@@ -34,7 +34,7 @@ private:
 		unsigned int _otherComputerMTU;
 
 	} _commInfo;
-
+	PipeManager* _pipeManager;
 	PacketManager _packetManager;
 
 	/*std::queue<std::unique_ptr<DefaultPacket>> _recviedPacketsQueue;
