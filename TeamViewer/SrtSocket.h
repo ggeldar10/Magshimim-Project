@@ -70,6 +70,7 @@ private:
 	void sendMonitoring();
 	void recvMonitoring();
 	void sendSrt();
+	void sendImageStream();
 	std::unique_ptr<const DefaultPacket> recvSrt();
 
 public:

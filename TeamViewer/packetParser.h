@@ -66,7 +66,7 @@ public:
     }
 
     static std::vector<char> packetToBytes(const UdpPacket& udpHeaders, const DefaultPacket& strHeaders, const std::vector<char>* data);
-
+    static std::vector<char> packetToBytes(const UdpPacket& udpHeaders, const std::vector<char>& data);
     static IpPacket createIpPacketFromVector(const std::vector<char>& ipPacketBuffer);
     static UdpPacket createUdpPacketFromVector(const std::vector<char>& udpPacketBuffer);
 

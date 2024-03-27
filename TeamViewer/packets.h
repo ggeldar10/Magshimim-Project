@@ -201,3 +201,16 @@ public:
 
     std::vector<char> toBuffer() const;
 };
+
+
+
+class ImageScreenDataPacket : public DefaultDataPacket {
+private:
+    std::vector<char> _imageBytes;
+
+public:
+    ImageScreenDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, const std::vector<char>& imageBytes);
+    std::vector<char> getImageBytes();
+
+    std::vector<char> toBuffer() const override;
+};

@@ -1,5 +1,7 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "SrtSocket.h"
+#include "ImageCapture.h"
+#include <fstream>
 
 
 SrtSocket::SrtSocket()
@@ -434,13 +436,48 @@ void SrtSocket::sendSrt() {
 	{
 		std::vector<char> dataBuffer = this->_packetSendQueue.front();
 		this->_packetSendQueue.pop();
+		sockaddr_in destAddr = { 0 };
+		destAddr.sin_addr.s_addr = this->_commInfo._dstIP;
+		destAddr.sin_family = AF_INET;
 		UdpPacket udpPacket(this->_commInfo._srcPort, this->_commInfo._dstPort, dataBuffer.size(), 0);
-		PacketParser::packetToBytes(udpPacket,)
+		std::vector<char> packetBytes = PacketParser::packetToBytes(udpPacket, dataBuffer);
+		if (sendto(this->_srtSocket, packetBytes.data(), packetBytes.size(), 0, (sockaddr*)&destAddr, sizeof(sockaddr_in)) < 0)
+		{
+			std::cerr << "Error while trying to send in sendSrt " << std::endl;
+		}
 
-		sendto(this->_srtSocket, charArray, packetBuffer.size(), 0, (struct sockaddr*)&dest_addr, sizeof(dest_addr));
-
-		delete[] charArray;
 	}
+}
+
+void SrtSocket::sendImageStream()
+{
+	ImageCapture capturer(NULL);
+	CLSID clsid;
+	ImageCapture::getEncoderClsid(L"image/jpeg", &clsid);
+	while (!_shutdownSwitch)
+	{
+		capturer.captureScreen()->Save(L"..\\captureImage.jpg", &clsid, NULL);
+
+#pragma region GetFileFromStream
+
+		std::ifstream stream = std::ifstream("..\\captureImage.jpg", std::ios::binary);
+		stream.seekg(0, std::ios::end);
+		int length = stream.tellg();
+		stream.seekg(0, std::ios::beg);
+		std::vector<char> bufferVec(length);
+		stream.read(bufferVec.data(), length);
+
+#pragma endregion
+
+#pragma region SendData
+		
+		{
+			std::lock_guard<std::mutex> lock(this->_packetSendQueueMtx);
+			this->_packetSendQueue.push(bufferVec);
+		}
+#pragma endregion
+	}
+
 }
 
 std::unique_ptr<const DefaultPacket> SrtSocket::recvSrt()

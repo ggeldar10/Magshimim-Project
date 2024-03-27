@@ -227,6 +227,16 @@ std::vector<char> PacketParser::packetToBytes(const UdpPacket& udpHeaders, const
     return buffer;
 }
 
+std::vector<char> PacketParser::packetToBytes(const UdpPacket& udpHeaders, const std::vector<char>& data)
+{
+    std::vector<char> buffer = udpHeaders.toBuffer();
+    for (int i = 0; i < data.size(); i++)
+    {
+        buffer.push_back(data.at(i));
+    }
+    return buffer;
+}
+
 std::unique_ptr<const DefaultPacket> PacketParser::createPacketFromVectorGlobal(const std::vector<char>& globalPacketBuffer)
 {8
     int index = 0;

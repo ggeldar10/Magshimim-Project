@@ -312,3 +312,19 @@ std::vector<char> UdpPacket::toBuffer() const
     PacketParser::hostToNetworkIntoVector<uint16_t>(&buffer, this->_checksum);
     return buffer;
 }
+
+ImageScreenDataPacket::ImageScreenDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, const std::vector<char>& imageBytes) : DefaultDataPacket(ackNum, packetNum, time), imageBytes(imageBytes)
+{
+}
+
+std::vector<char> ImageScreenDataPacket::getImageBytes()
+{
+    return std::vector<char>();
+}
+
+std::vector<char> ImageScreenDataPacket::toBuffer() const
+{
+    std::vector<char> buffer = DefaultDataPacket::toBuffer();
+    
+    
+}
