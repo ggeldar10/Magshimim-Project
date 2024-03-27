@@ -462,19 +462,12 @@ void SrtSocket::sendImageStream()
 	while (runLoop)
 	{
 		capturer.captureScreen()->Save(L"..\\captureImage.jpg", &clsid, NULL);
-
-#pragma region GetFileFromStream
-
 		std::ifstream stream = std::ifstream("..\\captureImage.jpg", std::ios::binary);
 		stream.seekg(0, std::ios::end);
 		int length = stream.tellg();
 		stream.seekg(0, std::ios::beg);
 		std::vector<char> bufferVec(length);
 		stream.read(bufferVec.data(), length);
-
-#pragma endregion
-
-#pragma region SendData
 		
 		//todo add here the packet 
 		sendLock.lock();
@@ -485,7 +478,6 @@ void SrtSocket::sendImageStream()
 		runLoop = !_shutdownSwitch;
 		switchLock.unlock();
 		Sleep(100);
-#pragma endregion
 	}
 
 }
@@ -529,7 +521,7 @@ void SrtSocket::initializeThreads(MODES mode)
 	}
 	else
 	{
-		this->_screenListenerThread = std::thread(sta);
+		this->_screenListenerThread = std::thread(&SrtSocket::sendImageStream, this);
 		this->_screenListenerThread.detach();
 	}
 }
