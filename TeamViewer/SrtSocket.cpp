@@ -430,7 +430,7 @@ void SrtSocket::keepAliveTimer()
 void SrtSocket::sendSrt() {
 	std::lock_guard<std::mutex> lock(this->_packetSendQueueMtx);
 
-	if (this->_packetSendQueue.size() != 0) 
+	/*if (this->_packetSendQueue.size() != 0) 
 	{
 		std::vector<char> dataBuffer = this->_packetSendQueue.front();
 		this->_packetSendQueue.pop();
@@ -440,7 +440,7 @@ void SrtSocket::sendSrt() {
 		sendto(this->_srtSocket, charArray, packetBuffer.size(), 0, (struct sockaddr*)&dest_addr, sizeof(dest_addr));
 
 		delete[] charArray;
-	}
+	}*/
 }
 
 std::unique_ptr<const DefaultPacket> SrtSocket::recvSrt()

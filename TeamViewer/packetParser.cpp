@@ -228,7 +228,7 @@ std::vector<char> PacketParser::packetToBytes(const UdpPacket& udpHeaders, const
 }
 
 std::unique_ptr<const DefaultPacket> PacketParser::createPacketFromVectorGlobal(const std::vector<char>& globalPacketBuffer)
-{8
+{
     int index = 0;
     std::unique_ptr<const DefaultPacket> packet = createDefaultPacketFromVector(globalPacketBuffer, index);
     std::unique_ptr<const DefaultDataPacket> dataPacket;
