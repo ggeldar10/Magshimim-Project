@@ -508,7 +508,7 @@ std::unique_ptr<const DefaultPacket> SrtSocket::recvSrt()
 
 void SrtSocket::initializeThreads(MODES mode)
 {
-	
+
 	this->_recivedPacketsThread = std::thread(&SrtSocket::recvMonitoring, this);
 	this->_recivedPacketsThread.detach();
 	//this->_sendPacketsThread = std::thread(&SrtSocket::sendMonitoring, this);

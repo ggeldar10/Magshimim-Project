@@ -15,10 +15,6 @@ using System.Windows.Shapes;
 
 namespace teamViewerGui
 {
-    enum MODES
-    { 
-        CONTROLLER, CONTROLLED
-    };
     
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -35,10 +31,17 @@ namespace teamViewerGui
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             List<byte> bytes = new List<byte>();
-            //bytes.Add((byte)MODES.CONTROLLER);
-            //PipeManagerSingletone.getInstance().SendMessage(bytes);
-            ControllerWindow window = new ControllerWindow();
-            window.Show();
+            bytes.Add((byte)MODES.CONTROLLER);
+            PipeManagerSingletone.getInstance().SendMessage(bytes);
+            UserInput userInput = new UserInput();
+            userInput.ShowDialog();
+            if ((bool)userInput.DialogResult)
+            {
+                ControllerWindow window = new ControllerWindow();
+                //todo ask for user input
+                window.Show();
+            }
+            
         }
     }
 }

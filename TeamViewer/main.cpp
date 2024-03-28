@@ -7,6 +7,21 @@
 #include "Controlled.h"
 #include "Controller.h"
 
+bool checkForStopCommand(PipeManager* pipeManager)
+{
+    if (!pipeManager->isDataAvail())
+    {
+        return false;
+    }
+    IntCharUnion convertor = { 0 };
+    std::vector<char> command = pipeManager->readDataFromPipe();
+    convertor.bytes[0] = command[0];
+    if (command.size() == 1 && (PIPE_CODES)convertor.num == PIPE_CODES::CLOSE_CONNECTION)
+    {
+        return true;
+    }
+    return false;
+}
 
 int main()
 {
@@ -27,15 +42,17 @@ int main()
     {
     case MODES::CONTROLLED:
     {
-        try
+        while (!pipeManager.isDataAvail())
         {
-            //user = std::make_unique<Controlled>(&pipeManager);
-            Controlled controlled(&pipeManager);
-            controlled.createServer(serverPort); // creates also the threads 
-        }
-        catch (const std::exception& error)
-        {
-            std::cerr << error.what() << std::endl;
+            try
+            {
+                Controlled controlled(&pipeManager);
+                controlled.createServer(serverPort);
+            }
+            catch (const std::exception& error)
+            {
+                std::cerr << error.what() << std::endl;
+            }
         }
         break;
     }
