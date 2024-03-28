@@ -49,12 +49,13 @@ namespace teamViewerGui
         // confirm button
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            string regexPattern = @"^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"; this.programClose = true;
+            string regexPattern = @"^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
             if (!Regex.IsMatch(textBoxIp.Text, regexPattern))
             {
                 errorMsg.Visibility = Visibility.Visible;
                 return;
             }
+            this.programClose = true;
             this.IpResult = textBoxIp.Text;
             this.Close();
             
