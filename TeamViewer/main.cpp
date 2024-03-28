@@ -18,10 +18,6 @@ int main()
     // The gui will send the code for 1 byte
     convertor.bytes[0] = buffer[0];
     MODES mode = static_cast<MODES>(convertor.num);
-
-    // The gui will send the code for 1 byte
-    convertor.bytes[0] = buffer[0];
-    MODES mode = static_cast<MODES>(convertor.num);
     
     switch (mode)
     {

@@ -75,7 +75,7 @@ public:
     static std::unique_ptr<const DefaultDataPacket> createDefaultDataPacketFromVector(const std::vector<char>& defaultDataPacketBuffer, int& index);
     static std::unique_ptr<const CursorDataPacket> createCursorDataPacketFromVector(const std::vector<char>& cursorDataPacketBuffer);
     static std::unique_ptr<const KeyboardDataPacket> createKeyboardDataPacketFromVector(const std::vector<char>& keyboardDataPacketBuffer);
-    static std::unique_ptr<const ImageScreenDataPacket> createScreenDataPacketFromVector(const std::vector<char>& screenDataPacketBuffer);
+    static std::unique_ptr<const ScreenDataPacket> createScreenDataPacketFromVector(const std::vector<char>& screenDataPacketBuffer);
 
     static std::unique_ptr<const DefaultControlPacket> createDefaultControlPacketFromVector(const std::vector<char>& defaultControlPacketBuffer, int& index);
     static std::unique_ptr<const HandshakeControlPacket> createHandshakeControlPacketFromVector(const std::vector<char>& handshakeControlPacketBuffer);

@@ -58,7 +58,7 @@ void makeCursorButtonAction(const CursorActions action, const int scrollValue)
     }
 }
 
-void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<std::vector<char>>& packetSendQueue, std::mutex* packetSendQueueMtx)
+void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<std::vector<char>>& packetSendQueue, std::mutex* packetSendQueueMtx, POINT* originPoint, POINT* endPoint, std::mutex* pointsMtx)
 {
     bool runLoop = true;
 
@@ -69,21 +69,30 @@ void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<st
     switchLock.unlock();
     std::unique_lock<std::mutex> sendLock(*packetSendQueueMtx);
     sendLock.unlock();
+    std::unique_lock<std::mutex> pointsLock(*pointsMtx);
+    pointsLock.unlock();
 
     CursorActions previousAction = CursorPosition;
 
     while (runLoop)
     {
         try {
-            POINT point = getCursorPosition();
-            std::cout << "Cursor position - x: " << point.x << ", y: " << point.y << std::endl;
-
-            now = std::chrono::system_clock::now();
-            currentTime = std::chrono::system_clock::to_time_t(now);
-            std::unique_ptr<CursorDataPacket> packetPtr = std::make_unique<CursorDataPacket>(-1, -1, currentTime, CursorPosition, 0, point.x, point.y);
-            sendLock.lock();
-            packetSendQueue.push(packetPtr->toBuffer());
-            sendLock.unlock();
+            POINT position = getCursorPosition();
+            std::cout << "Cursor position - x: " << position.x << ", y: " << position.y << std::endl;
+            pointsLock.lock();
+            if (originPoint != nullptr && endPoint != nullptr)
+            {
+                if (position.x >= originPoint->x && position.y >= originPoint->y && position.x <= endPoint->x && position.y <= endPoint->y)
+                {
+                    now = std::chrono::system_clock::now();
+                    currentTime = std::chrono::system_clock::to_time_t(now);
+                    std::unique_ptr<CursorDataPacket> packetPtr = std::make_unique<CursorDataPacket>(-1, -1, currentTime, CursorPosition, 0, position.x, position.y);
+                    sendLock.lock();
+                    packetSendQueue.push(packetPtr->toBuffer());
+                    sendLock.unlock();
+                }
+            }
+            pointsLock.unlock();
         }
         catch (GetCursorPositionException& e)
         {

@@ -1,10 +1,8 @@
 #include "packetManager.h"
 
-PacketManager::PacketManager(bool* keepAliveSwitch, bool* shutDownSwitch, std::mutex* switchesMtx, PipeManager* pipeManager) :  _pipeManager(pipeManager)
+PacketManager::PacketManager(bool* keepAliveSwitch, bool* shutDownSwitch, std::mutex* switchesMtx, PipeManager* pipeManager)
+    : _pipeManager(pipeManager), _keepAliveSwitch(keepAliveSwitch), _shutdownSwitch(shutDownSwitch), _switchesMtx(switchesMtx), _originScreenPoint(nullptr), _endScreenPoint(nullptr), _isScreenEdjusted(false)
 {
-    this->_keepAliveSwitch = keepAliveSwitch;
-    this->_shutdownSwitch = shutDownSwitch;
-    this->_switchesMtx = switchesMtx;
 }
 
 void PacketManager::handlePacket(std::unique_ptr<const DefaultPacket> packet)
@@ -31,6 +29,33 @@ void PacketManager::handlePacket(std::unique_ptr<const DefaultPacket> packet)
     }
 }
 
+double PacketManager::CalculateActualWidth(double originalWidth, double originalHeight, double containerWidth, double containerHeight)
+{
+    double ratioWidth = containerWidth / originalWidth;
+    double ratioHeight = containerHeight / originalHeight;
+    double ratio = (ratioWidth < ratioHeight) ? ratioWidth : ratioHeight;
+    return originalWidth * ratio;
+}
+
+double PacketManager::CalculateActualHeight(double originalWidth, double originalHeight, double containerWidth, double containerHeight)
+{
+    double ratioWidth = containerWidth / originalWidth;
+    double ratioHeight = containerHeight / originalHeight;
+    double ratio = (ratioWidth < ratioHeight) ? ratioWidth : ratioHeight;
+    return originalHeight * ratio;
+}
+
+POINT* PacketManager::getOriginScreenPoint() const
+{
+    return this->_originScreenPoint;
+}
+
+POINT* PacketManager::getEndScreenPoint() const
+{
+    return this->_endScreenPoint;
+}
+
+
 void PacketManager::handleDataPacket(std::unique_ptr<const DefaultDataPacket> dataPacket)
 {
     switch (dataPacket->getDataType())
@@ -49,7 +74,8 @@ void PacketManager::handleDataPacket(std::unique_ptr<const DefaultDataPacket> da
     }
     case Screen:
     {
-        // To Do
+        auto screenPacket = dynamic_cast<const ScreenDataPacket*>(dataPacket.get());
+        handleScreenDataPacket(std::unique_ptr<const ScreenDataPacket>(screenPacket));
         break;
     }
     case Chat:
@@ -154,9 +180,25 @@ void PacketManager::handleKeyboardDataPacket(std::unique_ptr<const KeyboardDataP
     }
 }
 
-void PacketManager::handleScreenDataPacket(std::unique_ptr<const ImageScreenDataPacket> screenPacket)
+void PacketManager::handleScreenDataPacket(std::unique_ptr<const ScreenDataPacket> screenPacket)
 {
     _pipeManager->sendToPipe(screenPacket->getImageBytes());
+    /*int controlledScreenHeight = screenPacket->getHeight();
+    int controlledScreenWidth = screenPacket->getWidth();*/
+    if (!this->_isScreenEdjusted)
+    {
+        std::lock_guard<std::mutex> pointsLock(this->_pointsMtx);
+        int myScreenHeight = GetSystemMetrics(SM_CXSCREEN);
+        int myScreenWidth = GetSystemMetrics(SM_CYSCREEN);
+
+        int guiScreenHeight = CalculateActualHeight(myScreenWidth, myScreenHeight, myScreenWidth - 200, myScreenHeight);
+        int guiScreenWidth = CalculateActualWidth(myScreenWidth, myScreenHeight, myScreenWidth - 200, myScreenHeight);
+
+        this->_originScreenPoint = new POINT{ 200, myScreenHeight / 2 - guiScreenHeight / 2 };
+        this->_endScreenPoint = new POINT{ 200 + guiScreenWidth, myScreenHeight / 2 - guiScreenHeight / 2 + guiScreenHeight };
+
+        this->_isScreenEdjusted = true;
+    }
 }
 
 void PacketManager::handleKeepAliveControlPacket(std::unique_ptr<const DefaultControlPacket> keepAlivePacket)
