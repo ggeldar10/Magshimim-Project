@@ -38,7 +38,6 @@ namespace teamViewerGui
             if ((bool)userInput.DialogResult)
             {
                 ControllerWindow window = new ControllerWindow();
-                //todo ask for user input
                 window.Show();
             }
             

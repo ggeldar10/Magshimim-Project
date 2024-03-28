@@ -27,4 +27,3 @@ void Controller::connectToServer(uint16_t portNum, const std::string& serverIp)
     std::cout << "connected" << std::endl;
 }
 
-
