@@ -14,15 +14,13 @@ private:
 
     PipeManager* _pipeManager;
 
-    POINT* _originScreenPoint;
-    POINT* _endScreenPoint;
+    std::unique_ptr<POINT> _originScreenPoint;
+    std::unique_ptr<POINT> _endScreenPoint;
     std::mutex _pointsMtx;
     bool _isScreenEdjusted;
 
     double CalculateActualWidth(double originalWidth, double originalHeight, double containerWidth, double containerHeight);
     double CalculateActualHeight(double originalWidth, double originalHeight, double containerWidth, double containerHeight);
-    POINT* getOriginScreenPoint() const;
-    POINT* getEndScreenPoint() const;
 
     void handleDataPacket(std::unique_ptr<const DefaultDataPacket> dataPacket);
     void handleControlPacket(std::unique_ptr<const DefaultControlPacket> controlPacket);
@@ -35,4 +33,7 @@ private:
 public:
     PacketManager(bool* keepAliveSwitch, bool* shutdownSwitch, std::mutex* switchesMtx, PipeManager* pipeManager);
     void handlePacket(std::unique_ptr<const DefaultPacket> packet);
+    std::unique_ptr<POINT> getOriginScreenPoint();
+    std::unique_ptr<POINT> getEndScreenPoint();
+    std::mutex* getPointsMtx();
 };

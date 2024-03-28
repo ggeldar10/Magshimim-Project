@@ -516,7 +516,7 @@ void SrtSocket::initializeThreads(MODES mode)
 	//this->_keepAliveMonitoringThread.detach();
 	if (mode == CONTROLLER)
 	{
-		this->_cursorListenerThread = std::thread(listenToCursor, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx);
+		this->_cursorListenerThread = std::thread(listenToCursor, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx, this->_packetManager.getOriginScreenPoint(), this->_packetManager.getEndScreenPoint(), this->_packetManager.getPointsMtx());
 		this->_cursorListenerThread.detach();
 		this->_keyboardListenerThread = std::thread(listenToKeyboard, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx);
 		this->_keyboardListenerThread.detach();

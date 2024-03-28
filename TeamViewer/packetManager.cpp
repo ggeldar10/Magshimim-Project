@@ -45,14 +45,19 @@ double PacketManager::CalculateActualHeight(double originalWidth, double origina
     return originalHeight * ratio;
 }
 
-POINT* PacketManager::getOriginScreenPoint() const
+std::unique_ptr<POINT> PacketManager::getOriginScreenPoint() 
 {
-    return this->_originScreenPoint;
+    return std::move(this->_originScreenPoint);
 }
 
-POINT* PacketManager::getEndScreenPoint() const
+std::unique_ptr<POINT> PacketManager::getEndScreenPoint() 
 {
-    return this->_endScreenPoint;
+    return std::move(this->_endScreenPoint);
+}
+
+std::mutex* PacketManager::getPointsMtx()
+{
+    return &this->_pointsMtx;
 }
 
 
@@ -183,19 +188,24 @@ void PacketManager::handleKeyboardDataPacket(std::unique_ptr<const KeyboardDataP
 void PacketManager::handleScreenDataPacket(std::unique_ptr<const ScreenDataPacket> screenPacket)
 {
     _pipeManager->sendToPipe(screenPacket->getImageBytes());
-    /*int controlledScreenHeight = screenPacket->getHeight();
-    int controlledScreenWidth = screenPacket->getWidth();*/
+    int controlledScreenHeight = screenPacket->getHeight();
+    int controlledScreenWidth = screenPacket->getWidth();
     if (!this->_isScreenEdjusted)
     {
         std::lock_guard<std::mutex> pointsLock(this->_pointsMtx);
         int myScreenHeight = GetSystemMetrics(SM_CXSCREEN);
         int myScreenWidth = GetSystemMetrics(SM_CYSCREEN);
 
-        int guiScreenHeight = CalculateActualHeight(myScreenWidth, myScreenHeight, myScreenWidth - 200, myScreenHeight);
-        int guiScreenWidth = CalculateActualWidth(myScreenWidth, myScreenHeight, myScreenWidth - 200, myScreenHeight);
+        int guiScreenHeight = CalculateActualHeight(controlledScreenWidth, controlledScreenHeight, myScreenWidth - 200, myScreenHeight);
+        int guiScreenWidth = CalculateActualWidth(controlledScreenWidth, controlledScreenHeight, myScreenWidth - 200, myScreenHeight);
 
-        this->_originScreenPoint = new POINT{ 200, myScreenHeight / 2 - guiScreenHeight / 2 };
-        this->_endScreenPoint = new POINT{ 200 + guiScreenWidth, myScreenHeight / 2 - guiScreenHeight / 2 + guiScreenHeight };
+        this->_originScreenPoint = std::make_unique<POINT>();
+        this->_originScreenPoint->x = 200;
+        this->_originScreenPoint->y = myScreenHeight / 2 - guiScreenHeight / 2;
+        this->_endScreenPoint = std::make_unique<POINT>();
+        this->_endScreenPoint->x = 200 + guiScreenWidth;
+        this->_endScreenPoint->y = myScreenHeight / 2 - guiScreenHeight / 2 + guiScreenHeight;
+
 
         this->_isScreenEdjusted = true;
     }

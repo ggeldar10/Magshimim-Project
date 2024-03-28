@@ -58,7 +58,7 @@ void makeCursorButtonAction(const CursorActions action, const int scrollValue)
     }
 }
 
-void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<std::vector<char>>& packetSendQueue, std::mutex* packetSendQueueMtx, POINT* originPoint, POINT* endPoint, std::mutex* pointsMtx)
+void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<std::vector<char>>& packetSendQueue, std::mutex* packetSendQueueMtx, std::unique_ptr<POINT> originPoint, std::unique_ptr<POINT> endPoint, std::mutex* pointsMtx)
 {
     bool runLoop = true;
 
