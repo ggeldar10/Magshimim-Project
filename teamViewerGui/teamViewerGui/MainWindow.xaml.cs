@@ -41,7 +41,7 @@ namespace teamViewerGui
                 {
                     bytes.Add(item);
                 }
-                PipeManagerSingletone.getInstance().SendMessage(new List<byte>(bytes);
+                PipeManagerSingletone.getInstance().SendMessage(new List<byte>(bytes));
                 ControllerWindow window = new ControllerWindow();
                 window.Show();
             }
