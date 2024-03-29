@@ -21,7 +21,6 @@ namespace teamViewerGui
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static CommunicatorPipes manager;
         public MainWindow()
         {
             InitializeComponent();
@@ -37,10 +36,23 @@ namespace teamViewerGui
             userInput.ShowDialog();
             if ((bool)userInput.DialogResult)
             {
+                bytes.Clear();
+                foreach (byte item in userInput.IpResult.ToList())
+                {
+                    bytes.Add(item);
+                }
+                PipeManagerSingletone.getInstance().SendMessage(new List<byte>(bytes);
                 ControllerWindow window = new ControllerWindow();
                 window.Show();
             }
             
+        }
+        
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            PipeManagerSingletone.getInstance().SendMessage(new List<byte> { (byte)MODES.CONTROLLER });
+            ControlledWindow controlled = new ControlledWindow();
+            controlled.Show();
         }
     }
 }
