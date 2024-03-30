@@ -11,13 +11,9 @@
 int main()
 {
     const int serverPort = 12356;
-    PipeManager pipeManager;
-    IntCharUnion convertor = {0};
-    std::vector<char> buffer = pipeManager.readDataFromPipe();
-
-    // The gui will send the code for 1 byte
-    convertor.bytes[0] = buffer[0];
-    MODES mode = static_cast<MODES>(convertor.num);
+    //PipeManager pipeManager;
+    //IntCharUnion convertor = {0};
+    //std::vector<char> buffer = pipeManager.readDataFromPipe();
 
     //// The gui will send the code for 1 byte
     //convertor.bytes[0] = buffer[0];
