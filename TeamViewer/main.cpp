@@ -8,12 +8,31 @@
 #include "Controller.h"
 
 
+bool checkForStopCommand(PipeManager* pipeManager, PIPE_CODES codeToCheckFor)
+{
+    if (!pipeManager->isDataAvail())
+    {
+        return false;
+    }
+    IntCharUnion convertor = { 0 };
+    std::vector<char> command = pipeManager->readDataFromPipe();
+    convertor.bytes[0] = command[0];
+    if (command.size() == 1 && (PIPE_CODES)convertor.num == codeToCheckFor)
+    {
+        return true;
+    }
+    return false;
+}
+
 int main()
 {
+    bool didStop = false ;
     const int serverPort = 12356;
     PipeManager pipeManager;
-    IntCharUnion convertor = {0};
-    std::vector<char> buffer = pipeManager.readDataFromPipe();
+    while (!didStop)
+    {
+        IntCharUnion convertor = { 0 };
+        std::vector<char> buffer = pipeManager.readDataFromPipe();
 
     // The gui will send the code for 1 byte
     convertor.bytes[0] = buffer[0];
@@ -25,36 +44,48 @@ int main()
     {
         try
         {
-            //user = std::make_unique<Controlled>(&pipeManager);
-            Controlled controlled(&pipeManager);
-            controlled.createServer(serverPort); // creates also the threads 
+            case MODES::CONTROLLED:
+            {
+                try
+                {
+                    Controlled controlled(&pipeManager);
+                    controlled.createServer(serverPort);
+                }
+                catch (const std::exception& error)
+                {
+                    std::cerr << error.what() << std::endl;
+                }
+                while (!checkForStopCommand(&pipeManager, PIPE_CODES::CLOSE_CONNECTION))
+                {
+                    Sleep(3000);
+                }
+                //send shut down to the server 
+                break;
+            }
+            case MODES::CONTROLLER:
+            {
+                try
+                {
+                    std::vector<char> ipBuffer = pipeManager.readDataFromPipe();
+                    Controller controller(&pipeManager);
+                    controller.connectToServer(serverPort, std::string(ipBuffer.begin(), ipBuffer.end()));
+                }
+                catch (const std::exception& error)
+                {
+                    std::cerr << error.what() << std::endl;
+                }
+                while (!checkForStopCommand(&pipeManager, PIPE_CODES::CLOSE_CONNECTION))
+                {
+                    Sleep(3000);
+                }
+                break;
+            }
+            default:
+            {
+                didStop = true;
+            };
         }
-        catch (const std::exception& error)
-        {
-            std::cerr << error.what() << std::endl;
-        }
-        break;
     }
-    case MODES::CONTROLLER:
-    {
-        try
-        {
-            std::vector<char> ipBuffer = pipeManager.readDataFromPipe();
-            Controller controller(&pipeManager);
-            controller.connectToServer(serverPort, std::string(ipBuffer.begin(), ipBuffer.end()));
-            controller.startImageStream();
-        }
-        catch (const std::exception& error)
-        {
-            std::cerr << error.what() << std::endl;
-        }
-        break;
-    }
-    default:
-    {}
-        std::cout << "Invalid option" << std::endl;
-        break;
-    };
 
     return 0;
 }

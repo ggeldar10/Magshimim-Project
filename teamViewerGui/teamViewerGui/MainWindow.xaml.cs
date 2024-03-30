@@ -15,17 +15,12 @@ using System.Windows.Shapes;
 
 namespace teamViewerGui
 {
-    enum MODES
-    { 
-        CONTROLLER, CONTROLLED
-    };
     
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static CommunicatorPipes manager;
         public MainWindow()
         {
             InitializeComponent();
@@ -35,10 +30,29 @@ namespace teamViewerGui
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             List<byte> bytes = new List<byte>();
-            //bytes.Add((byte)MODES.CONTROLLER);
-            //PipeManagerSingletone.getInstance().SendMessage(bytes);
-            ControllerWindow window = new ControllerWindow();
-            window.Show();
+            bytes.Add((byte)MODES.CONTROLLER);
+            PipeManagerSingletone.getInstance().SendMessage(bytes);
+            UserInput userInput = new UserInput();
+            userInput.ShowDialog();
+            if ((bool)userInput.DialogResult)
+            {
+                bytes.Clear();
+                foreach (byte item in userInput.IpResult.ToList())
+                {
+                    bytes.Add(item);
+                }
+                PipeManagerSingletone.getInstance().SendMessage(new List<byte>(bytes));
+                ControllerWindow window = new ControllerWindow();
+                window.Show();
+            }
+            
+        }
+        
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            PipeManagerSingletone.getInstance().SendMessage(new List<byte> { (byte)MODES.CONTROLLER });
+            ControlledWindow controlled = new ControlledWindow();
+            controlled.Show();
         }
     }
 }
