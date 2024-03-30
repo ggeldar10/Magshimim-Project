@@ -60,10 +60,10 @@ int main()
         }
         case MODES::CONTROLLER:
         {
+            Controller controller(&pipeManager);
             try
             {
                 std::vector<char> ipBuffer = pipeManager.readDataFromPipe();
-                Controller controller(&pipeManager);
                 controller.connectToServer(serverPort, std::string(ipBuffer.begin(), ipBuffer.end()));
             }
             catch (const std::exception& error)

@@ -50,7 +50,7 @@ namespace teamViewerGui
         
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            PipeManagerSingletone.getInstance().SendMessage(new List<byte> { (byte)MODES.CONTROLLER });
+            PipeManagerSingletone.getInstance().SendMessage(new List<byte> { (byte)MODES.CONTROLLED });
             ControlledWindow controlled = new ControlledWindow();
             controlled.Show();
         }
