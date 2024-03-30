@@ -78,8 +78,8 @@ std::unique_ptr<const DefaultDataPacket> PacketParser::createDefaultDataPacketFr
     DataPacketTypes dataPacketType;
 
     std::unique_ptr<const DefaultPacket> defaultPacket = createDefaultPacketFromVector(defaultDataPacketBuffer, index);
-    dataPacketType = static_cast<DataPacketTypes>(networkToHost<uint32_t>(defaultDataPacketBuffer, index));
-    index += sizeof(uint32_t);
+    dataPacketType = static_cast<DataPacketTypes>(networkToHost<uint8_t>(defaultDataPacketBuffer, index));
+    index += sizeof(uint8_t);
 
     return std::move(std::make_unique<DefaultDataPacket>(defaultPacket->getAckSequenceNumber(), defaultPacket->getPacketSequenceNumber(), defaultPacket->getTimeStamp(), dataPacketType));
 }
@@ -87,20 +87,20 @@ std::unique_ptr<const DefaultDataPacket> PacketParser::createDefaultDataPacketFr
 std::unique_ptr<const CursorDataPacket> PacketParser::createCursorDataPacketFromVector(const std::vector<char>& cursorDataPacketBuffer)
 {
     CursorActions action;
-    int scrollValue;
-    uint32_t x;
-    uint32_t y;
+    uint8_t scrollValue;
+    LONG x;
+    LONG y;
     int index = 0;
 
     std::unique_ptr<const DefaultDataPacket> defaultDataPacket = createDefaultDataPacketFromVector(cursorDataPacketBuffer, index);
-    action = static_cast<CursorActions>(networkToHost<uint32_t>(cursorDataPacketBuffer, index));
-    index += sizeof(uint32_t);
-    x = networkToHost<uint32_t>(cursorDataPacketBuffer, index);
-    index += sizeof(uint32_t);
-    y = networkToHost<uint32_t>(cursorDataPacketBuffer, index);
-    index += sizeof(uint32_t);
-    scrollValue = networkToHost<uint32_t>(cursorDataPacketBuffer, index);
-    index += sizeof(uint32_t);
+    action = static_cast<CursorActions>(networkToHost<uint8_t>(cursorDataPacketBuffer, index));
+    index += sizeof(uint8_t);
+    scrollValue = networkToHost<uint8_t>(cursorDataPacketBuffer, index);
+    index += sizeof(uint8_t);
+    x = networkToHost<LONG>(cursorDataPacketBuffer, index);
+    index += sizeof(LONG);
+    y = networkToHost<LONG>(cursorDataPacketBuffer, index);
+    index += sizeof(LONG);
 
     return std::move(std::make_unique<CursorDataPacket>(defaultDataPacket->getAckSequenceNumber(), defaultDataPacket->getPacketSequenceNumber(), defaultDataPacket->getTimeStamp(), action, scrollValue, x, y));
 }
