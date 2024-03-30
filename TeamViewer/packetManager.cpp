@@ -3,6 +3,14 @@
 PacketManager::PacketManager(bool* keepAliveSwitch, bool* shutDownSwitch, std::mutex* switchesMtx, PipeManager* pipeManager)
     : _pipeManager(pipeManager), _keepAliveSwitch(keepAliveSwitch), _shutdownSwitch(shutDownSwitch), _switchesMtx(switchesMtx), _originScreenPoint(nullptr), _endScreenPoint(nullptr), _isScreenEdjusted(false)
 {
+    this->_originScreenPoint = std::make_unique<POINT>();
+    this->_originScreenPoint->x = 0;
+    this->_originScreenPoint->y = 0;
+    this->_endScreenPoint = std::make_unique<POINT>();
+    this->_endScreenPoint->x = 1980;
+    this->_endScreenPoint->y = 1020;
+
+    this->_isScreenEdjusted = true;
 }
 
 void PacketManager::handlePacket(std::unique_ptr<const DefaultPacket> packet)
@@ -193,7 +201,7 @@ void PacketManager::handleScreenDataPacket(std::unique_ptr<const ScreenDataPacke
     if (!this->_isScreenEdjusted)
     {
         std::lock_guard<std::mutex> pointsLock(this->_pointsMtx);
-        int myScreenHeight = GetSystemMetrics(SM_CXSCREEN);
+        /*int myScreenHeight = GetSystemMetrics(SM_CXSCREEN);
         int myScreenWidth = GetSystemMetrics(SM_CYSCREEN);
 
         int guiScreenHeight = CalculateActualHeight(controlledScreenWidth, controlledScreenHeight, myScreenWidth - 200, myScreenHeight);
@@ -204,10 +212,8 @@ void PacketManager::handleScreenDataPacket(std::unique_ptr<const ScreenDataPacke
         this->_originScreenPoint->y = myScreenHeight / 2 - guiScreenHeight / 2;
         this->_endScreenPoint = std::make_unique<POINT>();
         this->_endScreenPoint->x = 200 + guiScreenWidth;
-        this->_endScreenPoint->y = myScreenHeight / 2 - guiScreenHeight / 2 + guiScreenHeight;
-
-
-        this->_isScreenEdjusted = true;
+        this->_endScreenPoint->y = myScreenHeight / 2 - guiScreenHeight / 2 + guiScreenHeight;*/
+        /*this->_isScreenEdjusted = true;*/
     }
 }
 

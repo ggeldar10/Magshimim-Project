@@ -42,7 +42,7 @@ std::vector<char> DefaultDataPacket::toBuffer() const {
     return buffer;
 }
 
-CursorDataPacket::CursorDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, CursorActions action, int scrollValue, unsigned int x, unsigned int y)
+CursorDataPacket::CursorDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, CursorActions action, uint8_t scrollValue, LONG x, LONG y)
     : DefaultDataPacket(ackNum, packetNum, time, Cursor), action(action), scrollValue(scrollValue) {
     location.x = x;
     location.y = y;
@@ -63,8 +63,11 @@ int CursorDataPacket::getScrollValue() const {
 std::vector<char> CursorDataPacket::toBuffer() const {
     std::vector<char> buffer = DefaultDataPacket::toBuffer();
     buffer.push_back(static_cast<uint8_t>(action));
-    buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&scrollValue), reinterpret_cast<const uint8_t*>(&scrollValue) + sizeof(scrollValue));
-    buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&location), reinterpret_cast<const uint8_t*>(&location) + sizeof(location));
+    PacketParser::hostToNetworkIntoVector<uint8_t>(&buffer, scrollValue);
+    PacketParser::hostToNetworkIntoVector<LONG>(&buffer, location.x);
+    PacketParser::hostToNetworkIntoVector<LONG>(&buffer, location.y);
+    //buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&scrollValue), reinterpret_cast<const uint8_t*>(&scrollValue) + sizeof(scrollValue));
+    //buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(&location), reinterpret_cast<const uint8_t*>(&location) + sizeof(location));
     return buffer;
 }
 
