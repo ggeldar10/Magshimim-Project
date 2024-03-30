@@ -34,56 +34,52 @@ int main()
         IntCharUnion convertor = { 0 };
         std::vector<char> buffer = pipeManager.readDataFromPipe();
 
-    // The gui will send the code for 1 byte
-    convertor.bytes[0] = buffer[0];
-    MODES mode = static_cast<MODES>(convertor.num);
-    
-    switch (mode)
-    {
-    case MODES::CONTROLLED:
-    {
-        try
+        // The gui will send the code for 1 byte
+        convertor.bytes[0] = buffer[0];
+        MODES mode = static_cast<MODES>(convertor.num);
+
+        switch (mode)
         {
-            case MODES::CONTROLLED:
+        case MODES::CONTROLLED:
+        {
+            try
             {
-                try
-                {
-                    Controlled controlled(&pipeManager);
-                    controlled.createServer(serverPort);
-                }
-                catch (const std::exception& error)
-                {
-                    std::cerr << error.what() << std::endl;
-                }
-                while (!checkForStopCommand(&pipeManager, PIPE_CODES::CLOSE_CONNECTION))
-                {
-                    Sleep(3000);
-                }
-                //send shut down to the server 
-                break;
+                Controlled controlled(&pipeManager);
+                controlled.createServer(serverPort);
             }
-            case MODES::CONTROLLER:
+            catch (const std::exception& error)
             {
-                try
-                {
-                    std::vector<char> ipBuffer = pipeManager.readDataFromPipe();
-                    Controller controller(&pipeManager);
-                    controller.connectToServer(serverPort, std::string(ipBuffer.begin(), ipBuffer.end()));
-                }
-                catch (const std::exception& error)
-                {
-                    std::cerr << error.what() << std::endl;
-                }
-                while (!checkForStopCommand(&pipeManager, PIPE_CODES::CLOSE_CONNECTION))
-                {
-                    Sleep(3000);
-                }
-                break;
+                std::cerr << error.what() << std::endl;
             }
-            default:
+            while (!checkForStopCommand(&pipeManager, PIPE_CODES::CLOSE_CONNECTION))
             {
-                didStop = true;
-            };
+                Sleep(3000);
+            }
+            //send shut down to the server 
+            break;
+        }
+        case MODES::CONTROLLER:
+        {
+            try
+            {
+                std::vector<char> ipBuffer = pipeManager.readDataFromPipe();
+                Controller controller(&pipeManager);
+                controller.connectToServer(serverPort, std::string(ipBuffer.begin(), ipBuffer.end()));
+            }
+            catch (const std::exception& error)
+            {
+                std::cerr << error.what() << std::endl;
+            }
+            while (!checkForStopCommand(&pipeManager, PIPE_CODES::CLOSE_CONNECTION))
+            {
+                Sleep(3000);
+            }
+            break;
+        }
+        default:
+        {
+            didStop = true;
+        };
         }
     }
 
