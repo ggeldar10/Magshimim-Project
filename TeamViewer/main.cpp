@@ -42,9 +42,9 @@ int main()
         {
         case MODES::CONTROLLED:
         {
+            Controlled controlled(&pipeManager);
             try
             {
-                Controlled controlled(&pipeManager);
                 controlled.createServer(serverPort);
             }
             catch (const std::exception& error)
