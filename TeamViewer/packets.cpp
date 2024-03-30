@@ -313,26 +313,27 @@ std::vector<char> UdpPacket::toBuffer() const
     return buffer;
 }
 
-ImageScreenDataPacket::ImageScreenDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, uint32_t width, uint32_t height, const std::vector<char>& imageBytes) : DefaultDataPacket(ackNum, packetNum, time, Screen), _width(width), _height(height), _imageBytes(imageBytes)
+ScreenDataPacket::ScreenDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, uint32_t width, uint32_t height, const std::vector<char>& imageBytes) 
+    : DefaultDataPacket(ackNum, packetNum, time, Screen), _width(width), _height(height), _imageBytes(imageBytes)
 {
 }
 
-std::vector<char> ImageScreenDataPacket::getImageBytes() const
+std::vector<char> ScreenDataPacket::getImageBytes() const
 {
     return this->_imageBytes;
 }
 
-unsigned int ImageScreenDataPacket::getWidth() const
+unsigned int ScreenDataPacket::getWidth() const
 {
     return _width;
 }
 
-unsigned int ImageScreenDataPacket::getHeight() const
+unsigned int ScreenDataPacket::getHeight() const
 {
     return _height;
 }
 
-std::vector<char> ImageScreenDataPacket::toBuffer() const
+std::vector<char> ScreenDataPacket::toBuffer() const
 {
     std::vector<char> buffer = DefaultDataPacket::toBuffer();
     PacketParser::hostToNetworkIntoVector<uint32_t>(&buffer, _width);

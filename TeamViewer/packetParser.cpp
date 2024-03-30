@@ -119,7 +119,7 @@ std::unique_ptr<const KeyboardDataPacket> PacketParser::createKeyboardDataPacket
     return std::move(std::make_unique<KeyboardDataPacket>(defaultDataPacket->getAckSequenceNumber(), defaultDataPacket->getPacketSequenceNumber(), defaultDataPacket->getTimeStamp(), action, keyCode));
 }
 
-std::unique_ptr<const ImageScreenDataPacket> PacketParser::createScreenDataPacketFromVector(const std::vector<char>& screenDataPacketBuffer)
+std::unique_ptr<const ScreenDataPacket> PacketParser::createScreenDataPacketFromVector(const std::vector<char>& screenDataPacketBuffer)
 {
     int index = 0;
     std::unique_ptr<const DefaultDataPacket> defaultDataPacket = createDefaultDataPacketFromVector(screenDataPacketBuffer, index);
@@ -128,7 +128,7 @@ std::unique_ptr<const ImageScreenDataPacket> PacketParser::createScreenDataPacke
     uint32_t height = networkToHost<uint32_t>(screenDataPacketBuffer, index);
     index += sizeof(uint32_t);
     std::vector<char> imageBytes(screenDataPacketBuffer.begin() + index, screenDataPacketBuffer.end());
-    return std::move(std::make_unique<ImageScreenDataPacket>(defaultDataPacket->getAckSequenceNumber(), defaultDataPacket->getPacketSequenceNumber(), defaultDataPacket->getTimeStamp(), width, height, imageBytes));
+    return std::move(std::make_unique<ScreenDataPacket>(defaultDataPacket->getAckSequenceNumber(), defaultDataPacket->getPacketSequenceNumber(), defaultDataPacket->getTimeStamp(), width, height, imageBytes));
 }
 
 
