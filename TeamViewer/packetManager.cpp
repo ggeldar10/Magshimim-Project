@@ -11,14 +11,12 @@ void PacketManager::handlePacket(std::unique_ptr<const DefaultPacket> packet)
     {
     case DataPacket:
     {
-        auto dataPacket = dynamic_cast<const DefaultDataPacket*>(packet.get());
-        handleDataPacket(std::unique_ptr<const DefaultDataPacket>(dataPacket));
+        handleDataPacket(reinterpret_cast<const DefaultDataPacket*>(packet.get()));
         break;
     }
     case ControlPacket:
     {
-        auto controlPacket = dynamic_cast<const DefaultControlPacket*>(packet.get());
-        handleControlPacket(std::unique_ptr<const DefaultControlPacket>(controlPacket));
+        handleControlPacket(reinterpret_cast<const DefaultControlPacket*>(packet.get()));
         break;
     }
     default:
@@ -61,26 +59,24 @@ std::mutex* PacketManager::getPointsMtx()
 }
 
 
-void PacketManager::handleDataPacket(std::unique_ptr<const DefaultDataPacket> dataPacket)
+void PacketManager::handleDataPacket(const DefaultDataPacket* dataPacket)
 {
     switch (dataPacket->getDataType())
     {
     case Cursor:
     {
-        auto cursorPacket = dynamic_cast<const CursorDataPacket*>(dataPacket.get());
-        handleCursorDataPacket(std::unique_ptr<const CursorDataPacket>(cursorPacket));
+        handleCursorDataPacket(reinterpret_cast<const CursorDataPacket*>(dataPacket));
         break;
     }
     case Keyboard:
     {
-        auto keyboardPacket = dynamic_cast<const KeyboardDataPacket*>(dataPacket.get());
-        handleKeyboardDataPacket(std::unique_ptr<const KeyboardDataPacket>(keyboardPacket));
+        
+        handleKeyboardDataPacket(reinterpret_cast<const KeyboardDataPacket*>(dataPacket));
         break;
     }
     case Screen:
     {
-        auto screenPacket = dynamic_cast<const ScreenDataPacket*>(dataPacket.get());
-        handleScreenDataPacket(std::unique_ptr<const ScreenDataPacket>(screenPacket));
+        handleScreenDataPacket(reinterpret_cast<const ScreenDataPacket*>(dataPacket));
         break;
     }
     case Chat:
@@ -96,7 +92,7 @@ void PacketManager::handleDataPacket(std::unique_ptr<const DefaultDataPacket> da
     }
 }
 
-void PacketManager::handleControlPacket(std::unique_ptr<const DefaultControlPacket> controlPacket)
+void PacketManager::handleControlPacket(const DefaultControlPacket* controlPacket)
 {
     
     switch (controlPacket->getControlType())
@@ -147,7 +143,7 @@ void PacketManager::handleControlPacket(std::unique_ptr<const DefaultControlPack
     }
 }
 
-void PacketManager::handleCursorDataPacket(std::unique_ptr<const CursorDataPacket> cursorPacket)
+void PacketManager::handleCursorDataPacket(const CursorDataPacket* cursorPacket)
 {
     if (cursorPacket->getAction() == CursorPosition)
     {
@@ -173,7 +169,7 @@ void PacketManager::handleCursorDataPacket(std::unique_ptr<const CursorDataPacke
     }
 }
 
-void PacketManager::handleKeyboardDataPacket(std::unique_ptr<const KeyboardDataPacket> keyboardPacket)
+void PacketManager::handleKeyboardDataPacket(const KeyboardDataPacket* keyboardPacket)
 {
     try
     {
@@ -185,7 +181,7 @@ void PacketManager::handleKeyboardDataPacket(std::unique_ptr<const KeyboardDataP
     }
 }
 
-void PacketManager::handleScreenDataPacket(std::unique_ptr<const ScreenDataPacket> screenPacket)
+void PacketManager::handleScreenDataPacket(const ScreenDataPacket* screenPacket)
 {
     _pipeManager->sendToPipe(screenPacket->getImageBytes());
     int controlledScreenHeight = screenPacket->getHeight();
@@ -211,13 +207,13 @@ void PacketManager::handleScreenDataPacket(std::unique_ptr<const ScreenDataPacke
     }
 }
 
-void PacketManager::handleKeepAliveControlPacket(std::unique_ptr<const DefaultControlPacket> keepAlivePacket)
+void PacketManager::handleKeepAliveControlPacket(const DefaultControlPacket* keepAlivePacket)
 {
     std::lock_guard<std::mutex> lock(*this->_switchesMtx);
     *this->_keepAliveSwitch = true;
 }
 
-void PacketManager::handleShutdownControlPacket(std::unique_ptr<const DefaultControlPacket> shutdownPacket)
+void PacketManager::handleShutdownControlPacket(const DefaultControlPacket* shutdownPacket)
 {
     std::lock_guard<std::mutex> lock(*this->_switchesMtx);
     *this->_shutdownSwitch = true;
