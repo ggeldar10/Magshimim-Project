@@ -7,7 +7,11 @@
 SrtSocket::SrtSocket(PipeManager* pipeManager)
 	: _packetManager(&_keepAliveSwitch, &_shutdownSwitch, &_switchesMtx, pipeManager)
 {
+<<<<<<< HEAD
+	int recv_buffer_size = 100000000;  // Specify your desired buffer size
+=======
 	int recv_buffer_size = 8096;  // Specify your desired buffer size
+>>>>>>> f41b11f007adc65696dda9394624bbd5806e93e2
 	WSADATA wsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
 	{
@@ -518,8 +522,13 @@ void SrtSocket::initializeThreads(MODES mode)
 	{
 		this->_cursorListenerThread = std::thread(listenToCursor, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx, this->_packetManager.getOriginScreenPoint(), this->_packetManager.getEndScreenPoint(), this->_packetManager.getPointsMtx());
 		this->_cursorListenerThread.detach();
+<<<<<<< HEAD
+		/*this->_keyboardListenerThread = std::thread(listenToKeyboard, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx);
+		this->_keyboardListenerThread.detach();*/
+=======
 		//this->_keyboardListenerThread = std::thread(listenToKeyboard, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx);
 		//this->_keyboardListenerThread.detach();
+>>>>>>> f41b11f007adc65696dda9394624bbd5806e93e2
 	}
 	else
 	{

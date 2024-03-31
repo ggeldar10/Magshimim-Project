@@ -86,11 +86,11 @@ public:
 class CursorDataPacket : public DefaultDataPacket {
 private:
     CursorActions action;
-    int scrollValue;
+    uint8_t scrollValue;
     POINT location;
 
 public:
-    CursorDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, CursorActions action, int scrollValue, unsigned int x, unsigned int y);
+    CursorDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, CursorActions action, uint8_t scrollValue, LONG x, LONG y);
     CursorActions getAction() const;
     POINT getLocation() const;
     int getScrollValue() const;

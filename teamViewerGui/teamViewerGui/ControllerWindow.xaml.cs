@@ -31,8 +31,8 @@ namespace teamViewerGui
             InitializeComponent();
             this.ResizeMode = ResizeMode.NoResize;
             this.WindowState = WindowState.Maximized;
-            List<byte> bytes = new List<byte> { (byte)PIPE_CODES.START_SENDING };
-            PipeManagerSingletone.getInstance().SendMessage(bytes);
+            //List<byte> bytes = new List<byte> { (byte)PIPE_CODES.START_SENDING };
+            //PipeManagerSingletone.getInstance().SendMessage(bytes);
             this.backgroundThread = new Thread(setImageFromPipeData);
             this.backgroundThread.IsBackground = true;
             this.backgroundThread.Start();
