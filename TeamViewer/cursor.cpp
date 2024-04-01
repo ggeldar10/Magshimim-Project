@@ -193,7 +193,7 @@ void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<st
             runLoop = false;
         }
         // Sleep for a short duration to avoid high CPU usage
-        Sleep(200);
+        Sleep(500);
         switchLock.lock();
         runLoop = !*shutdownSwitch;
         switchLock.unlock();

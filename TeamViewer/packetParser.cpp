@@ -123,12 +123,16 @@ std::unique_ptr<const ScreenDataPacket> PacketParser::createScreenDataPacketFrom
 {
     int index = 0;
     std::unique_ptr<const DefaultDataPacket> defaultDataPacket = createDefaultDataPacketFromVector(screenDataPacketBuffer, index);
+    uint32_t startSequenceNum = networkToHost<uint32_t>(screenDataPacketBuffer, index);
+    index += sizeof(uint32_t);
+    uint32_t endSequenceNum = networkToHost<uint32_t>(screenDataPacketBuffer, index);
+    index += sizeof(uint32_t);
     uint32_t width = networkToHost<uint32_t>(screenDataPacketBuffer, index);
     index += sizeof(uint32_t);
     uint32_t height = networkToHost<uint32_t>(screenDataPacketBuffer, index);
     index += sizeof(uint32_t);
     std::vector<char> imageBytes(screenDataPacketBuffer.begin() + index, screenDataPacketBuffer.end());
-    return std::move(std::make_unique<ScreenDataPacket>(defaultDataPacket->getAckSequenceNumber(), defaultDataPacket->getPacketSequenceNumber(), defaultDataPacket->getTimeStamp(), width, height, imageBytes));
+    return std::move(std::make_unique<ScreenDataPacket>(defaultDataPacket->getAckSequenceNumber(), defaultDataPacket->getPacketSequenceNumber(), defaultDataPacket->getTimeStamp(), width, height, imageBytes, startSequenceNum, endSequenceNum));
 }
 
 

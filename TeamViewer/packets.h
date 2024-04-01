@@ -113,12 +113,14 @@ public:
 
 class ScreenDataPacket : public DefaultDataPacket {
 private:
+    uint32_t _startSequenceNumber;
+    uint32_t _endSequenceNumber;
     std::vector<char> _imageBytes;
     uint32_t _width;
     uint32_t _height;
 
 public:
-    ScreenDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, uint32_t width, uint32_t height, const std::vector<char>& imageBytes);
+    ScreenDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, uint32_t width, uint32_t height, const std::vector<char>& imageBytes, uint32_t startSequenceNum, uint32_t endSequenceNum);
     std::vector<char> getImageBytes() const;
     unsigned int getWidth() const;
     unsigned int getHeight() const;
