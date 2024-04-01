@@ -5,22 +5,42 @@ VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TeamViewer", "TeamViewer.vcxproj", "{E66289CE-9039-4A7E-A10F-243140D229FE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "teamViewerGui", "..\teamViewerGui\teamViewerGui\teamViewerGui.csproj", "{C1DBA55C-A5A9-4700-8EB7-CA417076BE48}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E66289CE-9039-4A7E-A10F-243140D229FE}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{E66289CE-9039-4A7E-A10F-243140D229FE}.Debug|Any CPU.Build.0 = Debug|x64
 		{E66289CE-9039-4A7E-A10F-243140D229FE}.Debug|x64.ActiveCfg = Debug|x64
 		{E66289CE-9039-4A7E-A10F-243140D229FE}.Debug|x64.Build.0 = Debug|x64
 		{E66289CE-9039-4A7E-A10F-243140D229FE}.Debug|x86.ActiveCfg = Debug|Win32
 		{E66289CE-9039-4A7E-A10F-243140D229FE}.Debug|x86.Build.0 = Debug|Win32
+		{E66289CE-9039-4A7E-A10F-243140D229FE}.Release|Any CPU.ActiveCfg = Release|x64
+		{E66289CE-9039-4A7E-A10F-243140D229FE}.Release|Any CPU.Build.0 = Release|x64
 		{E66289CE-9039-4A7E-A10F-243140D229FE}.Release|x64.ActiveCfg = Release|x64
 		{E66289CE-9039-4A7E-A10F-243140D229FE}.Release|x64.Build.0 = Release|x64
 		{E66289CE-9039-4A7E-A10F-243140D229FE}.Release|x86.ActiveCfg = Release|Win32
 		{E66289CE-9039-4A7E-A10F-243140D229FE}.Release|x86.Build.0 = Release|Win32
+		{C1DBA55C-A5A9-4700-8EB7-CA417076BE48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1DBA55C-A5A9-4700-8EB7-CA417076BE48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1DBA55C-A5A9-4700-8EB7-CA417076BE48}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C1DBA55C-A5A9-4700-8EB7-CA417076BE48}.Debug|x64.Build.0 = Debug|Any CPU
+		{C1DBA55C-A5A9-4700-8EB7-CA417076BE48}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C1DBA55C-A5A9-4700-8EB7-CA417076BE48}.Debug|x86.Build.0 = Debug|Any CPU
+		{C1DBA55C-A5A9-4700-8EB7-CA417076BE48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1DBA55C-A5A9-4700-8EB7-CA417076BE48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1DBA55C-A5A9-4700-8EB7-CA417076BE48}.Release|x64.ActiveCfg = Release|Any CPU
+		{C1DBA55C-A5A9-4700-8EB7-CA417076BE48}.Release|x64.Build.0 = Release|Any CPU
+		{C1DBA55C-A5A9-4700-8EB7-CA417076BE48}.Release|x86.ActiveCfg = Release|Any CPU
+		{C1DBA55C-A5A9-4700-8EB7-CA417076BE48}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

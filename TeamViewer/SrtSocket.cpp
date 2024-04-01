@@ -470,13 +470,33 @@ void SrtSocket::sendImageStream()
 		stream.seekg(0, std::ios::beg);
 		std::vector<char> bufferVec(length);
 		stream.read(bufferVec.data(), length);
+		int amountOfPackets = length / this->_commInfo._otherComputerMTU;
+		if (length % this->_commInfo._otherComputerMTU != 0)
+		{
+			amountOfPackets++;
+		}
+		for (unsigned int i = 0; i < amountOfPackets - 1; i++)
+		{
+			now = std::chrono::system_clock::now();
+			currentTime = std::chrono::system_clock::to_time_t(now);
+			auto it = bufferVec.begin() + i * this->_commInfo._otherComputerMTU; 
+			std::unique_ptr<ScreenDataPacket> packetPtr = std::make_unique<ScreenDataPacket>(-1, i, currentTime, capturer.getScreenWidth(), capturer.getScreenHeight(),
+				std::vector<char>(it, it + this->_commInfo._otherComputerMTU));
+			sendLock.lock();
+			this->_packetSendQueue.push(packetPtr->toBuffer());
+			sendLock.unlock();
+			switchLock.lock();
+			runLoop = !_shutdownSwitch;
+			switchLock.unlock();
+		}
 		now = std::chrono::system_clock::now();
 		currentTime = std::chrono::system_clock::to_time_t(now);
-		std::unique_ptr<ScreenDataPacket> packetPtr = std::make_unique<ScreenDataPacket>(-1, -1, currentTime, capturer.getScreenWidth(), capturer.getScreenHeight(), bufferVec);
+		auto it = bufferVec.begin() + (amountOfPackets - 1) * this->_commInfo._otherComputerMTU;
+		std::unique_ptr<ScreenDataPacket> packetPtr = std::make_unique<ScreenDataPacket>(-1, amountOfPackets, currentTime, capturer.getScreenWidth(), capturer.getScreenHeight(),
+			std::vector<char>(it, bufferVec.end()));
 		sendLock.lock();
 		this->_packetSendQueue.push(packetPtr->toBuffer());
 		sendLock.unlock();
-
 		switchLock.lock();
 		runLoop = !_shutdownSwitch;
 		switchLock.unlock();
