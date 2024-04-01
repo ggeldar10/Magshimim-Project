@@ -518,14 +518,14 @@ void SrtSocket::initializeThreads(MODES mode)
 	{
 		this->_cursorListenerThread = std::thread(listenToCursor, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx, this->_packetManager.getOriginScreenPoint(), this->_packetManager.getEndScreenPoint(), this->_packetManager.getPointsMtx());
 		this->_cursorListenerThread.detach();
-		/*this->_keyboardListenerThread = std::thread(listenToKeyboard, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx);
-		this->_keyboardListenerThread.detach();*/
+		//this->_keyboardListenerThread = std::thread(listenToKeyboard, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx);
+		//this->_keyboardListenerThread.detach();
 		//this->_keyboardListenerThread = std::thread(listenToKeyboard, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx);
 		//this->_keyboardListenerThread.detach();
 	}
 	else
 	{
-		//this->_screenListenerThread = std::thread(&SrtSocket::sendImageStream, this);
-		//this->_screenListenerThread.detach();
+		this->_screenListenerThread = std::thread(&SrtSocket::sendImageStream, this);
+		this->_screenListenerThread.detach();
 	}
 }
