@@ -325,3 +325,79 @@ std::unique_ptr<const DefaultPacket> PacketParser::createPacketFromVectorGlobal(
     }
     return nullptr;
 }
+
+
+
+std::unique_ptr<const DefaultPacket> PacketParser::createPacketFromVectorGlobal(const std::vector<char>& globalPacketBuffer, std::unique_ptr<const DefaultPacket> packet)
+{
+    int index;
+    std::unique_ptr<const DefaultDataPacket> dataPacket;
+    std::unique_ptr<const DefaultControlPacket> controlPacket;
+
+    switch (packet->getPacketType())
+    {
+    case DataPacket:
+        index = 0;
+        dataPacket = createDefaultDataPacketFromVector(globalPacketBuffer, index);
+        switch (dataPacket->getDataType())
+        {
+        case Cursor:
+            return std::move(createCursorDataPacketFromVector(globalPacketBuffer));
+            break;
+        case Keyboard:
+            return std::move(createKeyboardDataPacketFromVector(globalPacketBuffer));
+            break;
+        case Screen:
+            return std::move(createScreenDataPacketFromVector(globalPacketBuffer));
+            break;
+        case Chat:
+            //To Do
+            break;
+        default:
+            throw PacketParserException("Error: Invalid data type");
+            break;
+        }
+        break;
+    case ControlPacket:
+        index = 0;
+        controlPacket = createDefaultControlPacketFromVector(globalPacketBuffer, index);
+        switch (controlPacket->getControlType())
+        {
+        case HANDSHAKE:
+            return std::move(createHandshakeControlPacketFromVector(globalPacketBuffer));
+            break;
+        case KEEPALIVE:
+            return std::move(controlPacket);
+            break;
+        case ACK:
+            return std::move(controlPacket);
+            break;
+        case NAK:
+            return std::move(createNAKControlPacketFromVector(globalPacketBuffer));
+            break;
+        case CongestionWarning:
+            return std::move(controlPacket);
+            break;
+        case SHUTDOWN:
+            return std::move(controlPacket);
+            break;
+        case ACKACK:
+            return std::move(controlPacket);
+            break;
+        case DROPREQ:
+            return std::move(createMessageDropRequestControlPacketFromVector(globalPacketBuffer));
+            break;
+        case PEERERROR:
+            return std::move(controlPacket);
+            break;
+        default:
+            throw PacketParserException("Error: Invalid control type");
+            break;
+        }
+        break;
+    default:
+        throw PacketParserException("Error: Invalid packet type");
+        break;
+    }
+    return nullptr;
+}

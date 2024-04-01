@@ -545,7 +545,7 @@ void SrtSocket::initializeThreads(MODES mode)
 	}
 	else
 	{
-		this->_screenListenerThread = std::thread(&SrtSocket::sendImageStream, this);
+		this->_screenListenerThread = std::thread(&SrtSocket::sendImageStream, this); // put this in a comment if it does not work
 		this->_screenListenerThread.detach();
 	}
 }

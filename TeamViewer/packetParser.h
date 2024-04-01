@@ -83,6 +83,7 @@ public:
     static std::unique_ptr<const MessageDropRequestControlPacket> createMessageDropRequestControlPacketFromVector(const std::vector<char>& messageDropRequestControlPacketBuffer);
     
     static std::unique_ptr<const DefaultPacket> createPacketFromVectorGlobal(const std::vector<char>& globalPacketBuffer);
+    static std::unique_ptr<const DefaultPacket> createPacketFromVectorGlobal(const std::vector<char>& globalPacketBuffer, std::unique_ptr<const DefaultPacket> packet);
 };
 
 class PacketParserException : public std::exception
