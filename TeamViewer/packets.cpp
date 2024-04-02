@@ -326,6 +326,16 @@ std::vector<char> ScreenDataPacket::getImageBytes() const
     return this->_imageBytes;
 }
 
+uint32_t ScreenDataPacket::getStartSequenceNumber() const
+{
+    return _startSequenceNumber;
+}
+
+uint32_t ScreenDataPacket::getEndSequenceNumber() const
+{
+    return _endSequenceNumber;
+}
+
 unsigned int ScreenDataPacket::getWidth() const
 {
     return _width;

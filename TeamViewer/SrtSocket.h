@@ -32,6 +32,7 @@ private:
 		uint32_t _seqNum;
 		unsigned int _otherComputerMaxWindowSize;
 		unsigned int _otherComputerMTU;
+		unsigned int startSeq;
 
 	} _commInfo;
 	PacketManager _packetManager;

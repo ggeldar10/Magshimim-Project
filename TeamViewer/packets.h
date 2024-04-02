@@ -122,6 +122,8 @@ private:
 public:
     ScreenDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, uint32_t width, uint32_t height, const std::vector<char>& imageBytes, uint32_t startSequenceNum, uint32_t endSequenceNum);
     std::vector<char> getImageBytes() const;
+    uint32_t getStartSequenceNumber() const;
+    uint32_t getEndSequenceNumber() const;
     unsigned int getWidth() const;
     unsigned int getHeight() const;
 

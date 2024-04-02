@@ -191,7 +191,19 @@ void PacketManager::handleKeyboardDataPacket(const KeyboardDataPacket* keyboardP
 
 void PacketManager::handleScreenDataPacket(const ScreenDataPacket* screenPacket)
 {
-    _pipeManager->sendToPipe(screenPacket->getImageBytes());
+    // inserts the data to a buffer to send to the gui
+    std::vector<char> buffer;
+    IntCharUnion convertor = {0};
+    convertor.num = screenPacket->getStartSequenceNumber();
+    buffer.insert(buffer.end(), convertor.bytes, convertor.bytes + sizeof(uint32_t));
+    convertor.num = screenPacket->getEndSequenceNumber();
+    buffer.insert(buffer.end(), convertor.bytes, convertor.bytes + sizeof(uint32_t));
+    convertor.num = screenPacket->getPacketSequenceNumber();
+    buffer.insert(buffer.end(), convertor.bytes, convertor.bytes + sizeof(uint32_t));
+    buffer.insert(buffer.end(), screenPacket->getImageBytes().begin(), screenPacket->getImageBytes().end());
+    _pipeManager->sendToPipe(buffer);
+
+    
     int controlledScreenHeight = screenPacket->getHeight();
     int controlledScreenWidth = screenPacket->getWidth();
     if (!this->_isScreenEdjusted)

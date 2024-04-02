@@ -26,6 +26,11 @@ namespace teamViewerGui
         private Thread backgroundThread;
         private double imageWidth = 0;
         private double imageHeight = 0;
+        private List<byte> imageBytes = new List<byte>();
+        private uint lastStartSeq = 0;
+        private uint lastEndSeq = 0;
+        private const uint mtu = 8096;
+
         public ControllerWindow()
         {
             InitializeComponent();
@@ -38,13 +43,31 @@ namespace teamViewerGui
             this.backgroundThread.Start();
         }
 
-        public void displayImage(byte[] imageBytes)
+        public void displayImage(byte[] messageBytes)
         {
-            using (MemoryStream ms = new MemoryStream(imageBytes))
+            uint startSeq = BitConverter.ToUInt32(messageBytes, 0);
+            uint endSeq = BitConverter.ToUInt32(messageBytes, 4);
+            uint currSeq = BitConverter.ToUInt32(messageBytes, 8);
+
+            if (this.lastEndSeq != endSeq || this.lastStartSeq != startSeq)
             {
-                var decoder = BitmapDecoder.Create(ms,
-            BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
-                UpdateImage(decoder.Frames[0]);
+                this.lastStartSeq = startSeq;
+                this.lastEndSeq = endSeq;
+                this.imageBytes = new List<byte>((int)((endSeq - startSeq) * mtu));
+            }
+            else if (this.lastStartSeq == startSeq && this.lastEndSeq == endSeq && currSeq != endSeq)
+            {
+                this.imageBytes.InsertRange((int)((currSeq - startSeq) * mtu), new ArraySegment<byte>(messageBytes, 12, messageBytes.Length - 12));
+            }
+            else if (currSeq == endSeq)
+            {
+                this.imageBytes.InsertRange((int)((currSeq - startSeq) * mtu), new ArraySegment<byte>(messageBytes, 12, messageBytes.Length - 12));
+                using (MemoryStream ms = new MemoryStream(this.imageBytes.ToArray()))
+                {
+                    var decoder = BitmapDecoder.Create(ms,
+                BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+                    UpdateImage(decoder.Frames[0]);
+                }
             }
         }
         protected virtual void Dispose(bool disposing)
