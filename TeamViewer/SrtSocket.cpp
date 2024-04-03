@@ -7,7 +7,6 @@
 SrtSocket::SrtSocket(PipeManager* pipeManager)
 	: _packetManager(&_keepAliveSwitch, &_shutdownSwitch, &_switchesMtx, pipeManager)
 {
-	int recv_buffer_size = 100000000;  // Specify your desired buffer sizezs
 	WSADATA wsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
 	{
@@ -24,10 +23,6 @@ SrtSocket::SrtSocket(PipeManager* pipeManager)
 	this->_shutdownSwitch = false;
 	this->_keepAliveSwitch = true;
 
-	
-	if (setsockopt(this->_srtSocket, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char*>(&recv_buffer_size), sizeof(recv_buffer_size)) == -1) {
-		std::cerr << "Failed to set receive buffer size" << std::endl;
-	}
 }
 
 
@@ -437,7 +432,7 @@ void SrtSocket::sendSrt() {
 		std::vector<char> dataBuffer = this->_packetSendQueue.front();
 		this->_packetSendQueue.pop();
 		sockaddr_in destAddr = { 0 };
-		destAddr.sin_addr.s_addr = this->_commInfo._dstIP;
+		destAddr.sin_addr.s_addr = ntohl(this->_commInfo._dstIP);
 		destAddr.sin_family = AF_INET;
 		UdpPacket udpPacket(this->_commInfo._srcPort, this->_commInfo._dstPort, dataBuffer.size(), 0);
 		std::vector<char> packetBytes = PacketParser::packetToBytes(udpPacket, dataBuffer);
@@ -537,8 +532,8 @@ void SrtSocket::initializeThreads(MODES mode)
 	//this->_keepAliveMonitoringThread.detach();
 	if (mode == CONTROLLER)
 	{
-		this->_cursorListenerThread = std::thread(listenToCursor, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx, this->_packetManager.getOriginScreenPoint(), this->_packetManager.getEndScreenPoint(), this->_packetManager.getPointsMtx());
-		this->_cursorListenerThread.detach();
+		/*this->_cursorListenerThread = std::thread(listenToCursor, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx, this->_packetManager.getOriginScreenPoint(), this->_packetManager.getEndScreenPoint(), this->_packetManager.getPointsMtx());
+		this->_cursorListenerThread.detach();*/
 		//this->_keyboardListenerThread = std::thread(listenToKeyboard, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx);
 		//this->_keyboardListenerThread.detach();
 		//this->_keyboardListenerThread = std::thread(listenToKeyboard, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx);
