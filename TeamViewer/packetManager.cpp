@@ -200,7 +200,8 @@ void PacketManager::handleScreenDataPacket(const ScreenDataPacket* screenPacket)
     buffer.insert(buffer.end(), convertor.bytes, convertor.bytes + sizeof(uint32_t));
     convertor.num = screenPacket->getPacketSequenceNumber();
     buffer.insert(buffer.end(), convertor.bytes, convertor.bytes + sizeof(uint32_t));
-    buffer.insert(buffer.end(), screenPacket->getImageBytes().begin(), screenPacket->getImageBytes().end());
+    std::vector<char> help = screenPacket->getImageBytes();
+    buffer.insert(buffer.end(), help.begin(), help.end());
     _pipeManager->sendToPipe(buffer);
 
     
