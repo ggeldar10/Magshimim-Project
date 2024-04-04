@@ -77,7 +77,7 @@ void SrtSocket::listenAndAccept()
 
 	sockaddr_in toAddr = { 0 };
 	toAddr.sin_port = htons(this->_commInfo._dstPort);
-	toAddr.sin_addr.s_addr = this->_commInfo._dstIP;
+	toAddr.sin_addr.s_addr = ntohl(this->_commInfo._dstIP);
 	toAddr.sin_family = AF_INET;
 
 	HandshakeControlPacket handshakeSend = HandshakeControlPacket(2, 0, std::time(nullptr), 0, DEFUALT_MAX_TRANSMISSION, 0, DEFUALT_MTU_SIZE, INDUCTION_2);
@@ -135,7 +135,7 @@ void SrtSocket::connectToServer(sockaddr_in* addrs) //todo add the waitForValidP
 
 
 	this->_commInfo._dstPort = htons(addrs->sin_port);
-	this->_commInfo._dstIP = addrs->sin_addr.s_addr;
+	this->_commInfo._dstIP = htonl(addrs->sin_addr.s_addr);
 	sockaddr_in bindToAddr = { 0 };
 	bindToAddr.sin_addr.s_addr = INADDR_ANY;
 	bindToAddr.sin_port = 0;
