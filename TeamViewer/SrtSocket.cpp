@@ -302,7 +302,7 @@ void SrtSocket::sendMonitoring()
 	while (runLoop)
 	{
 		sendSrt();
-		Sleep(200);
+		Sleep(50);
 		switchLock.lock();
 		runLoop = !this->_shutdownSwitch;
 		switchLock.unlock();
@@ -316,7 +316,7 @@ void SrtSocket::recvMonitoring()
 	std::unique_lock<std::mutex> switchLock(this->_switchesMtx);
 	switchLock.unlock();
 	std::unique_lock<std::mutex> packetRecvLock(this->_packetRecvQueueMtx);
-
+	packetRecvLock.unlock();
 
 	while (runLoop)
 	{
@@ -326,7 +326,7 @@ void SrtSocket::recvMonitoring()
 		packetRecvLock.unlock();
 		isNotified = true;
 		this->_cvRecvPackets.notify_one();
-		Sleep(100);
+		Sleep(50); // maybe delete from existance
 		switchLock.lock();
 		runLoop = !this->_shutdownSwitch;
 		switchLock.unlock();
@@ -393,7 +393,7 @@ void SrtSocket::keepAliveMonitoring()
 		switchLock.lock();
 		runLoop = this->_keepAliveSwitch && !this->_shutdownSwitch;
 		switchLock.unlock();
-		Sleep(2000);
+		Sleep(1000);
 	}
 
 	now = std::chrono::system_clock::now();
@@ -570,11 +570,9 @@ void SrtSocket::initializeThreads(MODES mode)
 	//this->_keepAliveMonitoringThread.detach();
 	if (mode == CONTROLLER)
 	{
-		/*this->_cursorListenerThread = std::thread(listenToCursor, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx, this->_packetManager.getOriginScreenPoint(), this->_packetManager.getEndScreenPoint(), this->_packetManager.getPointsMtx());
-		this->_cursorListenerThread.detach();*/
+		this->_cursorListenerThread = std::thread(listenToCursor, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx, this->_packetManager.getOriginScreenPoint(), this->_packetManager.getEndScreenPoint(), this->_packetManager.getPointsMtx());
+		this->_cursorListenerThread.detach();
 		//this->_keyboardListenerThread = std::thread(listenToKeyboared, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx);
-		//this->_keyboardListenerThread.detach();
-		//this->_keyboardListenerThread = std::thread(listenToKeyboard, &_shutdownSwitch, &_switchesMtx, std::ref(_packetSendQueue), &_packetSendQueueMtx);
 		//this->_keyboardListenerThread.detach();
 	}
 	else
