@@ -219,7 +219,7 @@ void SrtSocket::waitForValidPacket(std::vector<char>* buffer, std::function<bool
 	const int ipFirstHeaderRowHigherInArray = 3;
 	char ipFirstRow[MAX_IP_SIZE + 1] = { 0 };
 	bool notValid = true;
-	int totalLength = 0;
+	unsigned int totalLength = 0;
 	while (notValid)
 	{
 		recv(this->_srtSocket, ipFirstRow, IP_FIRST_HEADER_ROW, MSG_PEEK);
@@ -229,7 +229,7 @@ void SrtSocket::waitForValidPacket(std::vector<char>* buffer, std::function<bool
 			throw;// excetpion
 		}
 
-		totalLength = (ipFirstRow[ipFirstHeaderRowLowerInArray] << BYTE_IN_BITS) | ipFirstRow[ipFirstHeaderRowHigherInArray];
+		totalLength = (static_cast<unsigned char>(ipFirstRow[ipFirstHeaderRowLowerInArray]) << BYTE_IN_BITS) | static_cast<unsigned char>(ipFirstRow[ipFirstHeaderRowHigherInArray]);
 		std::unique_ptr<char[]> allBuffer = std::make_unique<char[]>(totalLength);
 
 		if(recv(this->_srtSocket, allBuffer.get(), totalLength, 0) < 0)
@@ -470,11 +470,13 @@ void SrtSocket::sendImageStream()
 		{
 			amountOfPackets++;
 		}
-		for (unsigned int i = 0; i < amountOfPackets - 1; i++)
+		amountOfPackets -= 1;
+		for (unsigned int i = 0; i < amountOfPackets; i++)
 		{
 			now = std::chrono::system_clock::now();
 			currentTime = std::chrono::system_clock::to_time_t(now);
 			auto it = bufferVec.begin() + i * this->_commInfo._otherComputerMTU; 
+			std::cout << "StartSeq: " << this->_commInfo.startSeq << " EndSeq: " << this->_commInfo.startSeq + amountOfPackets << " Curr: " << this->_commInfo.startSeq + i << std::endl;
 			std::unique_ptr<ScreenDataPacket> packetPtr = std::make_unique<ScreenDataPacket>(-1, this->_commInfo.startSeq + i, currentTime, capturer.getScreenWidth(), capturer.getScreenHeight(),
 				std::vector<char>(it, it + this->_commInfo._otherComputerMTU), this->_commInfo.startSeq, this->_commInfo.startSeq + amountOfPackets);
 			sendLock.lock();
@@ -486,17 +488,18 @@ void SrtSocket::sendImageStream()
 		}
 		now = std::chrono::system_clock::now();
 		currentTime = std::chrono::system_clock::to_time_t(now);
-		auto it = bufferVec.begin() + (amountOfPackets - 1) * this->_commInfo._otherComputerMTU;
-		std::unique_ptr<ScreenDataPacket> packetPtr = std::make_unique<ScreenDataPacket>(-1, amountOfPackets, currentTime, capturer.getScreenWidth(), capturer.getScreenHeight(),
+		auto it = bufferVec.begin() + amountOfPackets * this->_commInfo._otherComputerMTU;
+		std::cout << "StartSeq: " << this->_commInfo.startSeq << " EndSeq: " << this->_commInfo.startSeq + amountOfPackets << " Curr: " << this->_commInfo.startSeq +  amountOfPackets << std::endl;
+		std::unique_ptr<ScreenDataPacket> packetPtr = std::make_unique<ScreenDataPacket>(-1, this->_commInfo.startSeq + amountOfPackets, currentTime, capturer.getScreenWidth(), capturer.getScreenHeight(),
 			std::vector<char>(it, bufferVec.end()), this->_commInfo.startSeq, this->_commInfo.startSeq + amountOfPackets);
-		this->_commInfo.startSeq += amountOfPackets;
 		sendLock.lock();
 		this->_packetSendQueue.push(packetPtr->toBuffer());
 		sendLock.unlock();
 		switchLock.lock();
 		runLoop = !_shutdownSwitch;
 		switchLock.unlock();
-		Sleep(100);
+		this->_commInfo.startSeq += amountOfPackets + 1;
+		Sleep(10 * 1000); 
 	}
 
 }

@@ -29,7 +29,7 @@ namespace teamViewerGui
         private List<byte> imageBytes = new List<byte>();
         private uint lastStartSeq = 0;
         private uint lastEndSeq = 0;
-        private const uint mtu = 8096;
+        private const uint mtu = 1024; // later do it from the program itself
 
         public ControllerWindow()
         {
@@ -59,9 +59,9 @@ namespace teamViewerGui
             {
                 this.imageBytes.InsertRange((int)((currSeq - startSeq) * mtu), new ArraySegment<byte>(messageBytes, 12, messageBytes.Length - 12));
             }
-            else if (currSeq == endSeq)
+            else if (currSeq == endSeq) // here i assume that it goes 1 by 1 
             {
-                this.imageBytes.InsertRange((int)((currSeq - startSeq) * mtu), new ArraySegment<byte>(messageBytes, 12, messageBytes.Length - 12));
+                this.imageBytes.AddRange(new ArraySegment<byte>(messageBytes, 12, messageBytes.Length - 12));
                 using (MemoryStream ms = new MemoryStream(this.imageBytes.ToArray()))
                 {
                     var decoder = BitmapDecoder.Create(ms,
