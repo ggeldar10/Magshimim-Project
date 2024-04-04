@@ -50,7 +50,7 @@ void listenToKeyboard(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-        Sleep(100);
+        Sleep(500);
         switchLock.lock();
         runLoop = !*shutdownSwitch;
         switchLock.unlock();
