@@ -54,10 +54,12 @@ namespace teamViewerGui
                 this.lastStartSeq = startSeq;
                 this.lastEndSeq = endSeq;
                 this.imageBytes = new List<byte>((int)((endSeq - startSeq) * mtu));
+                this.imageBytes.AddRange(new ArraySegment<byte>(messageBytes, 12, messageBytes.Length - 12));
             }
             else if (this.lastStartSeq == startSeq && this.lastEndSeq == endSeq && currSeq != endSeq)
             {
-                this.imageBytes.InsertRange((int)((currSeq - startSeq) * mtu), new ArraySegment<byte>(messageBytes, 12, messageBytes.Length - 12));
+                //this.imageBytes.InsertRange((int)((currSeq - startSeq) * mtu), new ArraySegment<byte>(messageBytes, 12, messageBytes.Length - 12));
+                this.imageBytes.AddRange(new ArraySegment<byte>(messageBytes, 12, messageBytes.Length - 12));
             }
             else if (currSeq == endSeq) // here i assume that it goes 1 by 1 
             {
