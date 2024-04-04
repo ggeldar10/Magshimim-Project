@@ -87,6 +87,8 @@ void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<st
                     if (position.x >= originPoint->x && position.y >= originPoint->y && position.x <= endPoint->x && position.y <= endPoint->y)
                     {
                         std::cout << "Sending" << std::endl;
+                        prePosition.x = position.x;
+                        prePosition.y = position.y;
                         now = std::chrono::system_clock::now();
                         currentTime = std::chrono::system_clock::to_time_t(now);
                         std::unique_ptr<CursorDataPacket> packetPtr = std::make_unique<CursorDataPacket>(-1, -1, currentTime, CursorPosition, 0, position.x, position.y);
