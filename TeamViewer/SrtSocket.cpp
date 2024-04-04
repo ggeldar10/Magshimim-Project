@@ -565,6 +565,7 @@ void SrtSocket::initializeThreads(MODES mode)
 	this->_sendPacketsThread = std::thread(&SrtSocket::sendMonitoring, this);
 	this->_sendPacketsThread.detach();
 	this->_handleRecv = std::thread(&SrtSocket::handlePacket, this);
+	this->_handleRecv.detach();
 	//this->_keepAliveMonitoringThread = std::thread(&SrtSocket::keepAliveMonitoring, this);
 	//this->_keepAliveMonitoringThread.detach();
 	if (mode == CONTROLLER)
