@@ -545,7 +545,8 @@ void SrtSocket::handlePacket()
 		{
 			while (!_packetRecvQueue.empty())
 			{
-				this->_packetManager.handlePacket(std::move(_packetRecvQueue.front()));
+				std::thread handleThread(&PacketManager::handlePacket, &_packetManager, std::move(_packetRecvQueue.front()));
+				handleThread.detach();
 				_packetRecvQueue.pop();
 			}
 		}

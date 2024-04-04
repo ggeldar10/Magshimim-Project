@@ -73,27 +73,30 @@ void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<st
     pointsLock.unlock();
 
     CursorActions previousAction = CursorPosition;
-
+    POINT prePosition = {0, 0};
     while (runLoop)
     {
         try {
             POINT position = getCursorPosition();
             std::cout << "Cursor position - x: " << position.x << ", y: " << position.y << std::endl;
-            pointsLock.lock();
-            if (originPoint != nullptr && endPoint != nullptr)
+            if (position.x != prePosition.x || position.y != prePosition.y)
             {
-                if (position.x >= originPoint->x && position.y >= originPoint->y && position.x <= endPoint->x && position.y <= endPoint->y)
+                pointsLock.lock();
+                if (originPoint != nullptr && endPoint != nullptr)
                 {
-                    std::cout << "Sending" << std::endl;
-                    now = std::chrono::system_clock::now();
-                    currentTime = std::chrono::system_clock::to_time_t(now);
-                    std::unique_ptr<CursorDataPacket> packetPtr = std::make_unique<CursorDataPacket>(-1, -1, currentTime, CursorPosition, 0, position.x, position.y);
-                    sendLock.lock();
-                    packetSendQueue.push(packetPtr->toBuffer());
-                    sendLock.unlock();
+                    if (position.x >= originPoint->x && position.y >= originPoint->y && position.x <= endPoint->x && position.y <= endPoint->y)
+                    {
+                        std::cout << "Sending" << std::endl;
+                        now = std::chrono::system_clock::now();
+                        currentTime = std::chrono::system_clock::to_time_t(now);
+                        std::unique_ptr<CursorDataPacket> packetPtr = std::make_unique<CursorDataPacket>(-1, -1, currentTime, CursorPosition, 0, position.x, position.y);
+                        sendLock.lock();
+                        packetSendQueue.push(packetPtr->toBuffer());
+                        sendLock.unlock();
+                    }
                 }
+                pointsLock.unlock();
             }
-            pointsLock.unlock();
         }
         catch (GetCursorPositionException& e)
         {
