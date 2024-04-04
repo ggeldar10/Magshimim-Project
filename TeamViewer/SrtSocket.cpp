@@ -315,12 +315,17 @@ void SrtSocket::recvMonitoring()
 	bool runLoop = true;
 	std::unique_lock<std::mutex> switchLock(this->_switchesMtx);
 	switchLock.unlock();
+	std::unique_lock<std::mutex> packetRecvLock(this->_packetRecvQueueMtx);
 
 
 	while (runLoop)
 	{
 		std::unique_ptr<const DefaultPacket> packet = recvSrt();
-		this->_packetManager.handlePacket(std::move(packet));
+		packetRecvLock.lock();
+		this->_packetRecvQueue.push(std::move(packet));
+		packetRecvLock.unlock();
+		isNotified = true;
+		this->_cvRecvPackets.notify_one();
 		Sleep(100);
 		switchLock.lock();
 		runLoop = !this->_shutdownSwitch;
@@ -499,7 +504,7 @@ void SrtSocket::sendImageStream()
 		runLoop = !_shutdownSwitch;
 		switchLock.unlock();
 		this->_commInfo.startSeq += amountOfPackets + 1;
-		Sleep(10 * 1000); 
+		Sleep(45 * 1000);
 	}
 
 }
@@ -525,12 +530,41 @@ std::unique_ptr<const DefaultPacket> SrtSocket::recvSrt()
 	return std::move(packet);
 }
 
+void SrtSocket::handlePacket()
+{
+	bool runLoop = true;
+	std::unique_lock<std::mutex> recvPacketLock(this->_packetRecvQueueMtx);
+	recvPacketLock.unlock();
+	std::unique_lock<std::mutex> switchLock(this->_switchesMtx);
+	switchLock.unlock();
+	while (runLoop)
+	{
+		recvPacketLock.lock();
+		auto timeout = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+		if (_cvRecvPackets.wait_until(recvPacketLock, timeout, [&] {return isNotified; }))
+		{
+			while (!_packetRecvQueue.empty())
+			{
+				this->_packetManager.handlePacket(std::move(_packetRecvQueue.front()));
+				_packetRecvQueue.pop();
+			}
+		}
+		isNotified = false;
+		recvPacketLock.unlock();
+		switchLock.lock();
+		runLoop = !_shutdownSwitch;
+		switchLock.unlock();
+	}
+}
+
 void SrtSocket::initializeThreads(MODES mode)
 {
+	
 	this->_recivedPacketsThread = std::thread(&SrtSocket::recvMonitoring, this);
 	this->_recivedPacketsThread.detach();
 	this->_sendPacketsThread = std::thread(&SrtSocket::sendMonitoring, this);
 	this->_sendPacketsThread.detach();
+	this->_handleRecv = std::thread(&SrtSocket::handlePacket, this);
 	//this->_keepAliveMonitoringThread = std::thread(&SrtSocket::keepAliveMonitoring, this);
 	//this->_keepAliveMonitoringThread.detach();
 	if (mode == CONTROLLER)

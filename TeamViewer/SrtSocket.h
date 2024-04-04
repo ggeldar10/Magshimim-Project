@@ -8,6 +8,7 @@
 #include <thread>
 #include <string>
 #include <functional>
+#include <condition_variable>
 #include <mutex>
 
 #define RECV_BUFFER_SIZE 1024
@@ -43,6 +44,11 @@ private:
 	std::queue<std::vector<char>> _packetSendQueue;
 	std::mutex _packetSendQueueMtx;
 
+	std::queue<std::unique_ptr<const DefaultPacket>> _packetRecvQueue;
+	std::mutex _packetRecvQueueMtx;
+	std::condition_variable _cvRecvPackets;
+	bool isNotified = false;
+
 	bool _shutdownSwitch;
 	bool _keepAliveSwitch;
 	std::mutex _switchesMtx;
@@ -56,6 +62,7 @@ private:
 
 	std::thread _sendPacketsThread;
 	std::thread _recivedPacketsThread;
+	std::thread _handleRecv;
 	
 	void keepAliveMonitoring();
 	void keepAliveTimer();
@@ -72,6 +79,8 @@ private:
 	void sendSrt();
 	void sendImageStream();
 	std::unique_ptr<const DefaultPacket> recvSrt();
+
+	void handlePacket();
 
 public:
 	SrtSocket(PipeManager* pipeManager);

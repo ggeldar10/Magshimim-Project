@@ -41,6 +41,7 @@ namespace teamViewerGui
             this.backgroundThread = new Thread(setImageFromPipeData);
             this.backgroundThread.IsBackground = true;
             this.backgroundThread.Start();
+            
         }
 
         public void displayImage(byte[] messageBytes)
