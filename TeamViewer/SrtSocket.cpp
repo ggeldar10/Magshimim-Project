@@ -461,9 +461,20 @@ void SrtSocket::sendImageStream()
 	bool runLoop = true;
 	std::chrono::system_clock::time_point now;
 	std::time_t currentTime;
+	EncoderParameters encoderParameters;
+	ULONG quality = IMAGE_QUALITY;
+	encoderParameters.Count = 1;
+	encoderParameters.Parameter[0].Guid = EncoderQuality;
+	encoderParameters.Parameter[0].Type = EncoderParameterValueTypeLong;
+	encoderParameters.Parameter[0].NumberOfValues = 1;
+	encoderParameters.Parameter[0].Value = &quality;
+
+	// Save the image as a JPEG with quality level 0.
+	quality = 0;
+	encoderParameters.Parameter[0].Value = &quality;
 	while (runLoop)
 	{
-		capturer.captureScreen()->Save(L"..\\captureImage.jpg", &clsid, NULL);
+		capturer.captureScreen()->Save(L"..\\captureImage.jpg", &clsid, &encoderParameters);
 		std::ifstream stream = std::ifstream("..\\captureImage.jpg", std::ios::binary);
 		stream.seekg(0, std::ios::end);
 		int length = stream.tellg();
