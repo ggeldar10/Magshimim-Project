@@ -101,12 +101,12 @@ public:
 class KeyboardDataPacket : public DefaultDataPacket {
 private:
     KeyboardActions action;
-    unsigned int keyCode;
+    uint8_t keyCode;
 
 public:
-    KeyboardDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, KeyboardActions action, unsigned int keyCode);
+    KeyboardDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, KeyboardActions action, uint8_t keyCode);
     KeyboardActions getAction() const;
-    unsigned int getKeyCode() const;
+    uint8_t getKeyCode() const;
 
     std::vector<char> toBuffer() const override;
 };

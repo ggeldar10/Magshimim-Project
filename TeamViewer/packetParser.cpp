@@ -111,10 +111,10 @@ std::unique_ptr<const KeyboardDataPacket> PacketParser::createKeyboardDataPacket
     unsigned int keyCode;
     int index = 0;
     std::unique_ptr<const DefaultDataPacket> defaultDataPacket = createDefaultDataPacketFromVector(keyboardDataPacketBuffer, index);
-    action = static_cast<KeyboardActions>(networkToHost<uint32_t>(keyboardDataPacketBuffer, index));
-    index += sizeof(uint32_t);
-    keyCode = networkToHost<unsigned int>(keyboardDataPacketBuffer, index);
-    index += sizeof(unsigned int);
+    action = static_cast<KeyboardActions>(networkToHost<uint8_t>(keyboardDataPacketBuffer, index));
+    index += sizeof(uint8_t);
+    keyCode = networkToHost<uint8_t>(keyboardDataPacketBuffer, index);
+    index += sizeof(uint8_t);
 
     return std::move(std::make_unique<KeyboardDataPacket>(defaultDataPacket->getAckSequenceNumber(), defaultDataPacket->getPacketSequenceNumber(), defaultDataPacket->getTimeStamp(), action, keyCode));
 }

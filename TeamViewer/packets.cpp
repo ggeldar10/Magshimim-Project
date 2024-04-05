@@ -71,7 +71,7 @@ std::vector<char> CursorDataPacket::toBuffer() const {
     return buffer;
 }
 
-KeyboardDataPacket::KeyboardDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, KeyboardActions action, unsigned int keyCode)
+KeyboardDataPacket::KeyboardDataPacket(uint32_t ackNum, uint32_t packetNum, time_t time, KeyboardActions action, uint8_t keyCode)
     : DefaultDataPacket(ackNum, packetNum, time, Keyboard), action(action), keyCode(keyCode) {
 }
 
@@ -79,7 +79,7 @@ KeyboardActions KeyboardDataPacket::getAction() const {
     return action;
 }
 
-unsigned int KeyboardDataPacket::getKeyCode() const {
+uint8_t KeyboardDataPacket::getKeyCode() const {
     return keyCode;
 }
 

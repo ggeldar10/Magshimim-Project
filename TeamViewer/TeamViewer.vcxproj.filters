@@ -78,9 +78,6 @@
     <ClCompile Include="Controller.cpp">
       <Filter>Source Files\Communication\Internal Communication</Filter>
     </ClCompile>
-    <ClCompile Include="SrtSocket.cpp">
-      <Filter>Source Files\Communication</Filter>
-    </ClCompile>
     <ClCompile Include="ImageCapture.cpp">
       <Filter>Source Files\Communication</Filter>
     </ClCompile>
@@ -90,6 +87,9 @@
     <ClCompile Include="Source.cpp">
       <Filter>Source Files\Executables</Filter>
     </ClCompile>
+    <ClCompile Include="SrtSocket.cpp">
+      <Filter>Source Files\Communication</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cursor.h">
@@ -98,17 +98,8 @@
     <ClInclude Include="keyboard.h">
       <Filter>Header Files\Devices</Filter>
     </ClInclude>
-    <ClInclude Include="SrtSocket.h">
-      <Filter>Header Files\Communication</Filter>
-    </ClInclude>
-    <ClInclude Include="packets.h">
-      <Filter>Header Files\Communication</Filter>
-    </ClInclude>
     <ClInclude Include="packetParser.h">
       <Filter>Header Files\Communication</Filter>
-    </ClInclude>
-    <ClInclude Include="windowsHeaders.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="packetManager.h">
       <Filter>Header Files\Communication</Filter>
@@ -158,14 +149,23 @@
     <ClInclude Include="PipeManager.h">
       <Filter>Header Files\Communication\Internal Communication</Filter>
     </ClInclude>
-    <ClInclude Include="Controller.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Controlled.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Communication\Internal Communication</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller.h">
+      <Filter>Header Files\Communication\Internal Communication</Filter>
     </ClInclude>
     <ClInclude Include="IUser.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Communication\Internal Communication</Filter>
+    </ClInclude>
+    <ClInclude Include="packets.h">
+      <Filter>Header Files\Communication</Filter>
+    </ClInclude>
+    <ClInclude Include="SrtSocket.h">
+      <Filter>Header Files\Communication</Filter>
+    </ClInclude>
+    <ClInclude Include="windowsHeaders.h">
+      <Filter>Header Files\Communication</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

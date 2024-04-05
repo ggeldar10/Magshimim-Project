@@ -78,7 +78,6 @@ void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<st
     {
         try {
             POINT position = getCursorPosition();
-            std::cout << "Cursor position - x: " << position.x << ", y: " << position.y << std::endl;
             if (position.x != prePosition.x || position.y != prePosition.y)
             {
                 pointsLock.lock();
@@ -86,7 +85,7 @@ void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<st
                 {
                     if (position.x >= originPoint->x && position.y >= originPoint->y && position.x <= endPoint->x && position.y <= endPoint->y)
                     {
-                        std::cout << "Sending" << std::endl;
+                        std::cout << "Sending cursor position - x: " << position.x << ", y: " << position.y << std::endl;
                         prePosition.x = position.x;
                         prePosition.y = position.y;
                         now = std::chrono::system_clock::now();
@@ -198,7 +197,7 @@ void listenToCursor(bool* shutdownSwitch, std::mutex* switchesMtx, std::queue<st
             runLoop = false;
         }
         // Sleep for a short duration to avoid high CPU usage
-        Sleep(500);
+        Sleep(100);
         switchLock.lock();
         runLoop = !*shutdownSwitch;
         switchLock.unlock();
