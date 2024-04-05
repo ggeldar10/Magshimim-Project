@@ -14,7 +14,7 @@
 #define RECV_BUFFER_SIZE 1024
 #define MAX_PORT_NUM 65535
 #define MIN_PORT_NUM 1000
-#define IMAGE_QUALITY 20
+#define IMAGE_QUALITY 0
 
 enum MODES
 {

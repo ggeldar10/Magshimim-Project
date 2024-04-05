@@ -468,10 +468,6 @@ void SrtSocket::sendImageStream()
 	encoderParameters.Parameter[0].Type = EncoderParameterValueTypeLong;
 	encoderParameters.Parameter[0].NumberOfValues = 1;
 	encoderParameters.Parameter[0].Value = &quality;
-
-	// Save the image as a JPEG with quality level 0.
-	quality = 0;
-	encoderParameters.Parameter[0].Value = &quality;
 	while (runLoop)
 	{
 		capturer.captureScreen()->Save(L"..\\captureImage.jpg", &clsid, &encoderParameters);
@@ -515,7 +511,7 @@ void SrtSocket::sendImageStream()
 		runLoop = !_shutdownSwitch;
 		switchLock.unlock();
 		this->_commInfo.startSeq += amountOfPackets + 1;
-		Sleep(45 * 1000);
+		Sleep(10 * 1000);
 	}
 
 }
